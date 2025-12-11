@@ -175,6 +175,10 @@
         <hr class="sidebar-hr my-4">
 
         <!-- System Info -->
+        <div class="sidebar-icon group" id="lock-button">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+            <span class="sidebar-tooltip group-hover:scale-100">锁定系统</span>
+        </div>
         <div class="sidebar-icon group mt-auto" id="system-info">
             <i data-lucide="info" class="w-6 h-6"></i>
             <span class="sidebar-tooltip group-hover:scale-100">System Info</span>
@@ -225,7 +229,15 @@
             width: 600,
             height: 400,
             content: `
-                    <textarea class="w-full h-full p-4 bg-white border-0 focus:ring-0 resize-none" placeholder="开始输入..."></textarea>
+                    <div class="h-full flex flex-col">
+                        <div class="bg-gray-100 p-2 flex items-center space-x-2 border-b">
+                            <button onclick="exportNotepad(this)" class="px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 text-sm">导出文件(txt)</button>
+                            <button onclick="importNotepad(this)" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">导入文件(txt)</button>
+                            <button onclick="saveNotepad(this)" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">存檔</button>
+                            <input type="file" id="notepad-file-input" accept=".txt" class="hidden">
+                        </div>
+                        <textarea class="w-full flex-1 p-4 bg-white border-0 focus:ring-0 resize-none" placeholder="开始输入..."></textarea>
+                    </div>
                 `
         },
 
@@ -266,23 +278,20 @@
                         <div class="bg-gray-100 p-2 flex items-center space-x-2 border-b">
                             <div class="flex-1 flex items-center bg-white rounded px-3 py-1 border">
                                 <i data-lucide="search" class="w-4 h-4 text-gray-400 mr-2"></i>
-                                <input type="text" class="w-full border-0 focus:ring-0 text-sm" value="https://circleos.com/home" readonly>
+                                <input type="text" id="browser-url" class="w-full border-0 focus:ring-0 text-sm" value="https://www.baidu.com" placeholder="输入网址...">
                             </div>
-                            <button class="p-1 hover:bg-gray-200 rounded"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
-                            <button class="p-1 hover:bg-gray-200 rounded"><i data-lucide="home" class="w-4 h-4"></i></button>
+                            <button onclick="navigateBrowser(this)" class="p-1 hover:bg-gray-200 rounded"><i data-lucide="search" class="w-4 h-4"></i></button>
+                            <button onclick="refreshBrowser(this)" class="p-1 hover:bg-gray-200 rounded"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                            <button onclick="goHomeBrowser(this)" class="p-1 hover:bg-gray-200 rounded"><i data-lucide="home" class="w-4 h-4"></i></button>
                         </div>
-                        <div class="flex-1 overflow-auto p-4">
-                            <div class="max-w-4xl mx-auto text-center">
-                                <div class="text-6xl mb-6">🚧</div>
-                                <h1 class="text-3xl font-bold mb-4 text-primary">浏览器开发中</h1>
-                                <p class="text-gray-600 mb-8">该功能正在开发中，敬请期待...</p>
-                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                    <div class="flex items-center justify-center text-yellow-600">
-                                        <i data-lucide="info" class="w-5 h-5 mr-2"></i>
-                                        <span>这是一个模拟浏览器，实际功能将在未来版本中推出</span>
-                                    </div>
+                        <div class="flex-1 overflow-hidden relative">
+                            <div id="browser-loading" class="hidden absolute inset-0 bg-white flex items-center justify-center z-10">
+                                <div class="text-center">
+                                    <div class="text-2xl mb-2">⏳</div>
+                                    <div class="text-gray-600">加载中...</div>
                                 </div>
                             </div>
+                            <iframe id="browser-frame" class="w-full h-full border-0" src="https://www.baidu.com"></iframe>
                         </div>
                     </div>
                 `
@@ -992,6 +1001,9 @@
             }
         });
 
+        // Lock button
+        document.getElementById('lock-button').addEventListener('click', lockSystem);
+
         // System info
         document.getElementById('system-info').addEventListener('click', showSystemInfo);
 
@@ -1136,6 +1148,18 @@
             }, 100);
         } else if (appName === 'clock') {
             initializeClockApp(windowId);
+        } else if (appName === 'browser') {
+            setTimeout(() => {
+                // Add enter key support for URL input
+                const urlInput = windowElement.querySelector('#browser-url');
+                if (urlInput) {
+                    urlInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            navigateBrowser(urlInput.closest('.fixed').querySelector('button[onclick="navigateBrowser(this)"]'));
+                        }
+                    });
+                }
+            }, 100);
         }
     }
 
@@ -1832,6 +1856,7 @@
             windowElement.style.height = windowElement.originalSize.height;
             windowElement.style.left = windowElement.originalPosition.left;
             windowElement.style.top = windowElement.originalPosition.top;
+            windowElement.style.transform = windowElement.originalTransform;
             button.textContent = '全屏模式';
 
             // Show window controls
@@ -1847,18 +1872,139 @@
                 left: windowElement.style.left,
                 top: windowElement.style.top
             };
+            windowElement.originalTransform = windowElement.style.transform;
 
             windowElement.classList.add('clock-fullscreen');
             windowElement.style.width = '100vw';
             windowElement.style.height = '100vh';
             windowElement.style.left = '0';
             windowElement.style.top = '0';
+            windowElement.style.transform = 'none';
             button.textContent = '退出全屏';
 
             // Hide window controls
             const header = windowElement.querySelector('.window-header');
             if (header) header.style.display = 'none';
         }
+    }
+
+    // Notepad functions
+    function exportNotepad(button) {
+        const windowElement = button.closest('.fixed');
+        const textarea = windowElement.querySelector('textarea');
+        const content = textarea.value;
+
+        if (!content.trim()) {
+            alert('文件内容为空，无法导出');
+            return;
+        }
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `notepad_${new Date().toISOString().slice(0, 10)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showNotification('文件导出成功！');
+    }
+
+    function importNotepad(button) {
+        const fileInput = document.getElementById('notepad-file-input');
+        fileInput.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const windowElement = button.closest('.fixed');
+                    const textarea = windowElement.querySelector('textarea');
+                    textarea.value = e.target.result;
+                    showNotification('文件导入成功！');
+                };
+                reader.readAsText(file);
+            }
+        };
+        fileInput.click();
+    }
+
+    function saveNotepad(button) {
+        const windowElement = button.closest('.fixed');
+        const textarea = windowElement.querySelector('textarea');
+        const content = textarea.value;
+
+        // Save to localStorage
+        const appData = JSON.parse(localStorage.getItem('circleos-app-data') || '{}');
+        const notepadWindows = document.querySelectorAll('[data-app="notepad"]');
+        const currentIndex = Array.from(notepadWindows).indexOf(windowElement);
+        appData[`notepad-${currentIndex}`] = content;
+        localStorage.setItem('circleos-app-data', JSON.stringify(appData));
+
+        showNotification('文件已保存！');
+    }
+
+    // Browser functions
+    function navigateBrowser(button) {
+        const windowElement = button.closest('.fixed');
+        const urlInput = windowElement.querySelector('#browser-url');
+        const iframe = windowElement.querySelector('#browser-frame');
+        const loading = windowElement.querySelector('#browser-loading');
+
+        let url = urlInput.value.trim();
+        if (!url) return;
+
+        // Add protocol if missing
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+            urlInput.value = url;
+        }
+
+        // Show loading
+        loading.classList.remove('hidden');
+
+        // Navigate to URL
+        iframe.src = url;
+
+        // Hide loading after load
+        iframe.onload = function() {
+            loading.classList.add('hidden');
+            urlInput.value = iframe.src;
+        };
+
+        iframe.onerror = function() {
+            loading.classList.add('hidden');
+            alert('无法加载该网页');
+        };
+    }
+
+    function refreshBrowser(button) {
+        const windowElement = button.closest('.fixed');
+        const iframe = windowElement.querySelector('#browser-frame');
+        const loading = windowElement.querySelector('#browser-loading');
+
+        loading.classList.remove('hidden');
+        iframe.src = iframe.src;
+
+        iframe.onload = function() {
+            loading.classList.add('hidden');
+        };
+    }
+
+    function goHomeBrowser(button) {
+        const windowElement = button.closest('.fixed');
+        const urlInput = windowElement.querySelector('#browser-url');
+        const iframe = windowElement.querySelector('#browser-frame');
+        const loading = windowElement.querySelector('#browser-loading');
+
+        urlInput.value = 'https://www.baidu.com';
+        loading.classList.remove('hidden');
+        iframe.src = 'https://www.baidu.com';
+
+        iframe.onload = function() {
+            loading.classList.add('hidden');
+        };
     }
 
     // Handle window before unload to save state
