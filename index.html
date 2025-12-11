@@ -69,6 +69,9 @@
             .minimized-window {
                 @apply border-l-4 border-gray-500;
             }
+            .clock-fullscreen {
+                @apply z-50 !important;
+            }
         }
     </style>
     <link rel="stylesheet" href="animations.css">
@@ -82,19 +85,12 @@
 <div id="welcome-screen" class="fixed inset-0 z-50 flex items-center justify-center">
     <div class="text-center text-white animate-fade-in">
         <div class="text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">CircleOS</div>
-        <div class="text-lg mb-12 animate-pulse">正在初始化系统...</div>
+        <div class="text-lg mb-4 animate-pulse">正在初始化系统...</div>
+        <div class="text-sm text-gray-200">这可能会花费一点时间，如果无法进入请重新载入</div>
     </div>
 </div>
 
-<!-- Debug Mode Panel -->
-<div id="debug-panel" class="hidden fixed bottom-4 right-4 glass p-4 rounded-lg z-50">
-    <div class="text-white text-sm mb-2 font-bold">DEBUG MODE</div>
-    <div class="space-y-2">
-        <button onclick="showDebugLog()" class="w-full py-1 px-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm text-white">Log</button>
-        <button onclick="forceEnterDesktop()" class="w-full py-1 px-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm text-white">强制进入桌面</button>
-        <button onclick="resetAllData()" class="w-full py-1 px-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm text-white">重置所有资料</button>
-    </div>
-</div>
+
 
 <!-- Setup Wizard -->
 <div id="setup-wizard" class="hidden fixed inset-0 z-50 flex items-center justify-center">
@@ -166,6 +162,10 @@
         <div class="sidebar-icon group" data-app="music">
             <span class="text-xl">🎵</span>
             <span class="sidebar-tooltip group-hover:scale-100">音乐</span>
+        </div>
+        <div class="sidebar-icon group" data-app="clock">
+            <span class="text-xl">🕐</span>
+            <span class="sidebar-tooltip group-hover:scale-100">时钟</span>
         </div>
         <div class="sidebar-icon group" data-app="settings">
             <span class="text-xl">⚙️</span>
@@ -434,6 +434,23 @@
                     </div>
                 `
         },
+        'clock': {
+            name: '时钟',
+            icon: '🕐',
+            width: 400,
+            height: 200,
+            content: `
+                    <div class="h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                        <div class="text-center">
+                            <div id="clock-display" class="text-6xl font-mono font-bold mb-4">00:00:00</div>
+                            <div id="clock-date" class="text-xl mb-6">YYYY-MM-DD</div>
+                            <button onclick="toggleClockFullscreen(this)" class="px-6 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors duration-200 backdrop-blur-sm">
+                                全屏模式
+                            </button>
+                        </div>
+                    </div>
+                `
+        },
         'settings': {
             name: 'Settings',
             icon: '⚙️',
@@ -526,8 +543,12 @@
     function checkFirstTime() {
         const isFirstTime = !localStorage.getItem('circleos-username');
         if (isFirstTime) {
-            // First time - show welcome screen
+            // First time - show welcome screen briefly then setup wizard
             document.getElementById('welcome-screen').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('welcome-screen').classList.add('hidden');
+                document.getElementById('setup-wizard').classList.remove('hidden');
+            }, 3000);
         } else {
             // Not first time - show welcome screen briefly then main interface
             document.getElementById('welcome-screen').classList.remove('hidden');
@@ -562,72 +583,30 @@
         if (desktopTimeElement) {
             desktopTimeElement.textContent = timeStr;
         }
-    }
 
-    // Debug mode functions
-    let debugMode = false;
-    let debugInfo = null;
+        // Update lock screen time
+        const lockScreenTime = document.getElementById('lock-screen-time');
+        if (lockScreenTime) {
+            lockScreenTime.textContent = now.toLocaleTimeString('zh-CN', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
 
-    function toggleDebugMode() {
-        debugMode = !debugMode;
-        const panel = document.getElementById('debug-panel');
-        if (debugMode) {
-            panel.classList.remove('hidden');
-            if (!debugInfo) {
-                showDebugInfo();
-            }
-        } else {
-            panel.classList.add('hidden');
-            if (debugInfo) {
-                debugInfo.remove();
-                debugInfo = null;
-            }
+        // Update lock screen date
+        const lockScreenDate = document.getElementById('lock-screen-date');
+        if (lockScreenDate) {
+            lockScreenDate.textContent = now.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
         }
     }
 
-    function showDebugLog() {
-        console.log('=== CircleOS Debug Log ===');
-        console.log('Active Windows:', activeWindows);
-        console.log('User Files:', userFiles);
-        console.log('Local Storage:', localStorage);
-        alert('调试日志已输出到控制台');
-    }
 
-    function showDebugInfo() {
-        if (debugInfo) return;
-
-        debugInfo = document.createElement('div');
-        debugInfo.className = 'fixed top-4 left-4 bg-black bg-opacity-70 text-green-400 font-mono text-xs p-2 rounded z-50';
-        debugInfo.innerHTML = `
-                <div>DEBUG MODE ACTIVE</div>
-                <div>FPS: <span id="debug-fps">60</span></div>
-                <div>Memory: <span id="debug-memory">0</span>MB</div>
-                <div>Windows: <span id="debug-windows">0</span></div>
-                <div>Files: <span id="debug-files">0</span></div>
-                <div>Uptime: <span id="debug-uptime">0</span>s</div>
-            `;
-        document.body.appendChild(debugInfo);
-
-        // Update debug info
-        let startTime = Date.now();
-        let frameCount = 0;
-
-        setInterval(() => {
-            frameCount++;
-            const uptime = Math.floor((Date.now() - startTime) / 1000);
-            const fps = Math.round(frameCount / (uptime || 1) * 10) / 10;
-
-            document.getElementById('debug-fps').textContent = fps;
-            document.getElementById('debug-windows').textContent = Object.keys(activeWindows).length;
-            document.getElementById('debug-files').textContent = userFiles.length;
-            document.getElementById('debug-uptime').textContent = uptime;
-        }, 100);
-    }
-
-    function forceEnterDesktop() {
-        document.getElementById('welcome-screen').classList.add('hidden');
-        document.getElementById('main-container').classList.remove('hidden');
-    }
 
     // Calculator functions
     function calcAppend(value) {
@@ -763,11 +742,7 @@
             showHelp();
         }
 
-        // F12 for debug mode
-        if (event.key === 'F12') {
-            event.preventDefault();
-            toggleDebugMode();
-        }
+
     }
 
     // Show notification
@@ -961,10 +936,12 @@
         // Handle visibility change
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                // Page hidden - go to welcome screen
-                document.getElementById('main-container').classList.add('hidden');
-                document.getElementById('welcome-screen').classList.remove('hidden');
-                saveAllData();
+                // Page hidden - lock system only if main container is visible
+                const mainContainer = document.getElementById('main-container');
+                if (mainContainer && !mainContainer.classList.contains('hidden')) {
+                    lockSystem();
+                    saveAllData();
+                }
             }
         });
 
@@ -1157,6 +1134,8 @@
                     textarea.addEventListener('input', saveAllData);
                 }
             }, 100);
+        } else if (appName === 'clock') {
+            initializeClockApp(windowId);
         }
     }
 
@@ -1469,9 +1448,6 @@
                     document.removeEventListener('keydown', handleBootKeyPress);
                     enterTerminalMode();
                 }
-            } else if (e.key.toLowerCase() === 'd') {
-                // Enable debug mode on next boot
-                localStorage.setItem('circleos-debug-mode', 'true');
             } else {
                 rKeyCount = 0;
                 tKeyCount = 0;
@@ -1497,11 +1473,7 @@
                     document.getElementById('main-container').classList.remove('hidden');
                     document.getElementById('welcome-screen').classList.add('hidden');
 
-                    // Check if debug mode should be enabled
-                    if (localStorage.getItem('circleos-debug-mode') === 'true') {
-                        toggleDebugMode();
-                        showDebugInfo();
-                    }
+
                 }, 500);
             }
         }, 100);
@@ -1687,7 +1659,7 @@
     // Lock system
     function lockSystem() {
         document.getElementById('main-container').classList.add('hidden');
-        document.getElementById('welcome-screen').classList.remove('hidden');
+        document.getElementById('lock-screen').classList.remove('hidden');
         document.getElementById('pin-input').value = '';
         saveAllData();
     }
@@ -1804,6 +1776,90 @@
     });
 
     resetInactivityTimer();
+
+    // Initialize clock app
+    function initializeClockApp(windowId) {
+        const windowElement = document.getElementById(windowId);
+        if (!windowElement) return;
+
+        // Update clock immediately
+        updateClockDisplay(windowElement);
+
+        // Set interval to update clock every second
+        const clockInterval = setInterval(() => {
+            updateClockDisplay(windowElement);
+        }, 1000);
+
+        // Store interval ID for cleanup when window is closed
+        windowElement.clockInterval = clockInterval;
+    }
+
+    // Update clock display
+    function updateClockDisplay(windowElement) {
+        const now = new Date();
+
+        // Update time
+        const timeDisplay = windowElement.querySelector('#clock-display');
+        if (timeDisplay) {
+            timeDisplay.textContent = now.toLocaleTimeString('zh-CN', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // Update date
+        const dateDisplay = windowElement.querySelector('#clock-date');
+        if (dateDisplay) {
+            dateDisplay.textContent = now.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+    }
+
+    // Toggle clock fullscreen
+    function toggleClockFullscreen(button) {
+        const windowElement = button.closest('.fixed');
+        if (!windowElement) return;
+
+        if (windowElement.classList.contains('clock-fullscreen')) {
+            // Exit fullscreen
+            windowElement.classList.remove('clock-fullscreen');
+            windowElement.style.width = windowElement.originalSize.width;
+            windowElement.style.height = windowElement.originalSize.height;
+            windowElement.style.left = windowElement.originalPosition.left;
+            windowElement.style.top = windowElement.originalPosition.top;
+            button.textContent = '全屏模式';
+
+            // Show window controls
+            const header = windowElement.querySelector('.window-header');
+            if (header) header.style.display = 'flex';
+        } else {
+            // Enter fullscreen
+            windowElement.originalSize = {
+                width: windowElement.style.width,
+                height: windowElement.style.height
+            };
+            windowElement.originalPosition = {
+                left: windowElement.style.left,
+                top: windowElement.style.top
+            };
+
+            windowElement.classList.add('clock-fullscreen');
+            windowElement.style.width = '100vw';
+            windowElement.style.height = '100vh';
+            windowElement.style.left = '0';
+            windowElement.style.top = '0';
+            button.textContent = '退出全屏';
+
+            // Hide window controls
+            const header = windowElement.querySelector('.window-header');
+            if (header) header.style.display = 'none';
+        }
+    }
 
     // Handle window before unload to save state
     window.addEventListener('beforeunload', saveSystemState);
