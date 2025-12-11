@@ -1,3152 +1,1167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NovaOS</title>
+    <title>CircleOS v0.0.1</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#6B7280',
+                        dark: '#1F2937',
+                        light: '#F9FAFB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .window-shadow {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            .task-item {
+                transition: all 0.2s ease;
+            }
+            .task-item:hover {
+                background-color: rgba(59, 130, 246, 0.1);
+            }
+            .fade-in {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            .slide-up {
+                animation: slideUp 0.3s ease-in-out;
+            }
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        }
+    </style>
     <style>
-        :root {
-            --primary-color: #4CAF50;
-            --hover-color: #45a049;
-            --error-color: #e74c3c;
-            --text-color: #333;
-            --bg-color: linear-gradient(135deg, #a8d5ba, #85c1e9);
-            --font-size: 16px;
-            --tab-active-color: #f0f0f0;
-            --tab-inactive-color: #e0e0e0;
-            --window-bg: white;
-            --window-header: #f0f0f0;
-            --text-primary: #333;
-            --text-secondary: #666;
-        }
-
-        /* Dark mode variables */
-        :root.dark-mode {
-            --window-bg: #2d2d2d;
-            --window-header: #1e1e1e;
-            --text-primary: #f0f0f0;
-            --text-secondary: #ccc;
-            --tab-active-color: #3d3d3d;
-            --tab-inactive-color: #2d2d2d;
-        }
-
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: var(--bg-color);
-            height: 100vh;
-            overflow: hidden;
-            font-size: var(--font-size);
-            color: var(--text-primary);
-            transition: background 0.5s ease;
+            transition: background-color 0.5s ease;
         }
-
-        /* Menu Bar */
-        .menu-bar {
-            background: rgba(255, 255, 255, 0.8);
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 0 15px;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .dark-mode .menu-bar {
-            background: rgba(30, 30, 30, 0.8);
-            color: white;
-        }
-
-        .clock-container {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .dark-mode .clock-container {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .clock-container:hover {
-            transform: scale(1.2);
-        }
-
-        /* Dock */
-        .dock {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.7);
-            padding: 10px;
-            border-radius: 15px;
-            display: flex;
-            gap: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
-
-        .dark-mode .dock {
-            background: rgba(30, 30, 30, 0.7);
-            color: white;
-        }
-
-        .dock span {
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.3s;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .dock span:hover {
-            transform: scale(1.2);
-        }
-
-        /* App Windows */
-        .app-window {
-            position: absolute;
-            background: var(--window-bg);
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        .window {
             display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 100;
-            min-width: 300px;
-            min-height: 200px;
-            transform: scale(0.9);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            color: var(--text-primary);
-        }
-
-        .app-window.active {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .app-window.closing {
-            transform: scale(0.9);
-            opacity: 0;
-        }
-
-        .app-header {
-            background: var(--window-header);
-            padding: 8px 15px;
-            font-weight: bold;
-            cursor: move;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-            user-select: none;
-        }
-
-        .window-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .window-btn {
-            cursor: pointer;
-            font-weight: bold;
-            padding: 0 5px;
-            border-radius: 3px;
-            transition: background 0.2s;
-        }
-
-        .window-btn:hover {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .dark-mode .window-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .close-btn {
-            color: var(--error-color);
-        }
-
-        .minimize-btn {
-            color: #f39c12;
-        }
-
-        .maximize-btn {
-            color: var(--primary-color);
-        }
-
-        .app-content {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Browser */
-        .browser-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .browser-tabs {
-            display: flex;
-            background: var(--tab-inactive-color);
-            padding: 5px 5px 0 5px;
-            overflow-x: auto;
-        }
-
-        .browser-tab {
-            padding: 8px 25px 8px 15px;
-            background: var(--tab-inactive-color);
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
-            position: relative;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .browser-tab.active {
-            background: var(--tab-active-color);
-            font-weight: bold;
-        }
-
-        .browser-tab-close {
             position: absolute;
-            right: 5px;
             top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 12px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
         }
-
-        .browser-tab-close:hover {
-            background: rgba(0,0,0,0.1);
-        }
-
-        .browser-add-tab {
-            padding: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            flex-shrink: 0;
-        }
-
-        .browser-add-tab:hover {
-            background: rgba(0,0,0,0.1);
-            border-radius: 5px;
-        }
-
-        .browser-navbar {
-            display: flex;
-            padding: 8px;
-            background: var(--tab-active-color);
-            border-bottom: 1px solid #ddd;
-        }
-
-        .browser-url {
-            flex: 1;
-            padding: 5px 10px;
-            border-radius: 15px;
-            border: 1px solid #ddd;
-            margin-right: 5px;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .browser-go-btn {
-            padding: 5px 10px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-        }
-
-        .browser-frame-container {
-            flex: 1;
-            display: none;
-            position: relative;
-        }
-
-        .browser-frame-container.active {
+        .window.active {
             display: block;
+            animation: fadeIn 0.3s ease-in-out;
         }
-
-        .browser-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-
-        /* Code Editor */
-        .code-container {
-            background: #1e1e1e;
-            color: #fff;
-            width: 100%;
-            height: 100%;
-            font-family: 'Courier New', monospace;
-            overflow: auto;
-            white-space: pre;
-            padding: 10px;
-            outline: none;
-            flex: 1;
-            line-height: 1.5;
-        }
-
-        /* Note App */
-        .note-container {
-            width: 100%;
-            height: 100%;
-            padding: 15px;
-            font-family: Arial, sans-serif;
-            overflow: auto;
-            flex: 1;
-            outline: none;
-            line-height: 1.6;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        /* Todo App */
-        .todo-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 15px;
-        }
-
-        .todo-input-container {
-            display: flex;
-            margin-bottom: 15px;
-            gap: 5px;
-        }
-
-        .todo-input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .todo-date {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 150px;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .todo-add-btn {
-            padding: 8px 15px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .todo-list {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .todo-item {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            color: var(--text-primary);
-        }
-
-        .todo-item input[type="checkbox"] {
-            margin-right: 10px;
-        }
-
-        .todo-item-text {
-            flex: 1;
-        }
-
-        .todo-item-date {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-right: 10px;
-        }
-
-        .todo-item-delete {
-            color: var(--error-color);
-            cursor: pointer;
-        }
-
-        /* Translate App */
-        .translate-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 15px;
-        }
-
-        .translate-textarea {
-            flex: 1;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: none;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .translate-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .translate-select {
-            flex: 1;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .translate-btn {
-            padding: 8px 15px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* Calculator App */
-        .calculator {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            padding: 15px;
-            height: 100%;
-        }
-
-        .calculator-display {
-            grid-column: span 4;
-            background: var(--tab-active-color);
-            padding: 15px;
-            text-align: right;
-            font-size: 24px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-        }
-
-        .calculator-btn {
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background: var(--tab-inactive-color);
-            transition: background 0.2s;
-        }
-
-        .calculator-btn:hover {
-            background: var(--tab-active-color);
-        }
-
-        .calculator-btn.operator {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .calculator-btn.operator:hover {
-            background: var(--hover-color);
-        }
-
-        .calculator-btn.clear {
-            background: var(--error-color);
-            color: white;
-        }
-
-        .calculator-btn.clear:hover {
-            background: #c0392b;
-        }
-
-        /* Weather App */
-        .weather-container {
-            padding: 20px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .weather-current {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .weather-icon {
-            font-size: 64px;
-            margin: 10px 0;
-        }
-
-        .weather-temp {
-            font-size: 48px;
-            font-weight: bold;
-        }
-
-        .weather-location {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .weather-desc {
-            font-size: 18px;
-            color: var(--text-secondary);
-        }
-
-        .weather-forecast {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            overflow-x: auto;
-            padding: 10px 0;
-        }
-
-        .weather-day {
-            min-width: 80px;
-            text-align: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 10px;
-            flex-shrink: 0;
-        }
-
-        .dark-mode .weather-day {
-            background: rgba(30, 30, 30, 0.7);
-            color: white;
-        }
-
-        .weather-day-icon {
-            font-size: 24px;
-            margin: 5px 0;
-        }
-
-        /* File Manager */
-        .file-manager {
-            display: flex;
-            height: 100%;
-        }
-
-        .file-sidebar {
-            width: 150px;
-            background: var(--tab-inactive-color);
-            padding: 15px;
-            border-right: 1px solid #ddd;
-            overflow-y: auto;
-        }
-
-        .file-content {
-            flex: 1;
-            padding: 15px;
-            overflow: auto;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 5px;
-            color: var(--text-primary);
-        }
-
-        .file-item:hover {
-            background: var(--tab-active-color);
-        }
-
-        .file-icon {
-            margin-right: 10px;
-            font-size: 20px;
-        }
-
-        /* Calendar App */
-        .calendar {
-            padding: 15px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .calendar-header {
+        .window-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            padding: 8px 16px;
+            background-color: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
         }
-
-        .calendar-title {
-            font-size: 18px;
-            font-weight: bold;
+        .window-content {
+            padding: 16px;
+            overflow-y: auto;
+            max-height: calc(80vh - 48px);
         }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            flex: 1;
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #64748b;
         }
-
-        .calendar-day-header {
-            text-align: center;
-            font-weight: bold;
-            padding: 5px;
+        .close-btn:hover {
+            color: #ef4444;
         }
-
-        .calendar-day {
-            border: 1px solid #ddd;
-            padding: 5px;
-            min-height: 60px;
-            overflow: hidden;
-            background: var(--window-bg);
+        .app-icon {
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
-
-        .calendar-day.empty {
-            background: var(--tab-inactive-color);
+        .app-icon:hover {
+            transform: scale(1.05);
         }
-
-        .calendar-day-number {
-            font-weight: bold;
-            margin-bottom: 3px;
+        .app-icon.active {
+            border-bottom: 2px solid #3b82f6;
         }
-
-        .calendar-event {
-            background: var(--primary-color);
-            color: white;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-size: 12px;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Music Player */
-        .music-player {
-            padding: 15px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .music-cover {
-            width: 200px;
-            height: 200px;
-            background: var(--tab-inactive-color);
-            margin: 0 auto 20px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-
-        .music-info {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .music-title {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .music-artist {
-            color: var(--text-secondary);
-        }
-
-        .music-controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .music-btn {
+        .pin-input {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .music-progress {
-            width: 100%;
-            height: 5px;
-            background: var(--tab-inactive-color);
-            border-radius: 5px;
-            margin-bottom: 5px;
-            position: relative;
-        }
-
-        .music-progress-bar {
-            height: 100%;
-            background: var(--primary-color);
-            border-radius: 5px;
-            width: 0%;
-        }
-
-        .music-time {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        /* Resize Handle */
-        .resize-handle {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ddd;
-            right: 0;
-            bottom: 0;
-            cursor: nwse-resize;
-            z-index: 10;
-        }
-
-        /* Lock Button */
-        .lock-edge {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary-color);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 18px;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .lock-edge:hover {
-            transform: scale(1.1);
-            background: var(--hover-color);
-        }
-
-        /* New Lock Screen Design */
-        .lock-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #2c3e50, #4ca1af);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: white;
-            backdrop-filter: blur(5px);
-        }
-
-        .lock-screen-content {
+            font-size: 20px;
             text-align: center;
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.5s ease-out;
+            margin: 0 5px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
         }
-
-        .lock-screen-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-
-        .lock-screen-time {
-            font-size: 60px;
-            font-weight: 300;
-            margin-bottom: 10px;
-        }
-
-        .lock-screen-date {
-            font-size: 18px;
-            margin-bottom: 30px;
-            opacity: 0.8;
-        }
-
-        .password-input-container {
-            position: relative;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .password-input {
-            padding: 15px;
-            font-size: 16px;
-            width: 80%;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .password-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .password-input:focus {
+        .pin-input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
-
-        .password-toggle {
-            position: absolute;
-            right: 10%;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .lock-screen-btn {
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        .lock-screen-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .error-message {
-            color: #ff9e9e;
-            font-size: 14px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        /* Settings */
-        .settings-form {
-            padding: 15px;
-        }
-
-        .settings-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .settings-form input,
-        .settings-form select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .settings-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .settings-btn:hover {
-            background: var(--hover-color);
-        }
-
-        /* Tabs */
-        .tab-container {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab {
-            padding: 8px 15px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            border-bottom: 2px solid var(--primary-color);
-            font-weight: bold;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 15px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .about-content {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .about-title {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-
-        .about-version {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: var(--text-secondary);
-        }
-
-        .about-creators {
-            font-size: 16px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* Setup Screen */
-        .setup-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .setup-content {
-            background: var(--window-bg);
-            padding: 30px;
-            border-radius: 10px;
-            width: 500px;
-            max-width: 90%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            color: var(--text-primary);
-        }
-
-        .setup-title {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-        }
-
         .setup-step {
             display: none;
         }
-
         .setup-step.active {
             display: block;
+            animation: fadeIn 0.3s ease-in-out;
         }
-
-        .setup-nav {
+        .wallpaper-option {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .wallpaper-option:hover {
+            transform: scale(1.05);
+        }
+        .wallpaper-option.selected {
+            border-color: #3b82f6;
+        }
+        .task-form input, .task-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+        .task-form input:focus, .task-form textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .setup-password-input {
-            color: var(--text-primary) !important;
-        }
-
-        /* Tutorial */
-        .tutorial-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 10001;
-            display: none;
-            justify-content: center;
             align-items: center;
         }
-
-        .tutorial-content {
-            background: var(--window-bg);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 500px;
-            position: relative;
-            color: var(--text-primary);
+        .task-item.completed {
+            text-decoration: line-through;
+            color: #9ca3af;
         }
-
-        .tutorial-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .tutorial-nav {
+        .task-actions {
             display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+            gap: 5px;
         }
-
-        /* Feedback Form */
-        .feedback-textarea {
-            width: 100%;
-            height: 150px;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: none;
-            background: var(--window-bg);
-            color: var(--text-primary);
+        .task-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
         }
-
-        /* DeepSeek Chat */
-        .deepseek-chat {
-            flex: 1;
+        .edit-btn {
+            color: #3b82f6;
+        }
+        .delete-btn {
+            color: #ef4444;
+        }
+        .complete-btn {
+            color: #10b981;
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
             overflow-y: auto;
-            padding: 15px;
-        }
-
-        .deepseek-input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        /* MLA Formatter */
-        .mla-input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: var(--window-bg);
-            color: var(--text-primary);
-        }
-
-        .mla-result {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
+            z-index: 5;
             display: none;
-            background: var(--window-bg);
-            border-radius: 5px;
         }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .search-results.active {
+            display: block;
         }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+        .search-item {
+            padding: 8px 16px;
+            cursor: pointer;
         }
-
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        /* Dynamic Wallpaper Animation */
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .dynamic-wallpaper {
-            background: linear-gradient(270deg, #a8d5ba, #85c1e9, #ff9a9e, #fad0c4);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+        .search-item:hover {
+            background-color: #f1f5f9;
         }
     </style>
 </head>
-<body>
-<div class="menu-bar">
-    <div class="clock-container">
-        <span id="clock" class="clock"></span>
-    </div>
-</div>
-
-<div class="dock">
-    <span id="browser-btn" onclick="openApp('Browser', 'Browser')">Browser</span>
-    <span id="vscode-btn" onclick="openApp('VS Code', 'VS Code')">VS Code</span>
-    <span id="note-btn" onclick="openApp('Note', 'Note')">Note</span>
-    <span id="todo-btn" onclick="openApp('Todo', 'Todo List')">Todo</span>
-    <span id="translate-btn" onclick="openApp('Translate', 'Translator')">Translate</span>
-    <span id="calculator-btn" onclick="openApp('Calculator', 'Calculator')">Calculator</span>
-    <span id="weather-btn" onclick="openApp('Weather', 'Weather')">Weather</span>
-    <span id="file-btn" onclick="openApp('File', 'File Manager')">Files</span>
-    <span id="calendar-btn" onclick="openApp('Calendar', 'Calendar')">Calendar</span>
-    <span id="music-btn" onclick="openApp('Music', 'Music Player')">Music</span>
-    <span id="deepseek-btn" onclick="openApp('DeepSeek', 'DeepSeek AI')">DeepSeek</span>
-    <span id="mla-btn" onclick="openApp('MLA', 'MLA Formatter')">MLA</span>
-    <span id="feedback-btn" onclick="openApp('Feedback', 'Feedback')">Feedback</span>
-    <span id="settings-btn" onclick="openApp('Settings', 'Settings')">Settings</span>
-</div>
-
-<!-- Lock Button -->
-<div class="lock-edge" id="lock-btn" onclick="showLockScreen()">Lock</div>
-
-<!-- New Lock Screen -->
-<div id="lock-screen" class="lock-screen">
-    <div class="lock-screen-content">
-        <div class="lock-screen-avatar">👤</div>
-        <div class="lock-screen-time" id="lock-time">12:34</div>
-        <div class="lock-screen-date" id="lock-date">Monday, January 1</div>
-
-        <div class="password-input-container">
-            <input type="password" id="password" class="password-input" placeholder="Enter password" />
-            <span class="password-toggle" onclick="togglePasswordVisibility()">👁️</span>
-        </div>
-        <button class="lock-screen-btn" id="unlock-btn" onclick="unlockScreen()">Unlock</button>
-        <div id="error-message" class="error-message">Incorrect password! Please try again.</div>
-    </div>
-</div>
-
-<!-- Setup Screen -->
-<div id="setup-screen" class="setup-screen">
-    <div class="setup-content">
-        <h2 class="setup-title" id="setup-title">Welcome to NovaOS</h2>
-
-        <div id="setup-step1" class="setup-step active">
-            <h3 id="password-title">Set Your Password</h3>
-            <div class="settings-form">
-                <label for="setup-password" id="new-password-label">Create a password:</label>
-                <input type="password" id="setup-password" class="setup-password-input" placeholder="Enter new password" />
-                <label for="setup-confirm-password" id="confirm-password-label">Confirm password:</label>
-                <input type="password" id="setup-confirm-password" class="setup-password-input" placeholder="Confirm password" />
-                <div id="setup-password-error" class="error-message" style="display: none;">Passwords don't match!</div>
+<body class="bg-gray-100 font-sans">
+<!-- 启动设置界面 -->
+<div id="setup-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-center mb-6">欢迎使用 CircleOS v0.0.1</h1>
+        <div class="setup-progress mb-6">
+            <div class="flex justify-between mb-2">
+                <span id="setup-step-indicator" class="text-sm font-medium text-gray-600">步骤 1/3</span>
             </div>
-            <div class="setup-nav">
-                <button class="settings-btn" id="next-btn">Next</button>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="setup-progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 33%"></div>
             </div>
         </div>
 
-        <div id="setup-step2" class="setup-step">
-            <h3 id="background-title">Choose Your Background</h3>
-            <div class="settings-form">
-                <label for="setup-bg-color" id="bg-color-label">Select background:</label>
-                <select id="setup-bg-color">
-                    <option value="linear-gradient(135deg, #a8d5ba, #85c1e9)">Default</option>
-                    <option value="linear-gradient(135deg, #ff9a9e, #fad0c4)">Sunset</option>
-                    <option value="linear-gradient(135deg, #a1c4fd, #c2e9fb)">Ocean</option>
-                    <option value="linear-gradient(135deg, #ffecd2, #fcb69f)">Peach</option>
-                    <option value="dynamic">Dynamic Wallpaper</option>
-                </select>
-
-                <label for="setup-dark-mode">Dark Mode:</label>
-                <select id="setup-dark-mode">
-                    <option value="false">Light</option>
-                    <option value="true">Dark</option>
-                </select>
+        <!-- 设置步骤 1: PIN码 -->
+        <div id="setup-step-1" class="setup-step active">
+            <h2 class="text-lg font-semibold mb-4">设置PIN码</h2>
+            <p class="text-gray-600 mb-4">请设置一个4位数字的PIN码，用于锁定和解锁系统。</p>
+            <div class="flex justify-center mb-4">
+                <input type="password" maxlength="1" class="pin-input" id="pin-1" autofocus>
+                <input type="password" maxlength="1" class="pin-input" id="pin-2">
+                <input type="password" maxlength="1" class="pin-input" id="pin-3">
+                <input type="password" maxlength="1" class="pin-input" id="pin-4">
             </div>
-            <div class="setup-nav">
-                <button class="settings-btn" id="back-btn">Back</button>
-                <button class="settings-btn" id="finish-btn">Finish</button>
+            <div class="text-center">
+                <button id="next-step-1" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-600 transition">下一步</button>
+            </div>
+        </div>
+
+        <!-- 设置步骤 2: 壁纸 -->
+        <div id="setup-step-2" class="setup-step">
+            <h2 class="text-lg font-semibold mb-4">选择壁纸颜色</h2>
+            <p class="text-gray-600 mb-4">请选择您喜欢的桌面壁纸颜色。</p>
+            <div class="flex justify-center gap-4 mb-4">
+                <div class="wallpaper-option selected" data-color="bg-black" style="background-color: black;"></div>
+                <div class="wallpaper-option" data-color="bg-blue-500" style="background-color: #3b82f6;"></div>
+                <div class="wallpaper-option" data-color="bg-red-500" style="background-color: #ef4444;"></div>
+                <div class="wallpaper-option" data-color="bg-white" style="background-color: white; border: 1px solid #e2e8f0;"></div>
+            </div>
+            <div class="text-center">
+                <button id="prev-step-2" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 transition mr-2">上一步</button>
+                <button id="next-step-2" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-600 transition">下一步</button>
+            </div>
+        </div>
+
+        <!-- 设置步骤 3: 使用说明 -->
+        <div id="setup-step-3" class="setup-step">
+            <h2 class="text-lg font-semibold mb-4">使用说明</h2>
+            <div class="bg-gray-50 p-4 rounded-md mb-4">
+                <h3 class="font-medium mb-2">基本操作</h3>
+                <ul class="list-disc pl-5 space-y-1 text-sm">
+                    <li>点击底部工具栏的图标打开应用程序</li>
+                    <li>点击顶部工具栏的锁图标锁定系统</li>
+                    <li>点击顶部工具栏的搜索框进行搜索</li>
+                    <li>点击设置应用程序更改系统设置</li>
+                </ul>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-md mb-4">
+                <h3 class="font-medium mb-2">应用程序</h3>
+                <ul class="list-disc pl-5 space-y-1 text-sm">
+                    <li><strong>VS Code</strong>：简单的代码编辑器</li>
+                    <li><strong>记事本</strong>：记录文本笔记</li>
+                    <li><strong>系统设置</strong>：更改系统配置</li>
+                    <li><strong>计算器</strong>：任务日历，管理您的任务</li>
+                </ul>
+            </div>
+            <div class="text-center">
+                <button id="prev-step-3" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 transition mr-2">上一步</button>
+                <button id="finish-setup" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-600 transition">完成设置</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Tutorial Overlay -->
-<div id="tutorial-overlay" class="tutorial-overlay">
-    <div class="tutorial-content">
-        <span class="tutorial-close" onclick="closeTutorial()">×</span>
-        <div id="tutorial-step1" class="tutorial-step active">
-            <h3 id="tutorial-welcome">Welcome to NovaOS</h3>
-            <p id="tutorial-intro">This is a simple web-based OS interface. Here's a quick guide to get started:</p>
-            <ul id="tutorial-points">
-                <li>Click on apps in the dock to open them</li>
-                <li>Drag windows by their title bar</li>
-                <li>Resize windows from the bottom-right corner</li>
-                <li>Use the lock button to secure your session</li>
+<!-- 锁定界面 -->
+<div id="lock-screen" class="fixed inset-0 bg-black z-40 flex items-center justify-center hidden">
+    <div class="w-full max-w-sm bg-gray-900 rounded-lg shadow-lg p-6 text-white">
+        <h1 class="text-2xl font-bold text-center mb-8">CircleOS v0.0.1</h1>
+        <h2 class="text-lg text-center mb-6">请输入PIN码解锁</h2>
+        <div class="flex justify-center mb-6">
+            <input type="password" maxlength="1" class="pin-input bg-gray-800 text-white border-gray-700" id="lock-pin-1" autofocus>
+            <input type="password" maxlength="1" class="pin-input bg-gray-800 text-white border-gray-700" id="lock-pin-2">
+            <input type="password" maxlength="1" class="pin-input bg-gray-800 text-white border-gray-700" id="lock-pin-3">
+            <input type="password" maxlength="1" class="pin-input bg-gray-800 text-white border-gray-700" id="lock-pin-4">
+        </div>
+        <p id="lock-error" class="text-red-500 text-center hidden">PIN码错误，请重试</p>
+    </div>
+</div>
+
+<!-- 主桌面界面 -->
+<div id="desktop" class="min-h-screen flex flex-col">
+    <!-- 顶部工具栏 -->
+    <div class="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center">
+        <div class="flex items-center">
+            <button id="lock-btn" class="text-gray-600 hover:text-gray-900 mr-4">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="relative w-1/3">
+            <input type="text" id="search-input" placeholder="搜索..." class="w-full py-1 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            <div id="search-results" class="search-results">
+                <!-- 搜索结果将在这里显示 -->
+            </div>
+        </div>
+        <div class="text-gray-600">
+            <span id="current-time"></span>
+        </div>
+    </div>
+
+    <!-- 桌面内容区域 -->
+    <div id="desktop-content" class="flex-grow p-4">
+        <!-- 应用程序窗口将在这里动态显示 -->
+    </div>
+
+    <!-- 底部工具栏 -->
+    <div class="bg-white border-t border-gray-200 py-2 px-4 flex justify-center">
+        <div class="flex space-x-8">
+            <div class="app-icon flex flex-col items-center" data-app="vscode">
+                <i class="fa fa-code text-2xl text-blue-600" aria-hidden="true"></i>
+                <span class="text-xs mt-1">VS Code</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" data-app="notepad">
+                <i class="fa fa-file-text-o text-2xl text-green-600" aria-hidden="true"></i>
+                <span class="text-xs mt-1">记事本</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" data-app="settings">
+                <i class="fa fa-cog text-2xl text-gray-600" aria-hidden="true"></i>
+                <span class="text-xs mt-1">设置</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" data-app="calculator">
+                <i class="fa fa-calendar text-2xl text-purple-600" aria-hidden="true"></i>
+                <span class="text-xs mt-1">计算器</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 系统版本信息 -->
+    <div class="text-center text-gray-400 text-xs py-1">
+        CircleOS v0.0.1
+    </div>
+</div>
+
+<!-- VS Code 应用窗口 -->
+<div id="vscode-window" class="window">
+    <div class="window-header">
+        <h3>VS Code</h3>
+        <button class="close-btn" data-app="vscode">×</button>
+    </div>
+    <div class="window-content">
+        <div class="bg-gray-900 text-white p-4 rounded-md mb-4">
+            <div class="text-sm text-green-400 mb-2">// 这是一个简单的代码编辑器</div>
+            <div class="text-sm text-blue-400">function <span class="text-yellow-300">greet</span>() {</div>
+            <div class="text-sm text-blue-400 ml-4">console.log(<span class="text-green-300">"Hello, CircleOS!"</span>);</div>
+            <div class="text-sm text-blue-400">}</div>
+            <div class="text-sm text-blue-400 mt-2"><span class="text-yellow-300">greet</span>();</div>
+        </div>
+        <textarea id="code-editor" class="w-full h-64 p-4 bg-gray-100 border border-gray-300 rounded-md font-mono text-sm" placeholder="在这里编写您的代码..."></textarea>
+        <div class="mt-4 flex justify-end">
+            <button id="save-code" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">保存代码</button>
+        </div>
+    </div>
+</div>
+
+<!-- 记事本应用窗口 -->
+<div id="notepad-window" class="window">
+    <div class="window-header">
+        <h3>记事本</h3>
+        <button class="close-btn" data-app="notepad">×</button>
+    </div>
+    <div class="window-content">
+        <textarea id="notepad-content" class="w-full h-64 p-4 bg-gray-50 border border-gray-300 rounded-md" placeholder="在这里记录您的笔记..."></textarea>
+        <div class="mt-4 flex justify-end">
+            <button id="save-note" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">保存笔记</button>
+        </div>
+    </div>
+</div>
+
+<!-- 设置应用窗口 -->
+<div id="settings-window" class="window">
+    <div class="window-header">
+        <h3>系统设置</h3>
+        <button class="close-btn" data-app="settings">×</button>
+    </div>
+    <div class="window-content">
+        <div class="mb-6">
+            <h4 class="text-lg font-medium mb-2">壁纸颜色</h4>
+            <div class="flex gap-4">
+                <div class="wallpaper-option" data-color="bg-black" style="background-color: black;"></div>
+                <div class="wallpaper-option" data-color="bg-blue-500" style="background-color: #3b82f6;"></div>
+                <div class="wallpaper-option" data-color="bg-red-500" style="background-color: #ef4444;"></div>
+                <div class="wallpaper-option" data-color="bg-white" style="background-color: white; border: 1px solid #e2e8f0;"></div>
+            </div>
+        </div>
+        <div class="mb-6">
+            <h4 class="text-lg font-medium mb-2">修改PIN码</h4>
+            <div class="flex justify-center mb-4">
+                <input type="password" maxlength="1" class="pin-input" id="new-pin-1">
+                <input type="password" maxlength="1" class="pin-input" id="new-pin-2">
+                <input type="password" maxlength="1" class="pin-input" id="new-pin-3">
+                <input type="password" maxlength="1" class="pin-input" id="new-pin-4">
+            </div>
+            <div class="text-center">
+                <button id="save-pin" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">保存PIN码</button>
+            </div>
+        </div>
+        <div class="mb-6">
+            <h4 class="text-lg font-medium mb-2">数据备份</h4>
+            <div class="flex justify-center gap-4">
+                <button id="export-data" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">导出数据</button>
+                <button id="import-data" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">导入数据</button>
+                <input type="file" id="import-file" accept=".json" class="hidden">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 计算器（任务日历）应用窗口 -->
+<div id="calculator-window" class="window">
+    <div class="window-header">
+        <h3>任务日历</h3>
+        <button class="close-btn" data-app="calculator">×</button>
+    </div>
+    <div class="window-content">
+        <div class="mb-6">
+            <h4 class="text-lg font-medium mb-2">添加新任务</h4>
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-title" placeholder="任务标题" required>
+                <textarea id="task-description" placeholder="任务描述" rows="2"></textarea>
+                <input type="date" id="task-date" required>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">添加任务</button>
+                </div>
+            </form>
+        </div>
+        <div>
+            <h4 class="text-lg font-medium mb-2">任务列表</h4>
+            <ul id="task-list" class="task-list">
+                <!-- 任务列表将在这里动态显示 -->
             </ul>
-        </div>
-        <div id="tutorial-step2" class="tutorial-step">
-            <h3 id="tutorial-apps-title">Available Apps</h3>
-            <p id="tutorial-apps-desc">NovaOS comes with several apps:</p>
-            <ul id="tutorial-apps-list">
-                <li><strong>Browser</strong>: Web browsing with tabs</li>
-                <li><strong>VS Code</strong>: Code editing</li>
-                <li><strong>Note</strong>: Simple note taking</li>
-                <li><strong>Todo List</strong>: Task management</li>
-                <li><strong>Translator</strong>: Text translation</li>
-                <li><strong>Calculator</strong>: Basic calculations</li>
-                <li><strong>Weather</strong>: Weather forecast</li>
-                <li><strong>File Manager</strong>: File management</li>
-                <li><strong>Calendar</strong>: Schedule management</li>
-                <li><strong>Music Player</strong>: Audio playback</li>
-                <li><strong>DeepSeek</strong>: AI assistant</li>
-                <li><strong>MLA Formatter</strong>: Citation generator</li>
-                <li><strong>Feedback</strong>: Send feedback</li>
-                <li><strong>Settings</strong>: Customize your OS</li>
-            </ul>
-        </div>
-        <div class="tutorial-nav">
-            <button class="settings-btn" onclick="prevTutorialStep()" id="tutorial-prev">Previous</button>
-            <button class="settings-btn" onclick="nextTutorialStep()" id="tutorial-next">Next</button>
-            <button class="settings-btn" onclick="closeTutorial()" id="tutorial-finish" style="display: none;">Finish</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Global variables
-    let currentPassword = "";
-    let zIndexCounter = 100;
-    let activeWindow = null;
-    let isResizing = false;
-    let startX, startY, startWidth, startHeight;
-    let isFirstRun = true;
-    let tutorialStep = 1;
-    let currentLanguage = 'en';
-    let timeFormat = '12'; // '12' or '24'
-    let darkMode = false;
-    let browserTabs = {}; // Store browser tabs data
-    let calendarEvents = {}; // Store calendar events
-    let audioElement = new Audio(); // Global audio element for music player
-    let dynamicWallpaperInterval = null;
+    // 系统初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 检查是否首次启动
+        const isFirstTime = !localStorage.getItem('circleos_config');
 
-    // User agent detection
-    const userAgent = navigator.userAgent;
-    let deviceType = "Desktop";
-    if (/Mobi|Android|iPhone|iPad|iPod/i.test(userAgent)) {
-        deviceType = "Mobile";
-    }
-
-    // Music playlist
-    const musicPlaylist = [
-        {
-            title: "Sample Song 1",
-            artist: "Artist A",
-            src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-            cover: "🎵"
-        },
-        {
-            title: "Sample Song 2",
-            artist: "Artist B",
-            src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-            cover: "🎶"
-        }
-    ];
-    let currentTrack = 0;
-
-    // Language translations
-    const translations = {
-        en: {
-            browser: "Browser",
-            vscode: "VS Code",
-            note: "Note",
-            todo: "Todo",
-            translate: "Translate",
-            calculator: "Calculator",
-            weather: "Weather",
-            file: "Files",
-            calendar: "Calendar",
-            music: "Music",
-            settings: "Settings",
-            deepseek: "DeepSeek",
-            mla: "MLA",
-            feedback: "Feedback",
-            lock: "Lock",
-            unlock: "Unlock",
-            welcome: "Welcome to NovaOS",
-            setPassword: "Set Your Password",
-            newPassword: "Create a password:",
-            confirmPassword: "Confirm password:",
-            chooseBg: "Choose Your Background",
-            selectBg: "Select background:",
-            next: "Next",
-            back: "Back",
-            finish: "Finish",
-            tutorialWelcome: "Welcome to NovaOS",
-            tutorialIntro: "This is a simple web-based OS interface. Here's a quick guide to get started:",
-            tutorialPoints: [
-                "Click on apps in the dock to open them",
-                "Drag windows by their title bar",
-                "Resize windows from the bottom-right corner",
-                "Use the lock button to secure your session"
-            ],
-            tutorialAppsTitle: "Available Apps",
-            tutorialAppsDesc: "NovaOS comes with several apps:",
-            tutorialAppsList: [
-                "Browser: Web browsing with tabs",
-                "VS Code: Code editing",
-                "Note: Simple note taking",
-                "Todo List: Task management",
-                "Translator: Text translation",
-                "Calculator: Basic calculations",
-                "Weather: Weather forecast",
-                "File Manager: File management",
-                "Calendar: Schedule management",
-                "Music Player: Audio playback",
-                "DeepSeek: AI assistant",
-                "MLA: Citation generator",
-                "Feedback: Send feedback",
-                "Settings: Customize your OS"
-            ],
-            passwordError: "Incorrect password! Please try again.",
-            passwordMismatch: "Passwords don't match!",
-            aboutTitle: "About NovaOS",
-            version: "NovaOS 11 Beta",
-            creators: "By: Ivan, Deepseek, ChatGPT",
-            deviceInfo: "Your device info:",
-            detectedAs: "Detected as:"
-        },
-        zh: {
-            browser: "瀏覽器",
-            vscode: "VS Code",
-            note: "筆記本",
-            todo: "待辦事項",
-            translate: "翻譯",
-            calculator: "計算器",
-            weather: "天氣",
-            file: "文件",
-            calendar: "日曆",
-            music: "音樂",
-            settings: "設定",
-            deepseek: "深度求索",
-            mla: "MLA格式",
-            feedback: "反饋",
-            lock: "鎖定",
-            unlock: "解鎖",
-            welcome: "歡迎使用 NovaOS",
-            setPassword: "設定密碼",
-            newPassword: "創建密碼:",
-            confirmPassword: "確認密碼:",
-            chooseBg: "選擇背景",
-            selectBg: "選擇背景:",
-            next: "下一步",
-            back: "上一步",
-            finish: "完成",
-            tutorialWelcome: "歡迎使用 NovaOS",
-            tutorialIntro: "這是一個基於網頁的作業系統界面。以下是快速入門指南:",
-            tutorialPoints: [
-                "點擊 Dock 中的應用程式來打開它們",
-                "通過標題欄拖動窗口",
-                "從右下角調整窗口大小",
-                "使用鎖定按鈕保護您的會話"
-            ],
-            tutorialAppsTitle: "可用應用",
-            tutorialAppsDesc: "NovaOS 包含以下應用程式:",
-            tutorialAppsList: [
-                "瀏覽器: 帶分頁的網頁瀏覽",
-                "VS Code: 代碼編輯",
-                "筆記本: 簡單筆記",
-                "待辦事項: 任務管理",
-                "翻譯: 文本翻譯",
-                "計算器: 基本計算",
-                "天氣: 天氣預報",
-                "文件管理器: 文件管理",
-                "日曆: 日程管理",
-                "音樂播放器: 音頻播放",
-                "深度求索: AI助手",
-                "MLA格式: 引用生成器",
-                "反饋: 發送反饋",
-                "設定: 自定義系統"
-            ],
-            passwordError: "密碼錯誤！請重試。",
-            passwordMismatch: "密碼不匹配！",
-            aboutTitle: "關於 NovaOS",
-            version: "NovaOS 11 Beta",
-            creators: "作者: Ivan, Deepseek, ChatGPT",
-            deviceInfo: "您的設備信息:",
-            detectedAs: "檢測為:"
-        }
-    };
-
-    // Initialize the OS
-    function initOS() {
-        try {
+        if (isFirstTime) {
+            // 显示设置向导
+            document.getElementById('setup-screen').classList.remove('hidden');
+            setupPinInputs();
+            setupWallpaperOptions();
+            setupSetupNavigation();
+        } else {
+            // 加载系统配置
+            loadSystemConfig();
+            // 显示桌面
+            document.getElementById('desktop').classList.remove('hidden');
+            // 更新时间
             updateTime();
-            setInterval(updateTime, 1000);
-            updateLockScreenTime();
-            setInterval(updateLockScreenTime, 1000);
-
-            const isSetupDone = localStorage.getItem('novaos_setup_done') === 'true';
-
-            if (!isSetupDone) {
-                // First run - show setup screen
-                document.getElementById('setup-screen').style.display = 'flex';
-                isFirstRun = true;
-
-                // Ensure button event listeners are properly bound
-                document.getElementById('next-btn').addEventListener('click', nextSetupStep);
-                document.getElementById('back-btn').addEventListener('click', prevSetupStep);
-                document.getElementById('finish-btn').addEventListener('click', finishSetup);
-            } else {
-                // Not first run - go directly to lock screen
-                currentPassword = localStorage.getItem('novaos_password') || "0000";
-                currentLanguage = localStorage.getItem('novaos_language') || 'en';
-                timeFormat = localStorage.getItem('novaos_time_format') || '12';
-                darkMode = localStorage.getItem('novaos_dark_mode') === 'true';
-                applyStoredSettings();
-                applyLanguage();
-                showLockScreen(); // Go directly to lock screen
-            }
-        } catch (error) {
-            console.error("Initialization failed:", error);
-            // Fallback to default settings
-            localStorage.setItem('novaos_setup_done', 'true');
-            localStorage.setItem('novaos_password', '0000');
-            localStorage.setItem('novaos_bg_color', 'linear-gradient(135deg, #a8d5ba, #85c1e9)');
-            location.reload();
-        }
-    }
-
-    // Apply stored settings
-    function applyStoredSettings() {
-        const bgColor = localStorage.getItem('novaos_bg_color') || "linear-gradient(135deg, #a8d5ba, #85c1e9)";
-        const fontSize = localStorage.getItem('novaos_font_size') || "16px";
-        const darkModeSetting = localStorage.getItem('novaos_dark_mode') === 'true';
-
-        if (bgColor === 'dynamic') {
-            setDynamicWallpaper();
-        } else {
-            document.body.style.background = bgColor;
-            document.documentElement.style.setProperty('--bg-color', bgColor);
+            setInterval(updateTime, 60000);
         }
 
-        document.body.style.fontSize = fontSize;
-        toggleDarkMode(darkModeSetting);
-
-        document.documentElement.style.setProperty('--font-size', fontSize);
-    }
-
-    // Set dynamic wallpaper
-    function setDynamicWallpaper() {
-        if (dynamicWallpaperInterval) {
-            clearInterval(dynamicWallpaperInterval);
-        }
-
-        document.body.classList.add('dynamic-wallpaper');
-    }
-
-    // Toggle dark mode
-    function toggleDarkMode(enable) {
-        darkMode = enable;
-        if (enable) {
-            document.documentElement.classList.add('dark-mode');
-        } else {
-            document.documentElement.classList.remove('dark-mode');
-        }
-        localStorage.setItem('novaos_dark_mode', enable);
-    }
-
-    // Apply language
-    function applyLanguage() {
-        const lang = translations[currentLanguage];
-
-        // Update UI elements
-        document.getElementById('browser-btn').textContent = lang.browser;
-        document.getElementById('vscode-btn').textContent = lang.vscode;
-        document.getElementById('note-btn').textContent = lang.note;
-        document.getElementById('todo-btn').textContent = lang.todo;
-        document.getElementById('translate-btn').textContent = lang.translate;
-        document.getElementById('calculator-btn').textContent = lang.calculator;
-        document.getElementById('weather-btn').textContent = lang.weather;
-        document.getElementById('file-btn').textContent = lang.file;
-        document.getElementById('calendar-btn').textContent = lang.calendar;
-        document.getElementById('music-btn').textContent = lang.music;
-        document.getElementById('deepseek-btn').textContent = lang.deepseek;
-        document.getElementById('mla-btn').textContent = lang.mla;
-        document.getElementById('feedback-btn').textContent = lang.feedback;
-        document.getElementById('settings-btn').textContent = lang.settings;
-        document.getElementById('lock-btn').textContent = lang.lock;
-        document.getElementById('unlock-btn').textContent = lang.unlock;
-        document.getElementById('setup-title').textContent = lang.welcome;
-        document.getElementById('password-title').textContent = lang.setPassword;
-        document.getElementById('new-password-label').textContent = lang.newPassword;
-        document.getElementById('confirm-password-label').textContent = lang.confirmPassword;
-        document.getElementById('background-title').textContent = lang.chooseBg;
-        document.getElementById('bg-color-label').textContent = lang.selectBg;
-        document.getElementById('next-btn').textContent = lang.next;
-        document.getElementById('back-btn').textContent = lang.back;
-        document.getElementById('finish-btn').textContent = lang.finish;
-        document.getElementById('tutorial-welcome').textContent = lang.tutorialWelcome;
-        document.getElementById('tutorial-intro').textContent = lang.tutorialIntro;
-
-        const tutorialPoints = document.getElementById('tutorial-points');
-        tutorialPoints.innerHTML = '';
-        lang.tutorialPoints.forEach(point => {
-            const li = document.createElement('li');
-            li.textContent = point;
-            tutorialPoints.appendChild(li);
-        });
-
-        document.getElementById('tutorial-apps-title').textContent = lang.tutorialAppsTitle;
-        document.getElementById('tutorial-apps-desc').textContent = lang.tutorialAppsDesc;
-
-        const tutorialAppsList = document.getElementById('tutorial-apps-list');
-        tutorialAppsList.innerHTML = '';
-        lang.tutorialAppsList.forEach(app => {
-            const li = document.createElement('li');
-            li.innerHTML = `<strong>${app.split(':')[0]}:</strong> ${app.split(':')[1]}`;
-            tutorialAppsList.appendChild(li);
-        });
-
-        document.getElementById('error-message').textContent = lang.passwordError;
-        document.getElementById('setup-password-error').textContent = lang.passwordMismatch;
-        document.getElementById('about-title').textContent = lang.aboutTitle;
-        document.getElementById('about-version').textContent = lang.version;
-        document.getElementById('about-creators').textContent = lang.creators;
-    }
-
-    // Change language
-    function changeLanguage(lang) {
-        currentLanguage = lang;
-        localStorage.setItem('novaos_language', lang);
-        applyLanguage();
-        updateTime();
-        updateLockScreenTime();
-    }
-
-    // Show user agent info
-    function showUserAgent() {
-        const lang = translations[currentLanguage];
-        alert(`${lang.deviceInfo}\n${userAgent}\n${lang.detectedAs} ${deviceType}`);
-    }
-
-    // Update time display
-    function updateTime() {
-        const now = new Date();
-        let timeString;
-
-        if (timeFormat === '12') {
-            timeString = now.toLocaleTimeString(currentLanguage === 'zh' ? 'zh-TW' : 'en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        } else {
-            timeString = now.toLocaleTimeString(currentLanguage === 'zh' ? 'zh-TW' : 'en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-        }
-
-        document.getElementById('clock').textContent = timeString;
-    }
-
-    // Update lock screen time
-    function updateLockScreenTime() {
-        const now = new Date();
-        let timeString;
-
-        if (timeFormat === '12') {
-            timeString = now.toLocaleTimeString(currentLanguage === 'zh' ? 'zh-TW' : 'en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        } else {
-            timeString = now.toLocaleTimeString(currentLanguage === 'zh' ? 'zh-TW' : 'en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-        }
-
-        const dateString = now.toLocaleDateString(currentLanguage === 'zh' ? 'zh-TW' : 'en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        document.getElementById('lock-time').textContent = timeString;
-        document.getElementById('lock-date').textContent = dateString;
-    }
-
-    // Setup functions
-    function nextSetupStep() {
-        const password = document.getElementById('setup-password').value;
-        const confirmPassword = document.getElementById('setup-confirm-password').value;
-
-        if (password !== confirmPassword) {
-            document.getElementById('setup-password-error').style.display = 'block';
-            document.getElementById('setup-password-error').classList.add('shake');
-            setTimeout(() => {
-                document.getElementById('setup-password-error').classList.remove('shake');
-            }, 500);
-            return;
-        }
-
-        document.getElementById('setup-step1').classList.remove('active');
-        document.getElementById('setup-step2').classList.add('active');
-    }
-
-    function prevSetupStep() {
-        document.getElementById('setup-step2').classList.remove('active');
-        document.getElementById('setup-step1').classList.add('active');
-    }
-
-    function finishSetup() {
-        const password = document.getElementById('setup-password').value;
-        const bgColor = document.getElementById('setup-bg-color').value;
-        const darkModeSetting = document.getElementById('setup-dark-mode').value === 'true';
-
-        // Save settings
-        currentPassword = password;
-        localStorage.setItem('novaos_password', password);
-        localStorage.setItem('novaos_bg_color', bgColor);
-        localStorage.setItem('novaos_setup_done', 'true');
-        localStorage.setItem('novaos_language', currentLanguage);
-        localStorage.setItem('novaos_time_format', timeFormat);
-        localStorage.setItem('novaos_dark_mode', darkModeSetting);
-
-        // Apply settings
-        if (bgColor === 'dynamic') {
-            setDynamicWallpaper();
-        } else {
-            document.body.style.background = bgColor;
-            document.documentElement.style.setProperty('--bg-color', bgColor);
-        }
-        toggleDarkMode(darkModeSetting);
-
-        // Hide setup screen
-        document.getElementById('setup-screen').style.display = 'none';
-
-        // Show lock screen
-        showLockScreen();
-
-        // Show tutorial (only on first run)
-        if (isFirstRun) {
-            showTutorial();
-            isFirstRun = false;
-        }
-    }
-
-    // Tutorial functions
-    function showTutorial() {
-        document.getElementById('tutorial-overlay').style.display = 'flex';
-    }
-
-    function nextTutorialStep() {
-        document.getElementById(`tutorial-step${tutorialStep}`).classList.remove('active');
-        tutorialStep++;
-        document.getElementById(`tutorial-step${tutorialStep}`).classList.add('active');
-
-        if (tutorialStep === 2) {
-            document.getElementById('tutorial-prev').style.display = 'block';
-            document.getElementById('tutorial-next').style.display = 'none';
-            document.getElementById('tutorial-finish').style.display = 'block';
-        }
-    }
-
-    function prevTutorialStep() {
-        document.getElementById(`tutorial-step${tutorialStep}`).classList.remove('active');
-        tutorialStep--;
-        document.getElementById(`tutorial-step${tutorialStep}`).classList.add('active');
-
-        if (tutorialStep === 1) {
-            document.getElementById('tutorial-prev').style.display = 'none';
-            document.getElementById('tutorial-next').style.display = 'block';
-            document.getElementById('tutorial-finish').style.display = 'none';
-        }
-    }
-
-    function closeTutorial() {
-        document.getElementById('tutorial-overlay').style.display = 'none';
-    }
-
-    // App management
-    function openApp(appName, title) {
-        // Close any active window first
-        if (activeWindow) {
-            activeWindow.style.zIndex = zIndexCounter - 1;
-        }
-
-        // Create new window if it doesn't exist
-        let windowId = appName.toLowerCase().replace(/\s+/g, '-') + '-window';
-        let appWindow = document.getElementById(windowId);
-
-        if (!appWindow) {
-            appWindow = document.createElement('div');
-            appWindow.className = 'app-window';
-            appWindow.id = windowId;
-            appWindow.style.zIndex = zIndexCounter++;
-
-            // Create window header
-            const header = document.createElement('div');
-            header.className = 'app-header';
-            header.innerHTML = `
-                    <span>${title}</span>
-                    <div class="window-controls">
-                        <span class="window-btn minimize-btn" onclick="minimizeWindow('${windowId}')">−</span>
-                        <span class="window-btn maximize-btn" onclick="toggleMaximize('${windowId}')">□</span>
-                        <span class="window-btn close-btn" onclick="closeApp('${windowId}')">×</span>
-                    </div>
-                `;
-            appWindow.appendChild(header);
-
-            // Create content area
-            const content = document.createElement('div');
-            content.className = 'app-content';
-            content.id = windowId + '-content';
-            appWindow.appendChild(content);
-
-            // Create resize handle
-            const resizeHandle = document.createElement('div');
-            resizeHandle.className = 'resize-handle';
-            appWindow.appendChild(resizeHandle);
-
-            document.body.appendChild(appWindow);
-
-            // Make draggable and resizable
-            makeDraggable(appWindow, header);
-            makeResizable(appWindow, resizeHandle);
-        }
-
-        // Set content based on app
-        const appContent = document.getElementById(windowId + '-content');
-        if (appName === "Browser") {
-            // Initialize browser tabs data if not exists
-            if (!browserTabs[windowId]) {
-                browserTabs[windowId] = {
-                    tabs: [],
-                    activeTab: 0
-                };
-            }
-
-            // Create browser container with tabs
-            appContent.innerHTML = `
-                    <div class="browser-container">
-                        <div class="browser-tabs" id="${windowId}-tabs-container"></div>
-                        <div class="browser-navbar">
-                            <input type="text" class="browser-url" id="${windowId}-url" value="https://www.google.com" />
-                            <button class="browser-go-btn" onclick="navigateBrowser('${windowId}')">${currentLanguage === 'zh' ? '前往' : 'Go'}</button>
-                        </div>
-                        <div class="browser-frame-container active" id="${windowId}-frame-container-0">
-                            <iframe class="browser-frame" id="${windowId}-iframe-0" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" src="https://www.google.com" frameborder="0"></iframe>
-                        </div>
-                    </div>
-                `;
-
-            // Initialize first tab
-            browserTabs[windowId].tabs = [{
-                id: 0,
-                url: "https://www.google.com",
-                title: "New Tab"
-            }];
-            browserTabs[windowId].activeTab = 0;
-
-            // Render tabs
-            renderBrowserTabs(windowId);
-        } else if (appName === "VS Code") {
-            appContent.innerHTML = '<div class="code-container" contenteditable="true">console.log("Hello, World!");\nfunction add(a, b) {\n    return a + b;\n}\nconsole.log(add(2, 3));</div>';
-        } else if (appName === "Note") {
-            appContent.innerHTML = '<div class="note-container" contenteditable="true">' + (currentLanguage === 'zh' ? '在此輸入您的筆記...' : 'Type your notes here...') + '</div>';
-        } else if (appName === "Todo") {
-            appContent.innerHTML = `
-                    <div class="todo-container">
-                        <div class="todo-input-container">
-                            <input type="text" class="todo-input" placeholder="${currentLanguage === 'zh' ? '添加新任務...' : 'Add a new task...'}" />
-                            <input type="date" class="todo-date" id="${windowId}-date" />
-                            <button class="todo-add-btn" onclick="addTodoItem('${windowId}')">${currentLanguage === 'zh' ? '添加' : 'Add'}</button>
-                        </div>
-                        <div class="todo-list" id="${windowId}-todo-list"></div>
-                    </div>
-                `;
-            loadTodoItems(windowId);
-        } else if (appName === "Translate") {
-            appContent.innerHTML = `
-                    <div class="translate-container">
-                        <textarea class="translate-textarea" placeholder="${currentLanguage === 'zh' ? '輸入要翻譯的文字...' : 'Enter text to translate...'}"></textarea>
-                        <div class="translate-controls">
-                            <select class="translate-select" id="${windowId}-from-lang">
-                                <option value="en">English</option>
-                                <option value="zh">中文</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                            </select>
-                            <button class="translate-btn" onclick="swapLanguages('${windowId}')">⇄</button>
-                            <select class="translate-select" id="${windowId}-to-lang">
-                                <option value="zh">中文</option>
-                                <option value="en">English</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                            </select>
-                        </div>
-                        <textarea class="translate-textarea" placeholder="${currentLanguage === 'zh' ? '翻譯結果將顯示在這裡...' : 'Translation will appear here...'}" readonly></textarea>
-                        <button class="translate-btn" onclick="translateText('${windowId}')">${currentLanguage === 'zh' ? '翻譯' : 'Translate'}</button>
-                    </div>
-                `;
-        } else if (appName === "Calculator") {
-            appContent.innerHTML = `
-                    <div class="calculator">
-                        <div class="calculator-display" id="${windowId}-display">0</div>
-                        <button class="calculator-btn clear" onclick="clearCalculator('${windowId}')">C</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '(')">(</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', ')')">)</button>
-                        <button class="calculator-btn operator" onclick="appendToCalculator('${windowId}', '/')">/</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '7')">7</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '8')">8</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '9')">9</button>
-                        <button class="calculator-btn operator" onclick="appendToCalculator('${windowId}', '*')">×</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '4')">4</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '5')">5</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '6')">6</button>
-                        <button class="calculator-btn operator" onclick="appendToCalculator('${windowId}', '-')">-</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '1')">1</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '2')">2</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '3')">3</button>
-                        <button class="calculator-btn operator" onclick="appendToCalculator('${windowId}', '+')">+</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '0')">0</button>
-                        <button class="calculator-btn" onclick="appendToCalculator('${windowId}', '.')">.</button>
-                        <button class="calculator-btn" onclick="backspaceCalculator('${windowId}')">⌫</button>
-                        <button class="calculator-btn operator" onclick="calculateResult('${windowId}')">=</button>
-                    </div>
-                `;
-        } else if (appName === "Weather") {
-            appContent.innerHTML = `
-                    <div class="weather-container">
-                        <div class="weather-current">
-                            <div class="weather-location" id="${windowId}-location">New York, NY</div>
-                            <div class="weather-icon">☀️</div>
-                            <div class="weather-temp" id="${windowId}-temp">72°F</div>
-                            <div class="weather-desc" id="${windowId}-desc">Sunny</div>
-                        </div>
-                        <div class="weather-forecast" id="${windowId}-forecast">
-                            <div class="weather-day">
-                                <div>Mon</div>
-                                <div class="weather-day-icon">☀️</div>
-                                <div>72°F</div>
-                            </div>
-                            <div class="weather-day">
-                                <div>Tue</div>
-                                <div class="weather-day-icon">⛅</div>
-                                <div>68°F</div>
-                            </div>
-                            <div class="weather-day">
-                                <div>Wed</div>
-                                <div class="weather-day-icon">🌧️</div>
-                                <div>65°F</div>
-                            </div>
-                            <div class="weather-day">
-                                <div>Thu</div>
-                                <div class="weather-day-icon">☀️</div>
-                                <div>70°F</div>
-                            </div>
-                            <div class="weather-day">
-                                <div>Fri</div>
-                                <div class="weather-day-icon">⛅</div>
-                                <div>69°F</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-        } else if (appName === "File") {
-            appContent.innerHTML = `
-                    <div class="file-manager">
-                        <div class="file-sidebar">
-                            <div class="file-item" onclick="changeFileDirectory('${windowId}', 'home')">
-                                <span class="file-icon">🏠</span>
-                                <span>${currentLanguage === 'zh' ? '主頁' : 'Home'}</span>
-                            </div>
-                            <div class="file-item" onclick="changeFileDirectory('${windowId}', 'documents')">
-                                <span class="file-icon">📄</span>
-                                <span>${currentLanguage === 'zh' ? '文檔' : 'Documents'}</span>
-                            </div>
-                            <div class="file-item" onclick="changeFileDirectory('${windowId}', 'pictures')">
-                                <span class="file-icon">🖼️</span>
-                                <span>${currentLanguage === 'zh' ? '圖片' : 'Pictures'}</span>
-                            </div>
-                            <div class="file-item" onclick="changeFileDirectory('${windowId}', 'music')">
-                                <span class="file-icon">🎵</span>
-                                <span>${currentLanguage === 'zh' ? '音樂' : 'Music'}</span>
-                            </div>
-                            <div class="file-item" onclick="changeFileDirectory('${windowId}', 'downloads')">
-                                <span class="file-icon">⬇️</span>
-                                <span>${currentLanguage === 'zh' ? '下載' : 'Downloads'}</span>
-                            </div>
-                        </div>
-                        <div class="file-content" id="${windowId}-files">
-                            <div class="file-item" onclick="openFile('${windowId}', 'document.pdf')">
-                                <span class="file-icon">📄</span>
-                                <span>document.pdf</span>
-                            </div>
-                            <div class="file-item" onclick="openFile('${windowId}', 'image.jpg')">
-                                <span class="file-icon">🖼️</span>
-                                <span>image.jpg</span>
-                            </div>
-                            <div class="file-item" onclick="openFile('${windowId}', 'song.mp3')">
-                                <span class="file-icon">🎵</span>
-                                <span>song.mp3</span>
-                            </div>
-                            <div class="file-item" onclick="openFile('${windowId}', 'notes.txt')">
-                                <span class="file-icon">📝</span>
-                                <span>notes.txt</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-        } else if (appName === "Calendar") {
-            const now = new Date();
-            const monthNames = currentLanguage === 'zh' ?
-                ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"] :
-                ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-            const monthName = monthNames[now.getMonth()];
-            const year = now.getFullYear();
-
-            appContent.innerHTML = `
-                    <div class="calendar">
-                        <div class="calendar-header">
-                            <button onclick="prevMonth('${windowId}')">←</button>
-                            <div class="calendar-title">${monthName} ${year}</div>
-                            <button onclick="nextMonth('${windowId}')">→</button>
-                        </div>
-                        <div class="calendar-grid" id="${windowId}-calendar">
-                            ${generateCalendar(now.getFullYear(), now.getMonth(), windowId)}
-                        </div>
-                    </div>
-                `;
-
-            // Load calendar events
-            if (!calendarEvents[windowId]) {
-                calendarEvents[windowId] = {};
-            }
-            loadCalendarEvents(windowId);
-        } else if (appName === "Music") {
-            appContent.innerHTML = `
-                    <div class="music-player">
-                        <div class="music-cover" id="${windowId}-cover">🎵</div>
-                        <div class="music-info">
-                            <div class="music-title" id="${windowId}-title">Song Title</div>
-                            <div class="music-artist" id="${windowId}-artist">Artist Name</div>
-                        </div>
-                        <div class="music-controls">
-                            <div class="music-btn" onclick="prevTrack('${windowId}')">⏮</div>
-                            <div class="music-btn" onclick="togglePlay('${windowId}')">▶️</div>
-                            <div class="music-btn" onclick="nextTrack('${windowId}')">⏭</div>
-                        </div>
-                        <div class="music-progress">
-                            <div class="music-progress-bar" id="${windowId}-progress"></div>
-                        </div>
-                        <div class="music-time">
-                            <span id="${windowId}-current-time">0:00</span>
-                            <span id="${windowId}-total-time">3:45</span>
-                        </div>
-                    </div>
-                `;
-            setupMusicPlayer(windowId);
-        } else if (appName === "DeepSeek") {
-            appContent.innerHTML = `
-                    <div style="display:flex; flex-direction:column; height:100%;">
-                        <div id="deepseek-chat" class="deepseek-chat"></div>
-                        <div style="padding:10px; border-top:1px solid #ddd; display:flex;">
-                            <input type="text" id="deepseek-input" class="deepseek-input"
-                                placeholder="${currentLanguage === 'zh' ? '向DeepSeek提問...' : 'Ask DeepSeek...'}" />
-                            <button onclick="askDeepSeek()" style="margin-left:10px; padding:8px 15px; background:var(--primary-color); color:white; border:none; border-radius:5px;">
-                                ${currentLanguage === 'zh' ? '發送' : 'Send'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-        } else if (appName === "MLA") {
-            appContent.innerHTML = `
-                    <div style="padding:20px;">
-                        <h3>MLA Format Generator</h3>
-                        <div style="margin-bottom:15px;">
-                            <label style="display:block;">Author:</label>
-                            <input type="text" id="mla-author" class="mla-input">
-                        </div>
-                        <div style="margin-bottom:15px;">
-                            <label style="display:block;">Title:</label>
-                            <input type="text" id="mla-title" class="mla-input">
-                        </div>
-                        <div style="margin-bottom:15px;">
-                            <label style="display:block;">Container:</label>
-                            <input type="text" id="mla-container" class="mla-input">
-                        </div>
-                        <div style="margin-bottom:15px;">
-                            <label style="display:block;">Publisher/Website:</label>
-                            <input type="text" id="mla-publisher" class="mla-input">
-                        </div>
-                        <div style="margin-bottom:15px;">
-                            <label style="display:block;">Date:</label>
-                            <input type="text" id="mla-date" class="mla-input">
-                        </div>
-                        <button onclick="generateMLA()" style="padding:8px 15px; background:var(--primary-color); color:white; border:none; border-radius:5px;">
-                            Generate MLA Citation
-                        </button>
-                        <div id="mla-result" class="mla-result"></div>
-                    </div>
-                `;
-        } else if (appName === "Feedback") {
-            appContent.innerHTML = `
-                    <div style="padding:20px;">
-                        <h3>${currentLanguage === 'zh' ? '提供反饋' : 'Provide Feedback'}</h3>
-                        <textarea id="feedback-text" class="feedback-textarea"
-                            placeholder="${currentLanguage === 'zh' ? '請輸入您的反饋...' : 'Please enter your feedback...'}"></textarea>
-                        <button onclick="submitFeedback()" style="padding:8px 15px; background:var(--primary-color); color:white; border:none; border-radius:5px;">
-                            ${currentLanguage === 'zh' ? '提交' : 'Submit'}
-                        </button>
-                    </div>
-                `;
-        } else if (appName === "Settings") {
-            const lang = translations[currentLanguage];
-            appContent.innerHTML = `
-                    <div class="tab-container">
-                        <div class="tab active" onclick="switchTab('appearance')">${currentLanguage === 'zh' ? '外觀' : 'Appearance'}</div>
-                        <div class="tab" onclick="switchTab('security')">${currentLanguage === 'zh' ? '安全性' : 'Security'}</div>
-                        <div class="tab" onclick="switchTab('time')">${currentLanguage === 'zh' ? '時間格式' : 'Time Format'}</div>
-                        <div class="tab" onclick="switchTab('about')">${currentLanguage === 'zh' ? '關於' : 'About'}</div>
-                    </div>
-                    <div id="appearance-tab" class="tab-content active">
-                        <form class="settings-form" onsubmit="saveAppearanceSettings(event)">
-                            <label for="bg-color">${currentLanguage === 'zh' ? '背景顏色:' : 'Background Color:'}</label>
-                            <select id="bg-color">
-                                <option value="linear-gradient(135deg, #a8d5ba, #85c1e9)">${currentLanguage === 'zh' ? '預設' : 'Default'}</option>
-                                <option value="linear-gradient(135deg, #ff9a9e, #fad0c4)">${currentLanguage === 'zh' ? '日落' : 'Sunset'}</option>
-                                <option value="linear-gradient(135deg, #a1c4fd, #c2e9fb)">${currentLanguage === 'zh' ? '海洋' : 'Ocean'}</option>
-                                <option value="linear-gradient(135deg, #ffecd2, #fcb69f)">${currentLanguage === 'zh' ? '桃子' : 'Peach'}</option>
-                                <option value="dynamic">${currentLanguage === 'zh' ? '動態桌布' : 'Dynamic Wallpaper'}</option>
-                            </select>
-
-                            <label for="font-size">${currentLanguage === 'zh' ? '字體大小:' : 'Font Size:'}</label>
-                            <select id="font-size">
-                                <option value="14px">${currentLanguage === 'zh' ? '小' : 'Small'}</option>
-                                <option value="16px" selected>${currentLanguage === 'zh' ? '中' : 'Medium'}</option>
-                                <option value="18px">${currentLanguage === 'zh' ? '大' : 'Large'}</option>
-                            </select>
-
-                            <label for="language">${currentLanguage === 'zh' ? '語言:' : 'Language:'}</label>
-                            <select id="language" onchange="changeLanguage(this.value)">
-                                <option value="en" ${currentLanguage === 'en' ? 'selected' : ''}>English</option>
-                                <option value="zh" ${currentLanguage === 'zh' ? 'selected' : ''}>中文</option>
-                            </select>
-
-                            <label for="dark-mode">${currentLanguage === 'zh' ? '深色模式:' : 'Dark Mode:'}</label>
-                            <select id="dark-mode">
-                                <option value="false" ${!darkMode ? 'selected' : ''}>${currentLanguage === 'zh' ? '關閉' : 'Off'}</option>
-                                <option value="true" ${darkMode ? 'selected' : ''}>${currentLanguage === 'zh' ? '開啟' : 'On'}</option>
-                            </select>
-
-                            <button type="submit" class="settings-btn">${currentLanguage === 'zh' ? '保存' : 'Save'}</button>
-                        </form>
-                    </div>
-                    <div id="security-tab" class="tab-content">
-                        <form class="settings-form" onsubmit="changePassword(event)">
-                            <label for="current-password">${currentLanguage === 'zh' ? '當前密碼:' : 'Current Password:'}</label>
-                            <input type="password" id="current-password" required>
-
-                            <label for="new-password">${currentLanguage === 'zh' ? '新密碼:' : 'New Password:'}</label>
-                            <input type="password" id="new-password" required>
-
-                            <label for="confirm-password">${currentLanguage === 'zh' ? '確認密碼:' : 'Confirm Password:'}</label>
-                            <input type="password" id="confirm-password" required>
-
-                            <button type="submit" class="settings-btn">${currentLanguage === 'zh' ? '更改密碼' : 'Change Password'}</button>
-                        </form>
-                    </div>
-                    <div id="time-tab" class="tab-content">
-                        <form class="settings-form" onsubmit="saveTimeFormat(event)">
-                            <label>${currentLanguage === 'zh' ? '時間格式:' : 'Time Format:'}</label>
-                            <div style="margin-bottom:15px;">
-                                <input type="radio" id="time-format-12" name="time-format" value="12" ${timeFormat === '12' ? 'checked' : ''}>
-                                <label for="time-format-12">12-hour</label>
-                                <input type="radio" id="time-format-24" name="time-format" value="24" ${timeFormat === '24' ? 'checked' : ''}>
-                                <label for="time-format-24">24-hour</label>
-                            </div>
-                            <button type="submit" class="settings-btn">${currentLanguage === 'zh' ? '保存' : 'Save'}</button>
-                        </form>
-                    </div>
-                    <div id="about-tab" class="tab-content">
-                        <div class="about-content">
-                            <h2 class="about-title">${lang.aboutTitle}</h2>
-                            <p class="about-version">${lang.version}</p>
-                            <p class="about-creators">${lang.creators}</p>
-                            <button onclick="showUserAgent()" class="settings-btn">${currentLanguage === 'zh' ? '顯示設備信息' : 'Show Device Info'}</button>
-                        </div>
-                    </div>
-                `;
-
-            // Set current values
-            const bgColor = localStorage.getItem('novaos_bg_color') || "linear-gradient(135deg, #a8d5ba, #85c1e9)";
-            const fontSize = localStorage.getItem('novaos_font_size') || "16px";
-
-            document.getElementById('bg-color').value = bgColor;
-            document.getElementById('font-size').value = fontSize;
-            document.getElementById('language').value = currentLanguage;
-            document.getElementById('dark-mode').value = darkMode;
-        }
-
-        // Set appropriate window size based on app type
-        const appSizes = {
-            'Browser': { width: 800, height: 600 },
-            'VS Code': { width: 700, height: 500 },
-            'Note': { width: 500, height: 400 },
-            'Todo': { width: 500, height: 500 },
-            'Translate': { width: 600, height: 500 },
-            'Calculator': { width: 350, height: 450 },
-            'Weather': { width: 500, height: 400 },
-            'File': { width: 700, height: 500 },
-            'Calendar': { width: 700, height: 500 },
-            'Music': { width: 400, height: 500 },
-            'DeepSeek': { width: 500, height: 500 },
-            'MLA': { width: 500, height: 500 },
-            'Feedback': { width: 500, height: 400 },
-            'Settings': { width: 600, height: 500 }
-        };
-
-        const size = appSizes[appName] || { width: 500, height: 300 };
-        appWindow.style.width = size.width + "px";
-        appWindow.style.height = size.height + "px";
-        appWindow.style.left = (window.innerWidth - size.width) / 2 + "px";
-        appWindow.style.top = (window.innerHeight - size.height) / 2 + "px";
-
-        // Show with animation
-        appWindow.style.display = "flex";
-        setTimeout(() => {
-            appWindow.classList.add('active');
-        }, 10);
-
-        activeWindow = appWindow;
-    }
-
-    // Browser tab functions
-    function renderBrowserTabs(windowId) {
-        const tabsContainer = document.getElementById(`${windowId}-tabs-container`);
-        tabsContainer.innerHTML = '';
-
-        const tabsData = browserTabs[windowId];
-
-        // Add existing tabs
-        tabsData.tabs.forEach((tab, index) => {
-            const tabElement = document.createElement('div');
-            tabElement.className = `browser-tab ${index === tabsData.activeTab ? 'active' : ''}`;
-            tabElement.innerHTML = `
-                    <span>${tab.title}</span>
-                    <span class="browser-tab-close" onclick="closeBrowserTab('${windowId}', ${tab.id}, event)">×</span>
-                `;
-            tabElement.onclick = (e) => {
-                if (!e.target.classList.contains('browser-tab-close')) {
-                    switchBrowserTab(windowId, tab.id);
-                }
-            };
-            tabsContainer.appendChild(tabElement);
-        });
-
-        // Add new tab button
-        const addTabButton = document.createElement('div');
-        addTabButton.className = 'browser-add-tab';
-        addTabButton.innerHTML = '+';
-        addTabButton.onclick = () => addBrowserTab(windowId);
-        tabsContainer.appendChild(addTabButton);
-    }
-
-    function addBrowserTab(windowId) {
-        const tabsData = browserTabs[windowId];
-        const newTabId = tabsData.tabs.length > 0 ? Math.max(...tabsData.tabs.map(t => t.id)) + 1 : 0;
-
-        // Add new tab data
-        tabsData.tabs.push({
-            id: newTabId,
-            url: "https://www.google.com",
-            title: "New Tab"
-        });
-        tabsData.activeTab = tabsData.tabs.length - 1;
-
-        // Create new iframe container
-        const appContent = document.getElementById(`${windowId}-content`);
-        const frameContainer = document.createElement('div');
-        frameContainer.className = 'browser-frame-container';
-        frameContainer.id = `${windowId}-frame-container-${newTabId}`;
-        frameContainer.innerHTML = `
-                <iframe class="browser-frame" id="${windowId}-iframe-${newTabId}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" src="https://www.google.com" frameborder="0"></iframe>
-            `;
-        appContent.appendChild(frameContainer);
-
-        // Hide all frames and show active one
-        document.querySelectorAll(`#${windowId}-content .browser-frame-container`).forEach(container => {
-            container.style.display = 'none';
-        });
-        document.getElementById(`${windowId}-frame-container-${newTabId}`).style.display = 'block';
-
-        // Update URL input
-        document.getElementById(`${windowId}-url`).value = "https://www.google.com";
-
-        // Render tabs
-        renderBrowserTabs(windowId);
-    }
-
-    function closeBrowserTab(windowId, tabId, event) {
-        event.stopPropagation();
-        const tabsData = browserTabs[windowId];
-        const tabIndex = tabsData.tabs.findIndex(t => t.id === tabId);
-
-        if (tabIndex === -1) return;
-
-        // Remove tab data
-        tabsData.tabs.splice(tabIndex, 1);
-
-        // Remove iframe container
-        const frameContainer = document.getElementById(`${windowId}-frame-container-${tabId}`);
-        if (frameContainer) {
-            frameContainer.remove();
-        }
-
-        // Update active tab
-        if (tabsData.tabs.length > 0) {
-            if (tabIndex <= tabsData.activeTab) {
-                tabsData.activeTab = Math.max(0, tabsData.activeTab - 1);
-            }
-
-            // Show active tab's frame
-            const activeTab = tabsData.tabs[tabsData.activeTab];
-            document.getElementById(`${windowId}-frame-container-${activeTab.id}`).style.display = 'block';
-            document.getElementById(`${windowId}-url`).value = activeTab.url;
-        } else {
-            // No tabs left, close the browser
-            closeApp(windowId);
-            return;
-        }
-
-        // Render tabs
-        renderBrowserTabs(windowId);
-    }
-
-    function switchBrowserTab(windowId, tabId) {
-        const tabsData = browserTabs[windowId];
-        const tabIndex = tabsData.tabs.findIndex(t => t.id === tabId);
-
-        if (tabIndex === -1) return;
-
-        // Update active tab
-        tabsData.activeTab = tabIndex;
-
-        // Hide all frames and show active one
-        document.querySelectorAll(`#${windowId}-content .browser-frame-container`).forEach(container => {
-            container.style.display = 'none';
-        });
-        document.getElementById(`${windowId}-frame-container-${tabId}`).style.display = 'block';
-
-        // Update URL input
-        const activeTab = tabsData.tabs[tabsData.activeTab];
-        document.getElementById(`${windowId}-url`).value = activeTab.url;
-
-        // Render tabs
-        renderBrowserTabs(windowId);
-    }
-
-    // Browser navigation
-    function navigateBrowser(windowId) {
-        const tabsData = browserTabs[windowId];
-        if (!tabsData || tabsData.tabs.length === 0) return;
-
-        const activeTab = tabsData.tabs[tabsData.activeTab];
-        const urlInput = document.getElementById(`${windowId}-url`);
-        let url = urlInput.value;
-
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
-
-        try {
-            // Create a proxy iframe to handle navigation
-            const proxyIframe = document.createElement('iframe');
-            proxyIframe.style.display = 'none';
-            proxyIframe.src = url;
-            document.body.appendChild(proxyIframe);
-
-            // Check if the navigation was successful
-            setTimeout(() => {
-                try {
-                    // If we can access the contentWindow, it's same-origin
-                    if (proxyIframe.contentWindow) {
-                        const iframe = document.getElementById(`${windowId}-iframe-${activeTab.id}`);
-                        iframe.src = url;
-
-                        // Update tab data
-                        activeTab.url = url;
-                        activeTab.title = "Loading...";
-                        renderBrowserTabs(windowId);
-
-                        // Update title when page loads
-                        iframe.onload = function() {
-                            try {
-                                activeTab.title = iframe.contentDocument.title || url;
-                            } catch (e) {
-                                activeTab.title = new URL(url).hostname;
-                            }
-                            renderBrowserTabs(windowId);
-                        };
+        // 设置应用程序点击事件
+        setupAppIcons();
+
+        // 设置锁定按钮
+        document.getElementById('lock-btn').addEventListener('click', lockSystem);
+
+        // 设置锁定界面PIN输入
+        setupLockPinInputs();
+
+        // 设置搜索功能
+        setupSearch();
+
+        // 加载应用程序数据
+        loadAppData();
+    });
+
+    // PIN码输入设置
+    function setupPinInputs() {
+        const pinInputs = document.querySelectorAll('#setup-step-1 .pin-input');
+
+        pinInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1) {
+                    if (index < pinInputs.length - 1) {
+                        pinInputs[index + 1].focus();
                     }
-                } catch (e) {
-                    // Cross-origin - show error message
-                    const iframe = document.getElementById(`${windowId}-iframe-${activeTab.id}`);
-                    iframe.srcdoc = `
-                            <html><body style="padding:20px;font-family:Arial">
-                                <h1>${currentLanguage === 'zh' ? '導航被阻止' : 'Navigation Blocked'}</h1>
-                                <p>${currentLanguage === 'zh' ? '出於安全原因，此演示中限制了跨域導航。' : 'For security reasons, cross-origin navigation is restricted in this demo.'}</p>
-                                <p>${currentLanguage === 'zh' ? '嘗試訪問:' : 'Try visiting:'} <a href="${url}" target="_blank">${url}</a></p>
-                                <p>${currentLanguage === 'zh' ? '或者，您可以嘗試這些演示頁面:' : 'Alternatively, you can try these demo pages:'}</p>
-                                <ul>
-                                    <li><a href="#" onclick="window.parent.postMessage('https://example.com', '*')">example.com</a></li>
-                                    <li><a href="#" onclick="window.parent.postMessage('https://wikipedia.org', '*')">wikipedia.org</a></li>
-                                    <li><a href="#" onclick="window.parent.postMessage('https://google.com', '*')">google.com</a></li>
-                                </ul>
-                            </body></html>
-                        `;
-
-                    // Update tab data
-                    activeTab.url = url;
-                    activeTab.title = "Blocked Page";
-                    renderBrowserTabs(windowId);
                 }
-                document.body.removeChild(proxyIframe);
-            }, 500);
-        } catch (e) {
-            console.error('Navigation error:', e);
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    pinInputs[index - 1].focus();
+                }
+            });
+        });
+    }
+
+    // 锁定界面PIN输入设置
+    function setupLockPinInputs() {
+        const lockPinInputs = document.querySelectorAll('#lock-screen .pin-input');
+
+        lockPinInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1) {
+                    if (index < lockPinInputs.length - 1) {
+                        lockPinInputs[index + 1].focus();
+                    } else {
+                        // 检查PIN码
+                        checkPin();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
+                    lockPinInputs[index - 1].focus();
+                }
+            });
+        });
+    }
+
+    // 壁纸选项设置
+    function setupWallpaperOptions() {
+        const wallpaperOptions = document.querySelectorAll('.wallpaper-option');
+
+        wallpaperOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // 移除所有选中状态
+                wallpaperOptions.forEach(opt => opt.classList.remove('selected'));
+                // 添加当前选中状态
+                this.classList.add('selected');
+            });
+        });
+    }
+
+    // 设置向导导航
+    function setupSetupNavigation() {
+        // 步骤 1 -> 步骤 2
+        document.getElementById('next-step-1').addEventListener('click', function() {
+            const pinInputs = document.querySelectorAll('#setup-step-1 .pin-input');
+            let pin = '';
+            let isValid = true;
+
+            pinInputs.forEach(input => {
+                if (!input.value) {
+                    isValid = false;
+                }
+                pin += input.value;
+            });
+
+            if (isValid && pin.length === 4) {
+                // 保存PIN码（简单加密）
+                localStorage.setItem('circleos_pin', btoa(pin));
+
+                // 更新进度条
+                document.getElementById('setup-progress-bar').style.width = '66%';
+                document.getElementById('setup-step-indicator').textContent = '步骤 2/3';
+
+                // 显示步骤 2
+                document.getElementById('setup-step-1').classList.remove('active');
+                document.getElementById('setup-step-2').classList.add('active');
+            } else {
+                alert('请输入完整的4位PIN码');
+            }
+        });
+
+        // 步骤 2 -> 步骤 1
+        document.getElementById('prev-step-2').addEventListener('click', function() {
+            // 更新进度条
+            document.getElementById('setup-progress-bar').style.width = '33%';
+            document.getElementById('setup-step-indicator').textContent = '步骤 1/3';
+
+            // 显示步骤 1
+            document.getElementById('setup-step-2').classList.remove('active');
+            document.getElementById('setup-step-1').classList.add('active');
+        });
+
+        // 步骤 2 -> 步骤 3
+        document.getElementById('next-step-2').addEventListener('click', function() {
+            // 获取选中的壁纸颜色
+            const selectedWallpaper = document.querySelector('#setup-step-2 .wallpaper-option.selected');
+            const wallpaperColor = selectedWallpaper.getAttribute('data-color');
+
+            // 保存壁纸颜色
+            localStorage.setItem('circleos_wallpaper', wallpaperColor);
+
+            // 更新进度条
+            document.getElementById('setup-progress-bar').style.width = '100%';
+            document.getElementById('setup-step-indicator').textContent = '步骤 3/3';
+
+            // 显示步骤 3
+            document.getElementById('setup-step-2').classList.remove('active');
+            document.getElementById('setup-step-3').classList.add('active');
+        });
+
+        // 步骤 3 -> 步骤 2
+        document.getElementById('prev-step-3').addEventListener('click', function() {
+            // 更新进度条
+            document.getElementById('setup-progress-bar').style.width = '66%';
+            document.getElementById('setup-step-indicator').textContent = '步骤 2/3';
+
+            // 显示步骤 2
+            document.getElementById('setup-step-3').classList.remove('active');
+            document.getElementById('setup-step-2').classList.add('active');
+        });
+
+        // 完成设置
+        document.getElementById('finish-setup').addEventListener('click', function() {
+            // 创建系统配置标记
+            localStorage.setItem('circleos_config', 'true');
+
+            // 隐藏设置向导
+            document.getElementById('setup-screen').classList.add('hidden');
+
+            // 显示桌面
+            document.getElementById('desktop').classList.remove('hidden');
+
+            // 应用壁纸颜色
+            applyWallpaper();
+
+            // 更新时间
+            updateTime();
+            setInterval(updateTime, 60000);
+        });
+    }
+
+    // 应用程序图标设置
+    function setupAppIcons() {
+        const appIcons = document.querySelectorAll('.app-icon');
+
+        appIcons.forEach(icon => {
+            icon.addEventListener('click', function() {
+                const appName = this.getAttribute('data-app');
+                openApp(appName);
+            });
+        });
+
+        // 设置关闭按钮
+        const closeButtons = document.querySelectorAll('.close-btn');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const appName = this.getAttribute('data-app');
+                closeApp(appName);
+            });
+        });
+    }
+
+    // 打开应用程序
+    function openApp(appName) {
+        // 关闭所有应用
+        document.querySelectorAll('.window').forEach(window => {
+            window.classList.remove('active');
+        });
+
+        // 打开指定应用
+        const appWindow = document.getElementById(`${appName}-window`);
+        if (appWindow) {
+            appWindow.classList.add('active');
+
+            // 如果是计算器应用，加载任务
+            if (appName === 'calculator') {
+                loadTasks();
+            }
+
+            // 如果是VS Code或记事本，加载保存的内容
+            if (appName === 'vscode' || appName === 'notepad') {
+                loadAppContent(appName);
+            }
         }
     }
 
-    function closeApp(windowId) {
-        const appWindow = document.getElementById(windowId);
+    // 关闭应用程序
+    function closeApp(appName) {
+        const appWindow = document.getElementById(`${appName}-window`);
         if (appWindow) {
             appWindow.classList.remove('active');
-            appWindow.classList.add('closing');
-
-            // Clean up browser tabs data if it's a browser window
-            if (windowId === 'browser-window') {
-                delete browserTabs[windowId];
-            }
-
-            // Clean up music player
-            if (windowId === 'music-window') {
-                audioElement.pause();
-                audioElement = new Audio();
-            }
-
-            setTimeout(() => {
-                appWindow.style.display = "none";
-                appWindow.classList.remove('closing');
-
-                if (activeWindow === appWindow) {
-                    activeWindow = null;
-                }
-            }, 300);
         }
     }
 
-    function minimizeWindow(windowId) {
-        const appWindow = document.getElementById(windowId);
-        if (appWindow) {
-            appWindow.style.display = "none";
-        }
-    }
-
-    function toggleMaximize(windowId) {
-        const appWindow = document.getElementById(windowId);
-        if (appWindow) {
-            if (appWindow.classList.contains('maximized')) {
-                // Restore
-                appWindow.classList.remove('maximized');
-                appWindow.style.width = "500px";
-                appWindow.style.height = "300px";
-                appWindow.style.left = (window.innerWidth - 500) / 2 + "px";
-                appWindow.style.top = (window.innerHeight - 300) / 2 + "px";
-            } else {
-                // Maximize
-                appWindow.classList.add('maximized');
-                appWindow.style.width = (window.innerWidth - 20) + "px";
-                appWindow.style.height = (window.innerHeight - 60) + "px";
-                appWindow.style.left = "10px";
-                appWindow.style.top = "10px";
-            }
-        }
-    }
-
-    // Todo functions
-    function addTodoItem(windowId) {
-        const input = document.querySelector(`#${windowId} .todo-input`);
-        const dateInput = document.getElementById(`${windowId}-date`);
-        const todoList = document.getElementById(`${windowId}-todo-list`);
-
-        if (input.value.trim() === '') return;
-
-        const todoId = Date.now();
-        const todoItem = document.createElement('div');
-        todoItem.className = 'todo-item';
-
-        const todoDate = dateInput.value ? new Date(dateInput.value) : null;
-        const dateString = todoDate ? todoDate.toLocaleDateString(currentLanguage === 'zh' ? 'zh-TW' : 'en-US') : '';
-
-        todoItem.innerHTML = `
-                <input type="checkbox" id="todo-${todoId}" onchange="toggleTodoItem(${todoId})" />
-                <span class="todo-item-text">${input.value}</span>
-                <span class="todo-item-date">${dateString}</span>
-                <span class="todo-item-delete" onclick="deleteTodoItem('${windowId}', ${todoId})">×</span>
-            `;
-
-        todoList.appendChild(todoItem);
-        input.value = '';
-        dateInput.value = '';
-
-        // Add to calendar if date is specified
-        if (todoDate) {
-            addEventToCalendar(todoDate, input.value, windowId);
-        }
-
-        saveTodoItems(windowId);
-    }
-
-    function toggleTodoItem(id) {
-        const checkbox = document.getElementById(`todo-${id}`);
-        const text = checkbox.nextElementSibling;
-
-        if (checkbox.checked) {
-            text.style.textDecoration = 'line-through';
-            text.style.color = '#999';
-        } else {
-            text.style.textDecoration = 'none';
-            text.style.color = '';
-        }
-    }
-
-    function deleteTodoItem(windowId, id) {
-        const item = document.getElementById(`todo-${id}`)?.parentNode;
-        if (item) {
-            const text = item.querySelector('.todo-item-text').textContent;
-            const dateString = item.querySelector('.todo-item-date').textContent;
-
-            item.remove();
-            saveTodoItems(windowId);
-
-            // Remove from calendar if date was specified
-            if (dateString) {
-                removeEventFromCalendar(text, windowId);
-            }
-        }
-    }
-
-    function saveTodoItems(windowId) {
-        const todoList = document.getElementById(`${windowId}-todo-list`);
-        const items = [];
-
-        todoList.querySelectorAll('.todo-item').forEach(item => {
-            items.push({
-                text: item.querySelector('.todo-item-text').textContent,
-                date: item.querySelector('.todo-item-date').textContent,
-                completed: item.querySelector('input').checked
-            });
-        });
-
-        localStorage.setItem(`novaos_todos_${windowId}`, JSON.stringify(items));
-    }
-
-    function loadTodoItems(windowId) {
-        const todoList = document.getElementById(`${windowId}-todo-list`);
-        const savedItems = localStorage.getItem(`novaos_todos_${windowId}`);
-
-        if (savedItems) {
-            const items = JSON.parse(savedItems);
-
-            items.forEach(item => {
-                const todoId = Date.now();
-                const todoItem = document.createElement('div');
-                todoItem.className = 'todo-item';
-                todoItem.innerHTML = `
-                        <input type="checkbox" id="todo-${todoId}" onchange="toggleTodoItem(${todoId})" ${item.completed ? 'checked' : ''} />
-                        <span class="todo-item-text" style="${item.completed ? 'text-decoration: line-through; color: #999' : ''}">${item.text}</span>
-                        <span class="todo-item-date">${item.date}</span>
-                        <span class="todo-item-delete" onclick="deleteTodoItem('${windowId}', ${todoId})">×</span>
-                    `;
-
-                todoList.appendChild(todoItem);
-            });
-        }
-    }
-
-    // Calendar functions
-    function generateCalendar(year, month, windowId) {
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDay = firstDay.getDay();
-
-        let calendarHTML = '';
-
-        // Day headers
-        const dayNames = currentLanguage === 'zh' ?
-            ['日', '一', '二', '三', '四', '五', '六'] :
-            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-        dayNames.forEach(day => {
-            calendarHTML += `<div class="calendar-day-header">${day}</div>`;
-        });
-
-        // Empty cells for days before the first day of the month
-        for (let i = 0; i < startingDay; i++) {
-            calendarHTML += '<div class="calendar-day empty"></div>';
-        }
-
-        // Days of the month
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateKey = `${year}-${month + 1}-${day}`;
-            const events = calendarEvents[windowId]?.[dateKey] || [];
-
-            calendarHTML += `
-                    <div class="calendar-day">
-                        <div class="calendar-day-number">${day}</div>
-                        ${events.map(event => `<div class="calendar-event">${event}</div>`).join('')}
-                    </div>
-                `;
-        }
-
-        return calendarHTML;
-    }
-
-    function loadCalendarEvents(windowId) {
-        const savedEvents = localStorage.getItem(`novaos_calendar_${windowId}`);
-        if (savedEvents) {
-            calendarEvents[windowId] = JSON.parse(savedEvents);
-        }
-    }
-
-    function saveCalendarEvents(windowId) {
-        if (calendarEvents[windowId]) {
-            localStorage.setItem(`novaos_calendar_${windowId}`, JSON.stringify(calendarEvents[windowId]));
-        }
-    }
-
-    function addEventToCalendar(date, eventText, windowId) {
-        const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-
-        if (!calendarEvents[windowId]) {
-            calendarEvents[windowId] = {};
-        }
-
-        if (!calendarEvents[windowId][dateKey]) {
-            calendarEvents[windowId][dateKey] = [];
-        }
-
-        calendarEvents[windowId][dateKey].push(eventText);
-        saveCalendarEvents(windowId);
-
-        // Refresh calendar view if open
-        const calendarWindow = document.getElementById('calendar-window');
-        if (calendarWindow && calendarWindow.style.display !== 'none') {
-            const now = new Date();
-            document.getElementById('calendar-window-calendar').innerHTML =
-                generateCalendar(now.getFullYear(), now.getMonth(), 'calendar-window');
-        }
-    }
-
-    function removeEventFromCalendar(eventText, windowId) {
-        for (const dateKey in calendarEvents[windowId]) {
-            const index = calendarEvents[windowId][dateKey].indexOf(eventText);
-            if (index !== -1) {
-                calendarEvents[windowId][dateKey].splice(index, 1);
-                if (calendarEvents[windowId][dateKey].length === 0) {
-                    delete calendarEvents[windowId][dateKey];
-                }
-                saveCalendarEvents(windowId);
-
-                // Refresh calendar view if open
-                const calendarWindow = document.getElementById('calendar-window');
-                if (calendarWindow && calendarWindow.style.display !== 'none') {
-                    const now = new Date();
-                    document.getElementById('calendar-window-calendar').innerHTML =
-                        generateCalendar(now.getFullYear(), now.getMonth(), 'calendar-window');
-                }
-                break;
-            }
-        }
-    }
-
-    function prevMonth(windowId) {
-        const now = new Date();
-        const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        document.getElementById(`${windowId}-calendar`).innerHTML =
-            generateCalendar(prevMonth.getFullYear(), prevMonth.getMonth(), windowId);
-    }
-
-    function nextMonth(windowId) {
-        const now = new Date();
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        document.getElementById(`${windowId}-calendar`).innerHTML =
-            generateCalendar(nextMonth.getFullYear(), nextMonth.getMonth(), windowId);
-    }
-
-    // Music player functions
-    function setupMusicPlayer(windowId) {
-        audioElement = new Audio();
-        loadTrack(currentTrack, windowId);
-
-        // Progress bar update
-        audioElement.addEventListener('timeupdate', function() {
-            const progress = (audioElement.currentTime / audioElement.duration) * 100;
-            document.getElementById(`${windowId}-progress`).style.width = `${progress}%`;
-
-            // Update current time
-            const minutes = Math.floor(audioElement.currentTime / 60);
-            const seconds = Math.floor(audioElement.currentTime % 60);
-            document.getElementById(`${windowId}-current-time`).textContent =
-                `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-        });
-
-        // Song ended - play next
-        audioElement.addEventListener('ended', function() {
-            nextTrack(windowId);
-        });
-
-        // Update total time when metadata is loaded
-        audioElement.addEventListener('loadedmetadata', function() {
-            const minutes = Math.floor(audioElement.duration / 60);
-            const seconds = Math.floor(audioElement.duration % 60);
-            document.getElementById(`${windowId}-total-time`).textContent =
-                `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-        });
-    }
-
-    function loadTrack(index, windowId) {
-        const track = musicPlaylist[index];
-        audioElement.src = track.src;
-
-        document.getElementById(`${windowId}-title`).textContent = track.title;
-        document.getElementById(`${windowId}-artist`).textContent = track.artist;
-        document.getElementById(`${windowId}-cover`).textContent = track.cover;
-
-        // Update total time when metadata is loaded
-        audioElement.addEventListener('loadedmetadata', function() {
-            const minutes = Math.floor(audioElement.duration / 60);
-            const seconds = Math.floor(audioElement.duration % 60);
-            document.getElementById(`${windowId}-total-time`).textContent =
-                `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-        });
-    }
-
-    function togglePlay(windowId) {
-        const playBtn = document.querySelector(`#${windowId} .music-btn:nth-child(2)`);
-        if (audioElement.paused) {
-            audioElement.play();
-            playBtn.textContent = '⏸';
-        } else {
-            audioElement.pause();
-            playBtn.textContent = '▶️';
-        }
-    }
-
-    function prevTrack(windowId) {
-        currentTrack = (currentTrack - 1 + musicPlaylist.length) % musicPlaylist.length;
-        loadTrack(currentTrack, windowId);
-        if (!audioElement.paused) audioElement.play();
-    }
-
-    function nextTrack(windowId) {
-        currentTrack = (currentTrack + 1) % musicPlaylist.length;
-        loadTrack(currentTrack, windowId);
-        if (!audioElement.paused) audioElement.play();
-    }
-
-    // Translate functions
-    function swapLanguages(windowId) {
-        const fromLang = document.getElementById(`${windowId}-from-lang`);
-        const toLang = document.getElementById(`${windowId}-to-lang`);
-
-        const temp = fromLang.value;
-        fromLang.value = toLang.value;
-        toLang.value = temp;
-    }
-
-    function translateText(windowId) {
-        const textareas = document.querySelectorAll(`#${windowId} .translate-textarea`);
-        const fromLang = document.getElementById(`${windowId}-from-lang`).value;
-        const toLang = document.getElementById(`${windowId}-to-lang`).value;
-
-        const text = textareas[0].value;
-        if (!text.trim()) return;
-
-        // This is a mock translation for demo purposes
-        const mockTranslations = {
-            'en-zh': {
-                'hello': '你好',
-                'world': '世界',
-                'good morning': '早上好'
-            },
-            'zh-en': {
-                '你好': 'hello',
-                '世界': 'world',
-                '早上好': 'good morning'
-            },
-            'en-es': {
-                'hello': 'hola',
-                'world': 'mundo',
-                'good morning': 'buenos días'
-            },
-            'es-en': {
-                'hola': 'hello',
-                'mundo': 'world',
-                'buenos días': 'good morning'
-            }
-        };
-
-        const translationKey = `${fromLang}-${toLang}`;
-        let translatedText = mockTranslations[translationKey]?.[text.toLowerCase()] || (currentLanguage === 'zh' ? '[演示中無此翻譯]' : '[Translation not available in demo]');
-
-        textareas[1].value = translatedText;
-    }
-
-    // Calculator functions
-    function appendToCalculator(windowId, value) {
-        const display = document.getElementById(`${windowId}-display`);
-        if (display.textContent === '0' && value !== '.') {
-            display.textContent = value;
-        } else {
-            display.textContent += value;
-        }
-    }
-
-    function clearCalculator(windowId) {
-        document.getElementById(`${windowId}-display`).textContent = '0';
-    }
-
-    function backspaceCalculator(windowId) {
-        const display = document.getElementById(`${windowId}-display`);
-        if (display.textContent.length === 1) {
-            display.textContent = '0';
-        } else {
-            display.textContent = display.textContent.slice(0, -1);
-        }
-    }
-
-    function calculateResult(windowId) {
-        const display = document.getElementById(`${windowId}-display`);
-        try {
-            // Replace × with * for calculation
-            const expression = display.textContent.replace(/×/g, '*');
-            display.textContent = eval(expression);
-        } catch (e) {
-            display.textContent = 'Error';
-        }
-    }
-
-    // File manager functions
-    function changeFileDirectory(windowId, directory) {
-        // In a real app, this would load files from the selected directory
-        const filesContainer = document.getElementById(`${windowId}-files`);
-        filesContainer.innerHTML = `
-                <div class="file-item" onclick="openFile('${windowId}', '${directory}_file1')">
-                    <span class="file-icon">📄</span>
-                    <span>${directory}_file1</span>
-                </div>
-                <div class="file-item" onclick="openFile('${windowId}', '${directory}_file2')">
-                    <span class="file-icon">🖼️</span>
-                    <span>${directory}_file2</span>
-                </div>
-                <div class="file-item" onclick="openFile('${windowId}', '${directory}_file3')">
-                    <span class="file-icon">🎵</span>
-                    <span>${directory}_file3</span>
-                </div>
-            `;
-    }
-
-    function openFile(windowId, filename) {
-        alert(`${currentLanguage === 'zh' ? '打開文件:' : 'Opening file:'} ${filename}`);
-    }
-
-    // DeepSeek functions
-    function askDeepSeek() {
-        const input = document.getElementById('deepseek-input');
-        const chat = document.getElementById('deepseek-chat');
-
-        if (input.value.trim()) {
-            const question = input.value;
-            chat.innerHTML += `<div><strong>You:</strong> ${question}</div>`;
+    // 锁定系统
+    function lockSystem() {
+        document.getElementById('lock-screen').classList.remove('hidden');
+
+        // 清空PIN输入
+        document.querySelectorAll('#lock-screen .pin-input').forEach(input => {
             input.value = '';
+        });
 
-            // Simulate AI response (in a real app, this would call an API)
+        // 聚焦第一个输入框
+        document.getElementById('lock-pin-1').focus();
+
+        // 隐藏错误信息
+        document.getElementById('lock-error').classList.add('hidden');
+    }
+
+    // 检查PIN码
+    function checkPin() {
+        const lockPinInputs = document.querySelectorAll('#lock-screen .pin-input');
+        let enteredPin = '';
+
+        lockPinInputs.forEach(input => {
+            enteredPin += input.value;
+        });
+
+        const storedPin = atob(localStorage.getItem('circleos_pin'));
+
+        if (enteredPin === storedPin) {
+            // 解锁系统
+            document.getElementById('lock-screen').classList.add('hidden');
+        } else {
+            // 显示错误信息
+            document.getElementById('lock-error').classList.remove('hidden');
+
+            // 清空PIN输入
             setTimeout(() => {
-                const responses = [
-                    "I'm DeepSeek, an AI assistant. How can I help you today?",
-                    "That's an interesting question. Here's what I know about that...",
-                    "I'm sorry, I can't answer that in this demo version.",
-                    "For more information, please visit the official DeepSeek website."
-                ];
-                const response = responses[Math.floor(Math.random() * responses.length)];
-                chat.innerHTML += `<div><strong>DeepSeek:</strong> ${response}</div>`;
-                chat.scrollTop = chat.scrollHeight;
-            }, 1000);
+                lockPinInputs.forEach(input => {
+                    input.value = '';
+                });
+                document.getElementById('lock-pin-1').focus();
+                document.getElementById('lock-error').classList.add('hidden');
+            }, 1500);
         }
     }
 
-    // MLA functions
-    function generateMLA() {
-        const author = document.getElementById('mla-author').value;
-        const title = document.getElementById('mla-title').value;
-        const container = document.getElementById('mla-container').value;
-        const publisher = document.getElementById('mla-publisher').value;
-        const date = document.getElementById('mla-date').value;
-
-        if (!title) {
-            alert(currentLanguage === 'zh' ? "標題是必需的！" : "Title is required!");
-            return;
-        }
-
-        let citation = "";
-        if (author) citation += `${author}. `;
-        citation += `"${title}." `;
-        if (container) citation += `<em>${container}</em>, `;
-        if (publisher) citation += `${publisher}, `;
-        if (date) citation += `${date}.`;
-
-        const result = document.getElementById('mla-result');
-        result.innerHTML = `<strong>MLA Citation:</strong><br>${citation}`;
-        result.style.display = 'block';
+    // 更新时间
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('current-time').textContent = timeString;
     }
 
-    // Feedback functions
-    function submitFeedback() {
-        const feedback = document.getElementById('feedback-text').value;
-        if (feedback.trim()) {
-            // In a real app, you would send this to a server
-            alert(currentLanguage === 'zh' ? '感謝您的反饋！' : 'Thank you for your feedback!');
-            closeApp('feedback-window');
-        } else {
-            alert(currentLanguage === 'zh' ? '請輸入一些反饋內容' : 'Please enter some feedback');
-        }
+    // 应用壁纸
+    function applyWallpaper() {
+        const wallpaperColor = localStorage.getItem('circleos_wallpaper') || 'bg-black';
+        document.getElementById('desktop-content').className = `flex-grow p-4 ${wallpaperColor} transition-colors duration-500`;
     }
 
-    // Settings functions
-    function switchTab(tabName) {
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
+    // 加载系统配置
+    function loadSystemConfig() {
+        // 应用壁纸
+        applyWallpaper();
+
+        // 设置设置页面的壁纸选项
+        const wallpaperColor = localStorage.getItem('circleos_wallpaper') || 'bg-black';
+        document.querySelectorAll('#settings-window .wallpaper-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.getAttribute('data-color') === wallpaperColor) {
+                option.classList.add('selected');
+            }
         });
 
-        // Show selected tab
-        document.getElementById(tabName + '-tab').classList.add('active');
-        document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-    }
+        // 设置设置页面的壁纸选项点击事件
+        document.querySelectorAll('#settings-window .wallpaper-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // 移除所有选中状态
+                document.querySelectorAll('#settings-window .wallpaper-option').forEach(opt => opt.classList.remove('selected'));
+                // 添加当前选中状态
+                this.classList.add('selected');
 
-    function saveAppearanceSettings(event) {
-        event.preventDefault();
-        const bgColor = document.getElementById('bg-color').value;
-        const fontSize = document.getElementById('font-size').value;
-        const language = document.getElementById('language').value;
-        const darkModeSetting = document.getElementById('dark-mode').value === 'true';
+                // 保存壁纸颜色
+                const newWallpaperColor = this.getAttribute('data-color');
+                localStorage.setItem('circleos_wallpaper', newWallpaperColor);
 
-        if (bgColor === 'dynamic') {
-            setDynamicWallpaper();
-        } else {
-            document.body.style.background = bgColor;
-            document.documentElement.style.setProperty('--bg-color', bgColor);
-        }
-
-        document.body.style.fontSize = fontSize;
-        toggleDarkMode(darkModeSetting);
-
-        // Update CSS variables
-        document.documentElement.style.setProperty('--font-size', fontSize);
-
-        // Save to localStorage
-        localStorage.setItem('novaos_bg_color', bgColor);
-        localStorage.setItem('novaos_font_size', fontSize);
-        localStorage.setItem('novaos_dark_mode', darkModeSetting);
-
-        // Change language if needed
-        if (language !== currentLanguage) {
-            changeLanguage(language);
-        }
-
-        alert(currentLanguage === 'zh' ? '外觀設置已保存！' : 'Appearance settings saved!');
-    }
-
-    function changePassword(event) {
-        event.preventDefault();
-
-        const currentPwd = document.getElementById('current-password').value;
-        const newPwd = document.getElementById('new-password').value;
-        const confirmPwd = document.getElementById('confirm-password').value;
-
-        if (currentPwd !== currentPassword) {
-            alert(currentLanguage === 'zh' ? '當前密碼不正確！' : 'Current password is incorrect!');
-            return;
-        }
-
-        if (newPwd !== confirmPwd) {
-            alert(currentLanguage === 'zh' ? '新密碼不匹配！' : 'New passwords don\'t match!');
-            return;
-        }
-
-        currentPassword = newPwd;
-        localStorage.setItem('novaos_password', newPwd);
-        alert(currentLanguage === 'zh' ? '密碼更改成功！' : 'Password changed successfully!');
-
-        // Clear form
-        document.getElementById('current-password').value = '';
-        document.getElementById('new-password').value = '';
-        document.getElementById('confirm-password').value = '';
-    }
-
-    function saveTimeFormat(event) {
-        event.preventDefault();
-        const selectedFormat = document.querySelector('input[name="time-format"]:checked').value;
-
-        timeFormat = selectedFormat;
-        localStorage.setItem('novaos_time_format', selectedFormat);
-
-        updateTime();
-        updateLockScreenTime();
-
-        alert(currentLanguage === 'zh' ? '時間格式已保存！' : 'Time format saved!');
-    }
-
-    // Draggable windows
-    function makeDraggable(element, header) {
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-
-        header.onmousedown = dragMouseDown;
-
-        function dragMouseDown(e) {
-            if (e.target.classList.contains('window-btn')) return;
-
-            e.preventDefault();
-            // Bring to front
-            element.style.zIndex = zIndexCounter++;
-            activeWindow = element;
-
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            document.onmousemove = elementDrag;
-        }
-
-        function elementDrag(e) {
-            e.preventDefault();
-            pos1 = pos3 - e.clientX;
-            pos2 = pos4 - e.clientY;
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-
-            // Calculate new position
-            let newTop = element.offsetTop - pos2;
-            let newLeft = element.offsetLeft - pos1;
-
-            // Constrain to window bounds
-            newTop = Math.max(0, Math.min(newTop, window.innerHeight - 50));
-            newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - 100));
-
-            element.style.top = newTop + "px";
-            element.style.left = newLeft + "px";
-        }
-
-        function closeDragElement() {
-            document.onmouseup = null;
-            document.onmousemove = null;
-        }
-    }
-
-    // Resizable windows
-    function makeResizable(element, handle) {
-        handle.addEventListener('mousedown', initResize);
-
-        function initResize(e) {
-            e.preventDefault();
-            isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
-            startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
-            document.addEventListener('mousemove', resize);
-            document.addEventListener('mouseup', stopResize);
-        }
-
-        function resize(e) {
-            if (!isResizing) return;
-
-            const newWidth = startWidth + e.clientX - startX;
-            const newHeight = startHeight + e.clientY - startY;
-
-            if (newWidth > 300) {
-                element.style.width = newWidth + 'px';
-            }
-
-            if (newHeight > 200) {
-                element.style.height = newHeight + 'px';
-            }
-        }
-
-        function stopResize() {
-            isResizing = false;
-            document.removeEventListener('mousemove', resize);
-            document.removeEventListener('mouseup', stopResize);
-        }
-    }
-
-    // Lock screen functions
-    function showLockScreen() {
-        updateLockScreenTime();
-        document.getElementById('lock-screen').style.display = 'flex';
-        document.getElementById('password').focus();
-    }
-
-    function unlockScreen() {
-        const password = document.getElementById('password').value;
-        const errorMessage = document.getElementById('error-message');
-
-        if (password === currentPassword) {
-            document.getElementById('lock-screen').style.display = 'none';
-            errorMessage.style.display = 'none';
-            document.getElementById('password').value = '';
-        } else {
-            errorMessage.style.display = 'block';
-            document.getElementById('password').value = '';
-            document.getElementById('password').focus();
-        }
-    }
-
-    function togglePasswordVisibility() {
-        const passwordInput = document.getElementById('password');
-        const toggle = document.querySelector('.password-toggle');
-
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggle.textContent = '👁️';
-        } else {
-            passwordInput.type = 'password';
-            toggle.textContent = '👁️';
-        }
-    }
-
-    // Initialize the OS when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        initOS();
-    });
-
-    // Event listeners
-    document.getElementById('password')?.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            unlockScreen();
-        }
-    });
-
-    // Allow dragging files onto the OS (prevent default behavior)
-    document.addEventListener('dragover', function(e) {
-        e.preventDefault();
-    });
-
-    document.addEventListener('drop', function(e) {
-        e.preventDefault();
-    });
-
-    // Handle messages from the browser iframe
-    window.addEventListener('message', function(e) {
-        // Check if the message is from a trusted source
-        if (e.origin === window.location.origin ||
-            e.data === 'https://example.com' ||
-            e.data === 'https://wikipedia.org' ||
-            e.data === 'https://google.com') {
-
-            const iframes = document.querySelectorAll('.browser-frame');
-            iframes.forEach(iframe => {
-                try {
-                    iframe.src = e.data;
-
-                    // Update tab title
-                    const iframeId = iframe.id;
-                    const windowId = iframeId.split('-iframe-')[0];
-                    const tabId = iframeId.split('-iframe-')[1];
-
-                    if (browserTabs[windowId]) {
-                        const tab = browserTabs[windowId].tabs.find(t => t.id == tabId);
-                        if (tab) {
-                            tab.url = e.data;
-                            iframe.onload = function() {
-                                try {
-                                    tab.title = iframe.contentDocument.title || e.data;
-                                } catch (err) {
-                                    tab.title = new URL(e.data).hostname;
-                                }
-                                renderBrowserTabs(windowId);
-                            };
-                        }
-                    }
-                } catch (err) {
-                    console.error('Failed to navigate iframe:', err);
-                }
+                // 应用新壁纸
+                applyWallpaper();
             });
+        });
+
+        // 设置保存PIN码按钮
+        document.getElementById('save-pin').addEventListener('click', function() {
+            const newPinInputs = document.querySelectorAll('#settings-window .pin-input');
+            let newPin = '';
+            let isValid = true;
+
+            newPinInputs.forEach(input => {
+                if (!input.value) {
+                    isValid = false;
+                }
+                newPin += input.value;
+            });
+
+            if (isValid && newPin.length === 4) {
+                // 保存新PIN码（简单加密）
+                localStorage.setItem('circleos_pin', btoa(newPin));
+
+                // 清空输入
+                newPinInputs.forEach(input => {
+                    input.value = '';
+                });
+
+                alert('PIN码已更新');
+            } else {
+                alert('请输入完整的4位PIN码');
+            }
+        });
+
+        // 设置导出数据按钮
+        document.getElementById('export-data').addEventListener('click', function() {
+            // 收集所有数据
+            const data = {
+                pin: localStorage.getItem('circleos_pin'),
+                wallpaper: localStorage.getItem('circleos_wallpaper'),
+                code: localStorage.getItem('circleos_code'),
+                notepad: localStorage.getItem('circleos_notepad'),
+                tasks: localStorage.getItem('circleos_tasks')
+            };
+
+            // 创建JSON字符串
+            const dataStr = JSON.stringify(data);
+
+            // 创建下载链接
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'circleos_backup.json';
+            link.click();
+
+            // 清理
+            URL.revokeObjectURL(url);
+        });
+
+        // 设置导入数据按钮
+        document.getElementById('import-data').addEventListener('click', function() {
+            document.getElementById('import-file').click();
+        });
+
+        // 设置文件输入变化事件
+        document.getElementById('import-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+
+                        // 导入数据
+                        if (data.pin) localStorage.setItem('circleos_pin', data.pin);
+                        if (data.wallpaper) {
+                            localStorage.setItem('circleos_wallpaper', data.wallpaper);
+                            applyWallpaper();
+                        }
+                        if (data.code) localStorage.setItem('circleos_code', data.code);
+                        if (data.notepad) localStorage.setItem('circleos_notepad', data.notepad);
+                        if (data.tasks) localStorage.setItem('circleos_tasks', data.tasks);
+
+                        alert('数据导入成功');
+
+                        // 重新加载应用内容
+                        loadAppData();
+
+                        // 如果计算器应用是打开的，重新加载任务
+                        if (document.getElementById('calculator-window').classList.contains('active')) {
+                            loadTasks();
+                        }
+                    } catch (error) {
+                        alert('导入失败：无效的数据文件');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+    }
+
+    // 加载应用程序数据
+    function loadAppData() {
+        // 加载VS Code内容
+        const savedCode = localStorage.getItem('circleos_code');
+        if (savedCode) {
+            document.getElementById('code-editor').value = savedCode;
         }
-    });
+
+        // 加载记事本内容
+        const savedNote = localStorage.getItem('circleos_notepad');
+        if (savedNote) {
+            document.getElementById('notepad-content').value = savedNote;
+        }
+
+        // 设置保存代码按钮
+        document.getElementById('save-code').addEventListener('click', function() {
+            const code = document.getElementById('code-editor').value;
+            localStorage.setItem('circleos_code', code);
+            alert('代码已保存');
+        });
+
+        // 设置保存笔记按钮
+        document.getElementById('save-note').addEventListener('click', function() {
+            const note = document.getElementById('notepad-content').value;
+            localStorage.setItem('circleos_notepad', note);
+            alert('笔记已保存');
+        });
+
+        // 设置任务表单提交
+        document.getElementById('task-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const date = document.getElementById('task-date').value;
+
+            // 获取现有任务
+            let tasks = JSON.parse(localStorage.getItem('circleos_tasks') || '[]');
+
+            // 添加新任务
+            tasks.push({
+                id: Date.now(),
+                title,
+                description,
+                date,
+                completed: false
+            });
+
+            // 保存任务
+            localStorage.setItem('circleos_tasks', JSON.stringify(tasks));
+
+            // 清空表单
+            document.getElementById('task-form').reset();
+
+            // 重新加载任务列表
+            loadTasks();
+        });
+    }
+
+    // 加载应用内容
+    function loadAppContent(appName) {
+        if (appName === 'vscode') {
+            const savedCode = localStorage.getItem('circleos_code');
+            if (savedCode) {
+                document.getElementById('code-editor').value = savedCode;
+            }
+        } else if (appName === 'notepad') {
+            const savedNote = localStorage.getItem('circleos_notepad');
+            if (savedNote) {
+                document.getElementById('notepad-content').value = savedNote;
+            }
+        }
+    }
+
+    // 加载任务
+    function loadTasks() {
+        const taskList = document.getElementById('task-list');
+        taskList.innerHTML = '';
+
+        // 获取任务
+        const tasks = JSON.parse(localStorage.getItem('circleos_tasks') || '[]');
+
+        // 按日期排序
+        tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // 如果没有任务，显示提示
+        if (tasks.length === 0) {
+            const emptyMessage = document.createElement('li');
+            emptyMessage.className = 'text-gray-500 text-center py-4';
+            emptyMessage.textContent = '暂无任务，请添加新任务';
+            taskList.appendChild(emptyMessage);
+            return;
+        }
+
+        // 添加任务到列表
+        tasks.forEach(task => {
+            const taskItem = document.createElement('li');
+            taskItem.className = `task-item ${task.completed ? 'completed' : ''}`;
+
+            const taskContent = document.createElement('div');
+            taskContent.innerHTML = `
+                    <div class="font-medium">${task.title}</div>
+                    <div class="text-sm text-gray-600">${task.description}</div>
+                    <div class="text-xs text-gray-500">${formatDate(task.date)}</div>
+                `;
+
+            const taskActions = document.createElement('div');
+            taskActions.className = 'task-actions';
+
+            const completeBtn = document.createElement('button');
+            completeBtn.className = 'complete-btn';
+            completeBtn.innerHTML = task.completed ?
+                '<i class="fa fa-check-circle" aria-hidden="true"></i>' :
+                '<i class="fa fa-circle-o" aria-hidden="true"></i>';
+            completeBtn.addEventListener('click', () => toggleTaskComplete(task.id));
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.innerHTML = '<i class="fa fa-pencil" aria-hidden="true"></i>';
+            editBtn.addEventListener('click', () => editTask(task.id));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '<i class="fa fa-trash" aria-hidden="true"></i>';
+            deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+            taskActions.appendChild(completeBtn);
+            taskActions.appendChild(editBtn);
+            taskActions.appendChild(deleteBtn);
+
+            taskItem.appendChild(taskContent);
+            taskItem.appendChild(taskActions);
+
+            taskList.appendChild(taskItem);
+        });
+    }
+
+    // 切换任务完成状态
+    function toggleTaskComplete(taskId) {
+        const tasks = JSON.parse(localStorage.getItem('circleos_tasks') || '[]');
+        const updatedTasks = tasks.map(task => {
+            if (task.id === taskId) {
+                return { ...task, completed: !task.completed };
+            }
+            return task;
+        });
+
+        localStorage.setItem('circleos_tasks', JSON.stringify(updatedTasks));
+        loadTasks();
+    }
+
+    // 编辑任务
+    function editTask(taskId) {
+        const tasks = JSON.parse(localStorage.getItem('circleos_tasks') || '[]');
+        const task = tasks.find(t => t.id === taskId);
+
+        if (task) {
+            const newTitle = prompt('编辑任务标题:', task.title);
+            if (newTitle !== null) {
+                const newDescription = prompt('编辑任务描述:', task.description);
+                if (newDescription !== null) {
+                    const newDate = prompt('编辑任务日期 (YYYY-MM-DD):', task.date);
+                    if (newDate !== null) {
+                        const updatedTasks = tasks.map(t => {
+                            if (t.id === taskId) {
+                                return { ...t, title: newTitle, description: newDescription, date: newDate };
+                            }
+                            return t;
+                        });
+
+                        localStorage.setItem('circleos_tasks', JSON.stringify(updatedTasks));
+                        loadTasks();
+                    }
+                }
+            }
+        }
+    }
+
+    // 删除任务
+    function deleteTask(taskId) {
+        if (confirm('确定要删除这个任务吗？')) {
+            const tasks = JSON.parse(localStorage.getItem('circleos_tasks') || '[]');
+            const updatedTasks = tasks.filter(task => task.id !== taskId);
+
+            localStorage.setItem('circleos_tasks', JSON.stringify(updatedTasks));
+            loadTasks();
+        }
+    }
+
+    // 格式化日期
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('zh-CN');
+    }
+
+    // 设置搜索功能
+    function setupSearch() {
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+
+            if (query.length === 0) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            // 搜索应用程序
+            const apps = [
+                { name: 'VS Code', icon: 'fa-code', color: 'text-blue-600', app: 'vscode' },
+                { name: '记事本', icon: 'fa-file-text-o', color: 'text-green-600', app: 'notepad' },
+                { name: '设置', icon: 'fa-cog', color: 'text-gray-600', app: 'settings' },
+                { name: '计算器', icon: 'fa-calendar', color: 'text-purple-600', app: 'calculator' }
+            ];
+
+            const matchingApps = apps.filter(app => app.name.toLowerCase().includes(query));
+
+            // 搜索任务
+            const tasks = JSON.parse(localStorage.getItem('circleos_tasks') || '[]');
+            const matchingTasks = tasks.filter(task =>
+                task.title.toLowerCase().includes(query) ||
+                task.description.toLowerCase().includes(query)
+            );
+
+            // 显示搜索结果
+            searchResults.innerHTML = '';
+
+            if (matchingApps.length === 0 && matchingTasks.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'search-item text-gray-500';
+                noResults.textContent = '没有找到匹配的结果';
+                searchResults.appendChild(noResults);
+            } else {
+                // 添加应用程序结果
+                matchingApps.forEach(app => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-item flex items-center';
+                    resultItem.innerHTML = `
+                            <i class="fa ${app.icon} ${app.color} mr-2" aria-hidden="true"></i>
+                            <span>${app.name}</span>
+                        `;
+                    resultItem.addEventListener('click', () => {
+                        openApp(app.app);
+                        searchResults.classList.remove('active');
+                        searchInput.value = '';
+                    });
+                    searchResults.appendChild(resultItem);
+                });
+
+                // 添加任务结果
+                matchingTasks.forEach(task => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-item flex items-center';
+                    resultItem.innerHTML = `
+                            <i class="fa fa-calendar-check-o text-green-600 mr-2" aria-hidden="true"></i>
+                            <div>
+                                <div>${task.title}</div>
+                                <div class="text-xs text-gray-500">${formatDate(task.date)}</div>
+                            </div>
+                        `;
+                    resultItem.addEventListener('click', () => {
+                        openApp('calculator');
+                        searchResults.classList.remove('active');
+                        searchInput.value = '';
+                    });
+                    searchResults.appendChild(resultItem);
+                });
+            }
+
+            searchResults.classList.add('active');
+        });
+
+        // 点击其他地方关闭搜索结果
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        });
+    }
 </script>
 </body>
 </html>
