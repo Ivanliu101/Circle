@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CircleOS - 安全模式</title>
+    <title>CircleOS - Safe Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
     <style>
@@ -59,8 +59,8 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen">
 <div class="text-center mb-8">
-    <h1 class="text-4xl font-bold text-green-400 mb-4">CircleOS v1 - 安全模式</h1>
-    <p class="text-yellow-400">系统正在安全模式下运行</p>
+    <h1 class="text-4xl font-bold text-green-400 mb-4">CircleOS v1 - Safe Mode</h1>
+    <p class="text-yellow-400">System is running in Safe Mode</p>
 </div>
 
 <div class="w-full max-w-4xl">
@@ -68,67 +68,67 @@
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:00]</span>
             <span class="log-level-info">[INFO]</span>
-            系统启动中...
+            System booting up...
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:01]</span>
             <span class="log-level-info">[INFO]</span>
-            检测到安全模式启动
+            Safe mode detected
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:02]</span>
             <span class="log-level-debug">[DEBUG]</span>
-            初始化核心系统组件
+            Initializing core system components
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:03]</span>
             <span class="log-level-info">[INFO]</span>
-            加载文件系统: /system
+            Loading file system: /system
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:04]</span>
             <span class="log-level-info">[INFO]</span>
-            用户认证服务启动
+            User authentication service started
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:05]</span>
             <span class="log-level-warning">[WARNING]</span>
-            部分非核心服务已禁用
+            Some non-core services disabled
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:06]</span>
             <span class="log-level-info">[INFO]</span>
-            网络服务初始化完成
+            Network services initialized
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:07]</span>
             <span class="log-level-debug">[DEBUG]</span>
-            内存使用: 128MB / 2GB
+            Memory usage: 128MB / 2GB
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:08]</span>
             <span class="log-level-info">[INFO]</span>
-            安全模式启动完成
+            Safe mode startup completed
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:09]</span>
             <span class="log-level-info">[INFO]</span>
-            等待用户输入...
+            Waiting for user input...
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:10]</span>
             <span class="log-level-debug">[DEBUG]</span>
-            系统状态: 正常运行
+            System status: Running normally
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:11]</span>
             <span class="log-level-info">[INFO]</span>
-            按任意键返回主系统
+            Press any key to return to main system
         </div>
         <div class="log-entry">
             <span class="log-time">[2025-12-11 10:00:12]</span>
             <span class="log-level-info">[INFO]</span>
-            或点击下方按钮重启系统
+            Or click buttons below to restart system
         </div>
         <div class="log-entry">
             <span class="cursor">_</span>
@@ -138,20 +138,20 @@
 
 <div class="mt-8 space-y-4">
     <button onclick="restartSystem()" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold">
-        重启系统
+        Restart System
     </button>
     <button onclick="shutdownSystem()" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold">
-        关闭系统
+        Shutdown System
     </button>
 </div>
 
 <div class="mt-8 text-center text-sm text-gray-400">
-    <p>开发者信息:</p>
-    <p>系统版本: CircleOS v1</p>
-    <p>构建日期: 2025-12-11</p>
-    <p>开发者: AI Assistant</p>
-    <p>内核版本: 5.15.0</p>
-    <p>安全模式: 已启用</p>
+    <p>Developer Information:</p>
+    <p>System Version: CircleOS v1</p>
+    <p>Build Date: 2025-12-11</p>
+    <p>Developer: AI Assistant</p>
+    <p>Kernel Version: 5.15.0</p>
+    <p>Safe Mode: Enabled</p>
 </div>
 
 <script>
@@ -173,9 +173,9 @@
         alert('系统已关闭');
         document.body.innerHTML = `
                 <div class="flex flex-col items-center justify-center min-h-screen">
-                    <h1 class="text-6xl font-bold text-white mb-8">关机</h1>
+                    <h1 class="text-6xl font-bold text-white mb-8">Shutdown</h1>
                     <button onclick="window.location.href='index.html'" class="px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-xl">
-                        开机
+                        Power On
                     </button>
                 </div>
             `;

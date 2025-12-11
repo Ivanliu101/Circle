@@ -205,10 +205,16 @@
 
     <!-- Lock Screen -->
     <div id="lock-screen" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
-        <div class="glass p-8 rounded-2xl w-96 animate-fade-in">
-            <h1 class="text-2xl font-bold text-center text-white mb-8">CircleOS Locked</h1>
+        <div class="glass p-8 rounded-2xl w-96 animate-fade-in text-center">
+            <h1 class="text-4xl font-bold text-white mb-8">Circle</h1>
+
+            <!-- Liquid Glass Clock -->
+            <div class="glass p-6 rounded-2xl mb-8 backdrop-blur-md border border-white/30">
+                <div id="lock-screen-time" class="text-5xl font-bold text-white mb-2">00:00:00</div>
+                <div id="lock-screen-date" class="text-lg text-white/80">YYYY-MM-DD</div>
+            </div>
+
             <div class="mb-6">
-                <label for="pin-input" class="block text-sm font-medium text-white mb-2">Enter PIN to unlock</label>
                 <input type="password" id="pin-input" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
             </div>
             <button id="unlock-button" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">Unlock</button>
@@ -271,8 +277,8 @@
         'browser': {
             name: 'Browser',
             icon: '🌐',
-            width: 900,
-            height: 600,
+            width: 1024,
+            height: 768,
             content: `
                     <div class="h-full flex flex-col">
                         <div class="bg-gray-100 p-2 flex items-center space-x-2 border-b">
@@ -1091,6 +1097,7 @@
                 <div class="window-content">
                     ${app.content}
                 </div>
+                <div class="window-resize-handle absolute bottom-0 right-0 w-4 h-4 bg-gray-400 cursor-se-resize" style="border-top-left-radius: 4px;"></div>
             `;
 
         document.getElementById('windows-container').appendChild(windowElement);
@@ -1163,10 +1170,12 @@
         }
     }
 
-    // Initialize window dragging
+    // Initialize window dragging and resizing
     function initializeWindowDragging(windowElement) {
         const header = windowElement.querySelector('.window-header');
+        const resizeHandle = windowElement.querySelector('.window-resize-handle');
 
+        // Window dragging
         header.addEventListener('mousedown', (e) => {
             if (e.target.closest('.window-button')) return;
 
@@ -1179,6 +1188,46 @@
             focusWindow(windowElement.id);
 
             e.preventDefault();
+        });
+
+        // Window resizing
+        let isResizing = false;
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            const rect = windowElement.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.right;
+            dragOffset.y = e.clientY - rect.bottom;
+
+            activeWindowElement = windowElement;
+            focusWindow(windowElement.id);
+
+            e.preventDefault();
+        });
+
+        // Handle resize on mouse move
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing || !activeWindowElement) return;
+
+            const container = document.getElementById('windows-container');
+            const containerRect = container.getBoundingClientRect();
+
+            let newWidth = e.clientX - dragOffset.x - containerRect.left;
+            let newHeight = e.clientY - dragOffset.y - containerRect.top;
+
+            // Minimum size constraints
+            newWidth = Math.max(300, newWidth);
+            newHeight = Math.max(200, newHeight);
+
+            // Update window size
+            activeWindowElement.style.width = `${newWidth}px`;
+            activeWindowElement.style.height = `${newHeight}px`;
+            activeWindowElement.style.transform = 'none';
+        });
+
+        // Stop resizing on mouse up
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
         });
     }
 
@@ -1526,11 +1575,11 @@
         terminalDiv.className = 'fixed inset-0 bg-black z-50 flex flex-col items-center justify-center';
         terminalDiv.innerHTML = `
                 <div class="text-center text-white">
-                    <div class="text-4xl font-bold mb-8">终端模式</div>
+                    <div class="text-4xl font-bold mb-8">Terminal Mode</div>
                     <div class="bg-gray-900 p-4 rounded-lg mb-8 text-green-400 font-mono">
                         <div>Welcome to CircleOS Terminal</div>
-                        <div>这个功能正在开发中...</div>
-                        <div id="countdown">3秒后自动重启...</div>
+                        <div>This feature is under development...</div>
+                        <div id="countdown">Restarting in 3 seconds...</div>
                     </div>
                 </div>
             `;
@@ -1541,7 +1590,7 @@
 
         const countdownInterval = setInterval(() => {
             countdown--;
-            countdownEl.textContent = `${countdown}秒后自动重启...`;
+            countdownEl.textContent = `Restarting in ${countdown} seconds...`;
 
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
