@@ -3,34 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CircleOS v1</title>
+    <title>CircleOS v0.0.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#9333EA', // Purple
-                        secondary: '#EC4899', // Pink
-                        accent: '#F472B6', // Light pink
-                        dark: '#1F2937',
-                        light: '#FFFFFF',
-                        background: '#F9FAFB'
+                        primary: '#8B5CF6',
+                        secondary: '#EC4899',
+                        accent: '#06B6D4',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
                     },
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif']
-                    },
-                    animation: {
-                        'bounce-slow': 'bounce 3s infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite'
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' }
-                        }
+                        sans: ['Inter', 'sans-serif']
                     }
                 }
             }
@@ -43,1145 +32,883 @@
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.2);
             }
-            .glass-dark {
-                background: rgba(31, 41, 55, 0.8);
+            .glass-hover {
+                background: rgba(255, 255, 255, 0.15);
                 backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.3);
             }
-            .text-gradient {
-                background: linear-gradient(135deg, #8B5CF6, #EC4899);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+            .window-shadow {
+                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
             }
-            .bg-gradient-primary {
-                background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            .sidebar-icon {
+                @apply relative flex items-center justify-center h-12 w-12 mt-2 mb-2 mx-auto shadow-lg
+                bg-gray-800 text-primary hover:bg-primary hover:text-white
+                rounded-3xl hover:rounded-xl transition-all duration-300 ease-linear
+                cursor-pointer;
             }
-            .border-gradient {
-                border-image: linear-gradient(135deg, #8B5CF6, #EC4899) 1;
+            .sidebar-tooltip {
+                @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
+                text-white bg-gray-900
+                text-xs font-bold transition-all duration-100 scale-0 origin-left;
             }
-            .app-shadow {
-                box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.1), 0 8px 10px -6px rgba(139, 92, 246, 0.1);
+            .sidebar-hr {
+                @apply bg-gray-700 border border-gray-700 rounded-full mx-2;
             }
-            .app-shadow-hover {
-                box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.2), 0 10px 10px -5px rgba(139, 92, 246, 0.1);
+            .window-header {
+                @apply flex items-center justify-between p-2 bg-gray-800 text-white rounded-t-lg cursor-move;
+            }
+            .window-content {
+                @apply p-4 bg-white rounded-b-lg h-full overflow-auto;
+            }
+            .window-button {
+                @apply w-8 h-8 flex items-center justify-center rounded-full mx-1 transition-all duration-200;
+            }
+            .active-window {
+                @apply border-l-4 border-blue-500;
+            }
+            .minimized-window {
+                @apply border-l-4 border-gray-500;
             }
         }
     </style>
+    <link rel="stylesheet" href="animations.css">
 </head>
-<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-white min-h-screen text-gray-800 overflow-x-hidden">
-<!-- Loading Screen -->
-<div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-white">
-    <div class="w-24 h-24 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
-    <h1 class="text-3xl font-bold text-gradient mb-2">CircleOS</h1>
-    <p class="text-gray-600 text-lg">Loading v1.0...</p>
-    <div class="mt-8 w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
-        <div id="loading-bar" class="h-full bg-gradient-primary w-0 transition-all duration-300"></div>
-    </div>
-</div>
+<body class="bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 min-h-screen font-sans text-gray-900 overflow-hidden">
 
-<!-- Welcome Screen -->
-<div id="welcome-screen" class="fixed inset-0 z-40 hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-white opacity-95"></div>
-    <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
-        <div class="text-center mb-12 animate-float">
-            <h1 class="text-6xl md:text-8xl font-bold text-gradient mb-4">CircleOS</h1>
-            <p class="text-2xl text-primary font-light">Version 1.0</p>
-            <p class="text-gray-600 mt-4 max-w-md mx-auto">Experience the next generation of operating system with beautiful purple and pink themes</p>
+<!-- Background Animation -->
+<div id="bg-animation" class="fixed inset-0 z-0 opacity-20"></div>
+
+<!-- Main Container -->
+<div class="relative z-10 flex h-screen">
+
+    <!-- Left Sidebar -->
+    <div class="sidebar glass w-16 flex flex-col items-center py-4">
+        <!-- Search -->
+        <div class="sidebar-icon group mb-4" id="search-button">
+            <i data-lucide="search" class="w-6 h-6"></i>
+            <span class="sidebar-tooltip group-hover:scale-100">Search</span>
         </div>
 
-        <div class="bg-white/80 backdrop-blur-md rounded-2xl p-8 w-full max-w-md border border-purple-100 shadow-lg">
-            <h2 class="text-2xl font-bold text-center mb-6 text-gradient">Welcome</h2>
-            <p class="text-gray-600 text-center mb-8">Click the button below to start your CircleOS journey</p>
-            <button id="start-button" class="w-full py-4 px-6 bg-gradient-primary text-white rounded-xl font-semibold text-lg hover:opacity-90 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                Start CircleOS
-            </button>
+        <!-- Apps -->
+        <div class="sidebar-icon group" data-app="vs-code">
+            <span class="text-xl">💻</span>
+            <span class="sidebar-tooltip group-hover:scale-100">VS Code</span>
+        </div>
+        <div class="sidebar-icon group" data-app="notepad">
+            <span class="text-xl">📝</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Notepad</span>
+        </div>
+        <div class="sidebar-icon group" data-app="calendar">
+            <span class="text-xl">📅</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Calendar</span>
+        </div>
+        <div class="sidebar-icon group" data-app="files">
+            <span class="text-xl">📁</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Files</span>
+        </div>
+        <div class="sidebar-icon group" data-app="browser">
+            <span class="text-xl">🌐</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Browser</span>
+        </div>
+        <div class="sidebar-icon group" data-app="paint">
+            <span class="text-xl">🎨</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Paint</span>
+        </div>
+        <div class="sidebar-icon group" data-app="settings">
+            <span class="text-xl">⚙️</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Settings</span>
         </div>
 
-        <!-- Version indicator (click to bypass) -->
-        <div id="version-info" class="absolute bottom-4 left-4 text-sm text-gray-500 cursor-pointer hover:text-primary transition-colors" title="Click to enter desktop">
-            CircleOS v1.0
-        </div>
-    </div>
-</div>
+        <hr class="sidebar-hr my-4">
 
-<!-- Setup Wizard -->
-<div id="setup-wizard" class="fixed inset-0 z-30 hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-white opacity-95"></div>
-    <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
-        <div class="bg-white/90 backdrop-blur-md rounded-2xl p-8 w-full max-w-md border border-purple-100 shadow-lg">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gradient mb-2">Setup Wizard</h1>
-                <p class="text-gray-600" id="setup-step-indicator">Step 1/3</p>
-            </div>
-
-            <!-- Progress bar -->
-            <div class="w-full h-2 bg-gray-800 rounded-full mb-8 overflow-hidden">
-                <div id="setup-progress-bar" class="h-full bg-gradient-primary w-0 transition-all duration-500"></div>
-            </div>
-
-            <!-- Step 1: PIN Setup -->
-            <div id="setup-step-1" class="setup-step active">
-                <h2 class="text-xl font-semibold mb-6 text-center">Create Your PIN</h2>
-                <p class="text-gray-600 text-center mb-6">Enter a 4-digit PIN to secure your system</p>
-
-                <div class="flex justify-center mb-6">
-                    <input type="password" id="single-pin-input" placeholder="Enter 4-digit PIN" maxlength="4"
-                           class="w-48 px-4 py-3 text-center text-xl bg-white border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
-                </div>
-
-                <div class="text-center">
-                    <button id="next-step-1" class="py-3 px-8 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        Continue
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Theme Selection -->
-            <div id="setup-step-2" class="setup-step hidden">
-                <h2 class="text-xl font-semibold mb-6 text-center">Choose Your Theme</h2>
-                <p class="text-gray-600 text-center mb-6">Select your preferred color theme</p>
-
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="theme-option cursor-pointer p-4 rounded-xl border-2 border-transparent hover:border-primary/50 transition-all" data-theme="purple-pink">
-                        <div class="w-full h-20 bg-gradient-to-br from-primary to-secondary rounded-lg mb-3"></div>
-                        <p class="text-center font-medium">Purple Pink</p>
-                        <p class="text-center text-sm text-gray-400">Default</p>
-                    </div>
-                    <div class="theme-option cursor-pointer p-4 rounded-xl border-2 border-transparent hover:border-primary/50 transition-all" data-theme="blue-purple">
-                        <div class="w-full h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mb-3"></div>
-                        <p class="text-center font-medium">Blue Purple</p>
-                        <p class="text-center text-sm text-gray-400">Cool</p>
-                    </div>
-                    <div class="theme-option cursor-pointer p-4 rounded-xl border-2 border-transparent hover:border-primary/50 transition-all" data-theme="pink-red">
-                        <div class="w-full h-20 bg-gradient-to-br from-pink-500 to-red-500 rounded-lg mb-3"></div>
-                        <p class="text-center font-medium">Pink Red</p>
-                        <p class="text-center text-sm text-gray-400">Warm</p>
-                    </div>
-                    <div class="theme-option cursor-pointer p-4 rounded-xl border-2 border-transparent hover:border-primary/50 transition-all" data-theme="green-teal">
-                        <div class="w-full h-20 bg-gradient-to-br from-green-500 to-teal-400 rounded-lg mb-3"></div>
-                        <p class="text-center font-medium">Green Teal</p>
-                        <p class="text-center text-sm text-gray-400">Nature</p>
-                    </div>
-                </div>
-
-                <div class="flex justify-between">
-                    <button id="prev-step-2" class="py-3 px-6 bg-gray-700 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-gray-500/50">
-                        Back
-                    </button>
-                    <button id="next-step-2" class="py-3 px-8 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-primary/50" disabled>
-                        Continue
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 3: Finish Setup -->
-            <div id="setup-step-3" class="setup-step hidden">
-                <h2 class="text-xl font-semibold mb-6 text-center">Setup Complete!</h2>
-                <p class="text-gray-600 text-center mb-8">Your CircleOS v1 is ready to use</p>
-
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 mx-auto bg-gradient-primary rounded-full flex items-center justify-center mb-4">
-                        <i class="fa fa-check text-3xl text-white"></i>
-                    </div>
-                    <p class="text-gray-400">All settings have been configured</p>
-                </div>
-
-                <div class="text-center">
-                    <button id="finish-setup" class="py-3 px-8 bg-gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        Start Using CircleOS
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Version indicator -->
-        <div id="setup-version-info" class="absolute bottom-4 left-4 text-sm text-gray-500 cursor-pointer hover:text-primary transition-colors" title="Click to bypass setup">
-            CircleOS v1.0
+        <!-- System Info -->
+        <div class="sidebar-icon group mt-auto" id="system-info">
+            <i data-lucide="info" class="w-6 h-6"></i>
+            <span class="sidebar-tooltip group-hover:scale-100">System Info</span>
         </div>
     </div>
-</div>
 
-<!-- Desktop Interface -->
-<div id="desktop" class="fixed inset-0 z-20 hidden">
-    <!-- Background with enhanced streamline design -->
-    <div id="desktop-background" class="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50 to-white overflow-hidden">
-        <!-- Advanced streamline design elements -->
-        <div class="absolute top-0 left-0 w-full h-full">
-            <!-- Primary flowing streamline shapes -->
-            <div class="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-r from-primary/10 to-secondary/10 rounded-full blur-[6rem] animate-pulse-slow"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-[32rem] h-[32rem] bg-gradient-to-r from-secondary/10 to-primary/10 rounded-full blur-[5rem] animate-pulse-slow" style="animation-delay: 1s;"></div>
-
-            <!-- Secondary flowing elements -->
-            <div class="absolute top-1/3 right-1/3 w-[28rem] h-[28rem] bg-gradient-to-r from-primary/8 to-secondary/8 rounded-full blur-[4rem] animate-pulse-slow" style="animation-delay: 0.5s;"></div>
-            <div class="absolute bottom-1/3 left-1/3 w-[24rem] h-[24rem] bg-gradient-to-r from-secondary/8 to-primary/8 rounded-full blur-[4rem] animate-pulse-slow" style="animation-delay: 1.5s;"></div>
-
-            <!-- Tertiary flowing elements -->
-            <div class="absolute top-1/2 left-1/2 w-[20rem] h-[20rem] bg-gradient-to-r from-primary/5 to-secondary/5 rounded-full blur-[3rem] animate-pulse-slow" style="animation-delay: 2s;"></div>
-            <div class="absolute top-1/4 right-1/4 w-[16rem] h-[16rem] bg-gradient-to-r from-secondary/5 to-primary/5 rounded-full blur-[3rem] animate-pulse-slow" style="animation-delay: 2.5s;"></div>
-
-            <!-- Dynamic streamline paths -->
-            <div class="absolute top-0 left-0 w-full h-full overflow-hidden">
-                <div class="absolute top-1/5 left-1/5 w-[30rem] h-[30rem] border-2 border-primary/10 rounded-full animate-[spin_30s_linear_infinite]"></div>
-                <div class="absolute top-1/4 left-1/4 w-[25rem] h-[25rem] border border-secondary/10 rounded-full animate-[spin_40s_linear_infinite_reverse]"></div>
-                <div class="absolute top-1/3 left-1/3 w-[20rem] h-[20rem] border border-primary/5 rounded-full animate-[spin_50s_linear_infinite]"></div>
+    <!-- Search Modal -->
+    <div id="search-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="glass p-8 rounded-2xl w-1/3 animate-fade-in">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search apps..." class="w-full p-4 pl-12 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-primary">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white"></i>
             </div>
-        </div>
-        <div id="particles-container" class="absolute inset-0"></div>
-    </div>
-
-    <!-- Taskbar -->
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full z-10 shadow-lg border border-gray-200">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-center h-14 space-x-2">
-                <!-- App icons -->
-                <div class="flex items-center space-x-1">
-                    <button class="taskbar-icon w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors relative" data-app="browser">
-                        <i class="fa fa-globe text-blue-500 text-lg"></i>
-                    </button>
-                    <button class="taskbar-icon w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors relative" data-app="files">
-                        <i class="fa fa-folder text-yellow-500 text-lg"></i>
-                    </button>
-                    <button class="taskbar-icon w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors relative" data-app="notes">
-                        <i class="fa fa-sticky-note text-green-500 text-lg"></i>
-                    </button>
-                    <button class="taskbar-icon w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors relative" data-app="calculator">
-                        <i class="fa fa-calculator text-purple-500 text-lg"></i>
-                    </button>
-                    <button class="taskbar-icon w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors relative" data-app="clock">
-                        <i class="fa fa-clock-o text-pink-500 text-lg"></i>
-                    </button>
-                    <button class="taskbar-icon w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors relative" data-app="settings">
-                        <i class="fa fa-cog text-gray-500 text-lg"></i>
-                    </button>
-                </div>
-
-                <!-- Lock button -->
-                <div class="flex items-center space-x-1">
-                    <button id="lock-button" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors">
-                        <i class="fa fa-lock text-gray-600 text-lg"></i>
-                    </button>
-                </div>
+            <div id="search-results" class="mt-4 max-h-60 overflow-y-auto">
+                <!-- Search results will be populated here -->
             </div>
         </div>
     </div>
 
-    <!-- Start Menu -->
-    <div id="start-menu" class="fixed bottom-16 left-4 glass-dark rounded-2xl p-4 w-80 border border-white/10 hidden z-20">
-        <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-white/10">
-            <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <i class="fa fa-circle text-white"></i>
-            </div>
-            <div>
-                <h3 class="font-semibold">CircleOS v1.0</h3>
-                <p class="text-sm text-gray-400">Welcome, User</p>
-            </div>
-        </div>
-
-        <div class="space-y-2 mb-4">
-            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-home w-6 text-center text-primary"></i>
-                <span>Home</span>
-            </button>
-            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-globe w-6 text-center text-blue-400"></i>
-                <span>Browser</span>
-            </button>
-            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-folder w-6 text-center text-yellow-400"></i>
-                <span>Files</span>
-            </button>
-            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-sticky-note w-6 text-center text-green-400"></i>
-                <span>Notes</span>
-            </button>
-            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-cog w-6 text-center text-gray-400"></i>
-                <span>Settings</span>
-            </button>
-        </div>
-
-        <div class="border-t border-white/10 pt-3">
-            <button class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-red-400">
-                <i class="fa fa-power-off w-6 text-center"></i>
-                <span>Shut Down</span>
-            </button>
-        </div>
+    <!-- Windows Container -->
+    <div id="windows-container" class="flex-1 relative overflow-hidden">
+        <!-- Windows will be dynamically created here -->
     </div>
 
-    <!-- Desktop Icons - Hidden as per user request -->
-    <div id="desktop-icons" class="hidden">
-        <!-- Desktop icons are now moved to taskbar -->
-    </div>
-</div>
-
-<!-- Lock Screen -->
-<div id="lock-screen" class="fixed inset-0 z-30 hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-white opacity-95"></div>
-    <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gradient mb-2">CircleOS</h1>
-            <p class="text-xl text-primary">Locked</p>
-        </div>
-
-        <div class="bg-white/90 backdrop-blur-md rounded-2xl p-8 w-full max-w-md border border-purple-100 shadow-lg">
-            <div class="text-center mb-6">
-                <div class="w-20 h-20 mx-auto bg-gradient-primary rounded-full flex items-center justify-center mb-4">
-                    <span class="font-medium text-xl text-white">U</span>
-                </div>
-                <h3 class="text-xl font-semibold text-gray-800">User</h3>
-                <p class="text-gray-600">Enter your PIN to unlock</p>
+    <!-- Lock Screen -->
+    <div id="lock-screen" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
+        <div class="glass p-8 rounded-2xl w-96 animate-fade-in">
+            <h1 class="text-2xl font-bold text-center text-white mb-8">CircleOS Locked</h1>
+            <div class="mb-6">
+                <label for="pin-input" class="block text-sm font-medium text-white mb-2">Enter PIN to unlock</label>
+                <input type="password" id="pin-input" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
             </div>
-
-            <div class="flex justify-center mb-6">
-                <input type="password" id="single-lock-pin-input" placeholder="Enter PIN" maxlength="4"
-                       class="w-48 px-4 py-3 text-center text-xl bg-white border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
-            </div>
-
-            <p id="lock-error" class="text-center text-red-500 hidden">Invalid PIN. Please try again.</p>
-        </div>
-    </div>
-</div>
-
-<!-- App Windows -->
-<!-- Browser App -->
-<div id="browser-app" class="app-window fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-4xl h-3/4 bg-white rounded-2xl border border-purple-100 shadow-lg hidden z-15">
-    <div class="app-header flex items-center justify-between p-4 border-b border-purple-100 bg-white">
-        <div class="flex items-center space-x-3">
-            <i class="fa fa-globe text-blue-500 text-xl"></i>
-            <h3 class="font-semibold text-gray-800">Browser</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button class="app-minimize w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="app-close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="app-content p-4 h-[calc(100%-60px)] overflow-auto bg-white">
-        <div class="bg-gray-50 rounded-lg p-6 mb-4">
-            <div class="flex items-center space-x-2 mb-4">
-                <i class="fa fa-search text-gray-400"></i>
-                <input type="text" placeholder="Search or enter URL" class="bg-transparent border-none outline-none flex-1 text-gray-800">
-                <button class="px-4 py-2 bg-gradient-primary rounded-lg text-white text-sm">Go</button>
-            </div>
-        </div>
-
-        <div class="space-y-4">
-            <div class="bg-gray-50 rounded-lg p-6">
-                <h2 class="text-2xl font-bold mb-4 text-gradient">Welcome to CircleOS Browser</h2>
-                <p class="text-gray-600 mb-4">This is a simulated web browser interface with beautiful purple and pink themes.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                        <h3 class="font-semibold mb-2 text-gray-800">CircleOS Homepage</h3>
-                        <p class="text-sm text-gray-600">Official website</p>
-                    </div>
-                    <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                        <h3 class="font-semibold mb-2 text-gray-800">App Store</h3>
-                        <p class="text-sm text-gray-600">Download apps</p>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-4">
-                    <p class="text-center text-sm text-gray-700">🔍 Search the web or visit your favorite websites</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Files App -->
-<div id="files-app" class="app-window fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-4xl h-3/4 bg-white rounded-2xl border border-purple-100 shadow-lg hidden z-15">
-    <div class="app-header flex items-center justify-between p-4 border-b border-purple-100 bg-white">
-        <div class="flex items-center space-x-3">
-            <i class="fa fa-folder text-yellow-500 text-xl"></i>
-            <h3 class="font-semibold text-gray-800">Files</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button class="app-minimize w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="app-close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="app-content p-4 h-[calc(100%-60px)] overflow-auto bg-white">
-        <div class="flex items-center space-x-3 mb-6">
-            <button class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-gray-800">
-                <i class="fa fa-arrow-left mr-2"></i> Back
-            </button>
-            <button class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-gray-800">
-                <i class="fa fa-plus mr-2"></i> New
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                <div class="flex items-center space-x-3 mb-2">
-                    <i class="fa fa-folder text-yellow-500 text-xl"></i>
-                    <h3 class="font-semibold text-gray-800">Documents</h3>
-                </div>
-                <p class="text-sm text-gray-600">Your documents folder</p>
-            </div>
-
-            <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                <div class="flex items-center space-x-3 mb-2">
-                    <i class="fa fa-picture-o text-green-500 text-xl"></i>
-                    <h3 class="font-semibold text-gray-800">Pictures</h3>
-                </div>
-                <p class="text-sm text-gray-600">Your photos and images</p>
-            </div>
-
-            <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                <div class="flex items-center space-x-3 mb-2">
-                    <i class="fa fa-music text-purple-500 text-xl"></i>
-                    <h3 class="font-semibold text-gray-800">Music</h3>
-                </div>
-                <p class="text-sm text-gray-600">Your music collection</p>
-            </div>
-
-            <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                <div class="flex items-center space-x-3 mb-2">
-                    <i class="fa fa-file-text-o text-blue-500 text-xl"></i>
-                    <h3 class="font-semibold text-gray-800">notes.txt</h3>
-                </div>
-                <p class="text-sm text-gray-600">Text Document • 2 KB</p>
-            </div>
-
-            <div class="bg-white rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer shadow-sm">
-                <div class="flex items-center space-x-3 mb-2">
-                    <i class="fa fa-file-image-o text-pink-500 text-xl"></i>
-                    <h3 class="font-semibold text-gray-800">wallpaper.jpg</h3>
-                </div>
-                <p class="text-sm text-gray-600">Image • 1.2 MB</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Notes App -->
-<div id="notes-app" class="app-window fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-3/4 bg-white rounded-2xl border border-purple-100 shadow-lg hidden z-15">
-    <div class="app-header flex items-center justify-between p-4 border-b border-purple-100 bg-white">
-        <div class="flex items-center space-x-3">
-            <i class="fa fa-sticky-note text-green-500 text-xl"></i>
-            <h3 class="font-semibold text-gray-800">Notes</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button class="app-minimize w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors text-gray-800">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="app-close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors text-gray-800">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="app-content p-4 h-[calc(100%-60px)] overflow-auto bg-white">
-        <div class="flex items-center space-x-3 mb-6">
-            <button id="new-note-btn" class="px-4 py-2 bg-gradient-primary rounded-lg hover:opacity-90 transition-colors text-white">
-                <i class="fa fa-plus mr-2"></i> New Note
-            </button>
-        </div>
-
-        <div id="notes-container" class="space-y-4">
-            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-primary shadow-sm">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-semibold text-lg text-gray-800">Welcome Note</h3>
-                    <span class="text-xs text-gray-600">Today</span>
-                </div>
-                <p class="text-gray-700">Welcome to CircleOS v1! This is your first note. You can create, edit, and delete notes here.</p>
-            </div>
-
-            <div class="bg-gray-50 rounded-lg p-4 border-l-4 border-secondary shadow-sm">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-semibold text-lg text-gray-800">PIN Reminder</h3>
-                    <span class="text-xs text-gray-600">Today</span>
-                </div>
-                <p class="text-gray-700">Remember to keep your PIN secure. This is for demonstration purposes only.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Settings App -->
-<div id="settings-app" class="app-window fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-3xl h-3/4 bg-white rounded-2xl border border-purple-100 shadow-lg hidden z-15">
-    <div class="app-header flex items-center justify-between p-4 border-b border-white/10">
-        <div class="flex items-center space-x-3">
-            <i class="fa fa-cog text-gray-400 text-xl"></i>
-            <h3 class="font-semibold">Settings</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button class="app-minimize w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="app-close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="app-content p-4 h-[calc(100%-60px)] overflow-auto">
-        <div class="space-y-6">
-            <div class="bg-white/5 rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gradient">Personalization</h2>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Theme</label>
-                        <select class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50">
-                            <option>Purple Pink (Default)</option>
-                            <option>Blue Purple</option>
-                            <option>Pink Red</option>
-                            <option>Green Teal</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Background</label>
-                        <div class="grid grid-cols-4 gap-3">
-                            <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-lg cursor-pointer border-2 border-primary"></div>
-                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg cursor-pointer hover:border-2 hover:border-primary/50 transition-all"></div>
-                            <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-red-500 rounded-lg cursor-pointer hover:border-2 hover:border-primary/50 transition-all"></div>
-                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-400 rounded-lg cursor-pointer hover:border-2 hover:border-primary/50 transition-all"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white/5 rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gradient">Security</h2>
-
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="font-medium">PIN Protection</h3>
-                            <p class="text-sm text-gray-400">Enable PIN lock</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        </label>
-                    </div>
-
-                    <button class="w-full bg-white/10 hover:bg-white/20 transition-colors rounded-lg px-4 py-2 text-left">
-                        <span class="font-medium">Change PIN</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white/5 rounded-lg p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gradient">About</h2>
-
-                <div class="space-y-2">
-                    <p><strong>OS Version:</strong> CircleOS v7.0</p>
-                    <p><strong>Build:</strong> 2025.12.11</p>
-                    <p><strong>Theme:</strong> Purple Pink</p>
-                    <p><strong>Status:</strong> Running</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Calculator App -->
-<div id="calculator-app" class="app-window fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-[600px] glass-dark rounded-2xl border border-white/10 hidden z-15 app-shadow">
-    <div class="app-header flex items-center justify-between p-4 border-b border-white/10">
-        <div class="flex items-center space-x-3">
-            <i class="fa fa-calculator text-purple-400 text-xl"></i>
-            <h3 class="font-semibold">Calculator</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button class="app-minimize w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="app-close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="app-content p-6 h-[calc(100%-60px)] flex flex-col">
-        <div class="bg-white/5 rounded-lg p-4 mb-6">
-            <input type="text" id="calc-display" class="w-full bg-transparent border-none outline-none text-right text-3xl font-mono" readonly>
-        </div>
-
-        <div class="grid grid-cols-4 gap-3 flex-1">
-            <button class="calc-btn bg-white/10 hover:bg-white/20 transition-colors rounded-xl text-xl py-4" data-value="C">C</button>
-            <button class="calc-btn bg-white/10 hover:bg-white/20 transition-colors rounded-xl text-xl py-4" data-value="±">±</button>
-            <button class="calc-btn bg-white/10 hover:bg-white/20 transition-colors rounded-xl text-xl py-4" data-value="%">%</button>
-            <button class="calc-btn bg-primary/20 hover:bg-primary/30 transition-colors rounded-xl text-xl py-4 text-primary" data-value="/">÷</button>
-
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="7">7</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="8">8</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="9">9</button>
-            <button class="calc-btn bg-primary/20 hover:bg-primary/30 transition-colors rounded-xl text-xl py-4 text-primary" data-value="*">×</button>
-
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="4">4</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="5">5</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="6">6</button>
-            <button class="calc-btn bg-primary/20 hover:bg-primary/30 transition-colors rounded-xl text-xl py-4 text-primary" data-value="-">−</button>
-
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="1">1</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="2">2</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value="3">3</button>
-            <button class="calc-btn bg-primary/20 hover:bg-primary/30 transition-colors rounded-xl text-xl py-4 text-primary" data-value="+">+</button>
-
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4 col-span-2" data-value="0">0</button>
-            <button class="calc-btn bg-white/5 hover:bg-white/10 transition-colors rounded-xl text-xl py-4" data-value=".">.</button>
-            <button class="calc-btn bg-gradient-primary hover:opacity-90 transition-colors rounded-xl text-xl py-4" data-value="=">=</button>
-        </div>
-    </div>
-</div>
-
-<!-- Clock App -->
-<div id="clock-app" class="app-window fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-2xl border border-purple-100 shadow-lg hidden z-15">
-    <div class="app-header flex items-center justify-between p-4 border-b border-purple-100 bg-white">
-        <div class="flex items-center space-x-3">
-            <i class="fa fa-clock-o text-pink-500 text-xl"></i>
-            <h3 class="font-semibold text-gray-800">Clock</h3>
-        </div>
-        <div class="flex items-center space-x-2">
-            <button class="app-minimize w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-minus"></i>
-            </button>
-            <button class="app-close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
-                <i class="fa fa-times"></i>
-            </button>
-        </div>
-    </div>
-    <div class="app-content p-6 h-[calc(100%-60px)] flex flex-col items-center justify-center">
-        <div class="relative w-48 h-48 mb-6">
-            <div class="absolute inset-0 border-4 border-white/20 rounded-full"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-4 h-4 bg-gradient-primary rounded-full"></div>
-            </div>
-            <div id="hour-hand" class="absolute top-1/2 left-1/2 w-1 h-16 bg-white/80 origin-bottom transform -translate-x-1/2 -translate-y-full rounded-full"></div>
-            <div id="minute-hand" class="absolute top-1/2 left-1/2 w-1 h-20 bg-white/90 origin-bottom transform -translate-x-1/2 -translate-y-full rounded-full"></div>
-            <div id="second-hand" class="absolute top-1/2 left-1/2 w-0.5 h-22 bg-primary origin-bottom transform -translate-x-1/2 -translate-y-full rounded-full"></div>
-
-            <!-- Clock numbers -->
-            <div class="absolute top-2 left-1/2 transform -translate-x-1/2 font-semibold">12</div>
-            <div class="absolute top-1/2 right-2 transform -translate-y-1/2 font-semibold">3</div>
-            <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 font-semibold">6</div>
-            <div class="absolute top-1/2 left-2 transform -translate-y-1/2 font-semibold">9</div>
-        </div>
-
-        <div class="text-center">
-            <div id="current-time" class="text-2xl font-mono font-semibold text-gradient"></div>
-            <div id="current-date" class="text-sm text-gray-400 mt-1"></div>
+            <button id="unlock-button" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">Unlock</button>
         </div>
     </div>
 </div>
 
 <script>
-    class CircleOS {
-        constructor() {
-            this.currentStep = 1;
-            this.selectedTheme = 'purple-pink';
-            this.isSetupComplete = false;
-            this.isLocked = false;
-            this.calculator = {
-                display: '',
-                operator: null,
-                previousValue: null,
-                waitingForOperand: false
-            };
+    // Initialize Lucide icons
+    lucide.createIcons();
 
-            this.init();
-        }
-
-        init() {
-            console.log('Initializing CircleOS v7.0...');
-            this.setupEventListeners();
-            this.startLoadingSequence();
-            this.setupCalculator();
-            this.updateClock();
-            setInterval(() => this.updateClock(), 1000);
-        }
-
-        startLoadingSequence() {
-            let progress = 0;
-            const loadingBar = document.getElementById('loading-bar');
-
-            const loadingInterval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(loadingInterval);
-
-                    setTimeout(() => {
-                        document.getElementById('loading-screen').classList.add('hidden');
-                        document.getElementById('welcome-screen').classList.remove('hidden');
-                    }, 500);
-                }
-                loadingBar.style.width = progress + '%';
-            }, 200);
-        }
-
-        setupEventListeners() {
-            // Welcome screen
-            document.getElementById('start-button').addEventListener('click', () => {
-                document.getElementById('welcome-screen').classList.add('hidden');
-                document.getElementById('setup-wizard').classList.remove('hidden');
-                this.setupPinInput();
-            });
-
-            // Version indicator bypass
-            document.getElementById('version-info').addEventListener('click', () => {
-                this.forceBypassSetup();
-            });
-
-            document.getElementById('setup-version-info').addEventListener('click', () => {
-                this.forceBypassSetup();
-            });
-
-            // Setup wizard navigation
-            document.getElementById('next-step-1').addEventListener('click', () => {
-                this.validateAndProceedToStep(2);
-            });
-
-            document.getElementById('prev-step-2').addEventListener('click', () => {
-                this.goToStep(1);
-            });
-
-            document.getElementById('next-step-2').addEventListener('click', () => {
-                this.goToStep(3);
-            });
-
-            document.getElementById('finish-setup').addEventListener('click', () => {
-                this.completeSetup();
-            });
-
-            // Theme selection
-            document.querySelectorAll('.theme-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    document.querySelectorAll('.theme-option').forEach(opt => {
-                        opt.classList.remove('border-primary');
-                        opt.classList.add('border-transparent');
-                    });
-                    option.classList.remove('border-transparent');
-                    option.classList.add('border-primary');
-                    this.selectedTheme = option.dataset.theme;
-                    document.getElementById('next-step-2').disabled = false;
-                });
-            });
-
-            // Taskbar
-            document.getElementById('start-button-taskbar').addEventListener('click', () => {
-                const startMenu = document.getElementById('start-menu');
-                startMenu.classList.toggle('hidden');
-            });
-
-            document.getElementById('lock-button').addEventListener('click', () => {
-                this.lockSystem();
-            });
-
-            // Desktop icons and taskbar icons
-            document.querySelectorAll('.desktop-icon, .taskbar-icon').forEach(icon => {
-                icon.addEventListener('click', () => {
-                    const app = icon.dataset.app;
-                    this.openApp(app);
-                });
-            });
-
-            // App window controls
-            document.querySelectorAll('.app-close').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const appWindow = e.target.closest('.app-window');
-                    appWindow.classList.add('hidden');
-                });
-            });
-
-            document.querySelectorAll('.app-minimize').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const appWindow = e.target.closest('.app-window');
-                    appWindow.classList.add('hidden');
-                });
-            });
-
-            // Notes app
-            document.getElementById('new-note-btn').addEventListener('click', () => {
-                this.createNewNote();
-            });
-
-            // Lock screen PIN input
-            this.setupLockPinInput();
-
-            // Click outside to close start menu
-            document.addEventListener('click', (e) => {
-                const startMenu = document.getElementById('start-menu');
-                const startButton = document.getElementById('start-button-taskbar');
-                if (!startMenu.contains(e.target) && !startButton.contains(e.target)) {
-                    startMenu.classList.add('hidden');
-                }
-            });
-        }
-
-        setupPinInput() {
-            const pinInput = document.getElementById('single-pin-input');
-            if (pinInput) {
-                pinInput.addEventListener('input', () => {
-                    if (pinInput.value.length === 4) {
-                        this.validateAndProceedToStep(2);
-                    }
-                });
-
-                pinInput.addEventListener('keydown', (e) => {
-                    if (!/^\d$/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' &&
-                        e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
-                        e.preventDefault();
-                    }
-
-                    if (e.key === 'Enter' && pinInput.value.length === 4) {
-                        this.validateAndProceedToStep(2);
-                    }
-                });
-
-                setTimeout(() => pinInput.focus(), 100);
-            }
-        }
-
-        setupLockPinInput() {
-            const lockPinInput = document.getElementById('single-lock-pin-input');
-            if (lockPinInput) {
-                lockPinInput.addEventListener('input', () => {
-                    if (lockPinInput.value.length === 4) {
-                        this.checkPin();
-                    }
-                });
-
-                lockPinInput.addEventListener('keydown', (e) => {
-                    if (!/^\d$/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' &&
-                        e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
-                        e.preventDefault();
-                    }
-
-                    if (e.key === 'Enter' && lockPinInput.value.length === 4) {
-                        this.checkPin();
-                    }
-                });
-            }
-        }
-
-        validateAndProceedToStep(step) {
-            if (step === 2) {
-                const pinInput = document.getElementById('single-pin-input');
-                const pin = pinInput.value.trim();
-
-                if (pin.length === 4 && /^\d+$/.test(pin)) {
-                    localStorage.setItem('circleos_pin', btoa(pin));
-                    this.goToStep(step);
-                } else {
-                    this.showPinError();
-                }
-            }
-        }
-
-        showPinError() {
-            let errorMsg = document.getElementById('pin-error');
-            if (!errorMsg) {
-                errorMsg = document.createElement('p');
-                errorMsg.id = 'pin-error';
-                errorMsg.className = 'text-red-500 text-center text-sm mt-2';
-                document.getElementById('single-pin-input').parentNode.appendChild(errorMsg);
-            }
-            errorMsg.textContent = 'Please enter a 4-digit PIN code';
-            errorMsg.style.display = 'block';
-
-            setTimeout(() => {
-                errorMsg.style.display = 'none';
-            }, 3000);
-        }
-
-        goToStep(step) {
-            document.querySelectorAll('.setup-step').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`setup-step-${step}`).classList.remove('hidden');
-
-            const progressBar = document.getElementById('setup-progress-bar');
-            const stepIndicator = document.getElementById('setup-step-indicator');
-
-            if (step === 1) {
-                progressBar.style.width = '0%';
-                stepIndicator.textContent = 'Step 1/3';
-            } else if (step === 2) {
-                progressBar.style.width = '33%';
-                stepIndicator.textContent = 'Step 2/3';
-            } else if (step === 3) {
-                progressBar.style.width = '66%';
-                stepIndicator.textContent = 'Step 3/3';
-            }
-
-            this.currentStep = step;
-        }
-
-        completeSetup() {
-            localStorage.setItem('circleos_setup_complete', 'true');
-            localStorage.setItem('circleos_theme', this.selectedTheme);
-
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('desktop').classList.remove('hidden');
-
-            this.isSetupComplete = true;
-            this.createParticles();
-        }
-
-        forceBypassSetup() {
-            // Generate a default PIN for bypass
-            const defaultPin = '1234';
-            localStorage.setItem('circleos_pin', btoa(defaultPin));
-            localStorage.setItem('circleos_setup_complete', 'true');
-            localStorage.setItem('circleos_theme', 'purple-pink');
-
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('desktop').classList.remove('hidden');
-
-            this.isSetupComplete = true;
-            this.createParticles();
-        }
-
-        lockSystem() {
-            this.isLocked = true;
-            document.getElementById('lock-screen').classList.remove('hidden');
-            document.getElementById('single-lock-pin-input').value = '';
-            setTimeout(() => {
-                document.getElementById('single-lock-pin-input').focus();
-            }, 100);
-        }
-
-        checkPin() {
-            const lockPinInput = document.getElementById('single-lock-pin-input');
-            const enteredPin = lockPinInput.value.trim();
-            const storedPin = atob(localStorage.getItem('circleos_pin'));
-
-            if (enteredPin === storedPin) {
-                this.isLocked = false;
-                document.getElementById('lock-screen').classList.add('hidden');
-                lockPinInput.value = '';
-            } else {
-                document.getElementById('lock-error').classList.remove('hidden');
-                setTimeout(() => {
-                    lockPinInput.value = '';
-                    lockPinInput.focus();
-                    document.getElementById('lock-error').classList.add('hidden');
-                }, 1500);
-            }
-        }
-
-        openApp(appName) {
-            const appWindow = document.getElementById(`${appName}-app`);
-            if (appWindow) {
-                document.querySelectorAll('.app-window').forEach(window => {
-                    window.classList.add('hidden');
-                });
-                appWindow.classList.remove('hidden');
-            }
-        }
-
-        createNewNote() {
-            const notesContainer = document.getElementById('notes-container');
-            const note = document.createElement('div');
-            note.className = 'bg-white/5 rounded-lg p-4 border-l-4 border-secondary animate-fadeIn';
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString();
-
-            note.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-semibold text-lg">New Note</h3>
-                        <span class="text-xs text-gray-400">${dateStr}</span>
+    // App definitions
+    const apps = {
+        'vs-code': {
+            name: 'VS Code',
+            icon: '💻',
+            width: 800,
+            height: 600,
+            content: `
+                    <div class="flex h-full bg-gray-900 text-white">
+                        <div class="w-48 bg-gray-800 p-4">
+                            <div class="text-sm text-gray-400 mb-2">FILES</div>
+                            <div class="space-y-1">
+                                <div class="flex items-center text-sm hover:text-primary cursor-pointer"><i data-lucide="file-code" class="w-4 h-4 mr-2"></i>main.js</div>
+                                <div class="flex items-center text-sm hover:text-primary cursor-pointer"><i data-lucide="file-code" class="w-4 h-4 mr-2"></i>style.css</div>
+                                <div class="flex items-center text-sm hover:text-primary cursor-pointer"><i data-lucide="file-code" class="w-4 h-4 mr-2"></i>index.html</div>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <div class="bg-gray-800 p-2 flex items-center space-x-2 border-b border-gray-700">
+                                <span class="text-sm">main.js - Visual Studio Code</span>
+                            </div>
+                            <div class="flex-1 p-4 font-mono text-sm overflow-auto">
+                                <pre class="text-green-400">// Welcome to CircleOS VS Code</pre>
+                                <pre class="text-blue-400">function <span class="text-yellow-300">greet</span>() {</pre>
+                                <pre class="text-white">  <span class="text-purple-400">console</span>.<span class="text-yellow-300">log</span>(<span class="text-green-300">"Hello, CircleOS!"</span>);</pre>
+                                <pre class="text-blue-400">}</pre>
+                                <pre class="text-white"><span class="text-yellow-300">greet</span>();</pre>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-gray-300">Click here to edit this note...</p>
-                `;
+                `
+        },
+        'notepad': {
+            name: 'Notepad',
+            icon: '📝',
+            width: 600,
+            height: 400,
+            content: `
+                    <textarea class="w-full h-full p-4 bg-white border-0 focus:ring-0 resize-none" placeholder="Start typing..."></textarea>
+                `
+        },
+        'calendar': {
+            name: 'Calendar',
+            icon: '📅',
+            width: 700,
+            height: 500,
+            content: `
+                    <div class="h-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <button class="text-primary hover:text-primary/80"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+                            <h2 class="text-xl font-bold">June 2024</h2>
+                            <button class="text-primary hover:text-primary/80"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                            <div class="text-sm font-semibold text-gray-600">Sun</div>
+                            <div class="text-sm font-semibold text-gray-600">Mon</div>
+                            <div class="text-sm font-semibold text-gray-600">Tue</div>
+                            <div class="text-sm font-semibold text-gray-600">Wed</div>
+                            <div class="text-sm font-semibold text-gray-600">Thu</div>
+                            <div class="text-sm font-semibold text-gray-600">Fri</div>
+                            <div class="text-sm font-semibold text-gray-600">Sat</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1">
+                            ${Array(30).fill(0).map((_, i) => `
+                                <div class="h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer ${i === 14 ? 'bg-primary text-white' : ''}">
+                                    ${i + 1}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `
+        },
+        'files': {
+            name: 'Files',
+            icon: '📁',
+            width: 750,
+            height: 550,
+            content: `
+                    <div class="h-full flex flex-col">
+                        <div class="bg-gray-100 p-4 rounded-t-lg border-b">
+                            <div class="flex items-center space-x-2">
+                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">📁 Documents</button>
+                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">📷 Pictures</button>
+                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">🎵 Music</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 p-4 overflow-auto">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border">
+                                    <span class="text-2xl mr-3">📁</span>
+                                    <div>
+                                        <div class="font-medium">Projects</div>
+                                        <div class="text-xs text-gray-500">Folder</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border">
+                                    <span class="text-2xl mr-3">📄</span>
+                                    <div>
+                                        <div class="font-medium">Resume.pdf</div>
+                                        <div class="text-xs text-gray-500">PDF - 2MB</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border">
+                                    <span class="text-2xl mr-3">📷</span>
+                                    <div>
+                                        <div class="font-medium">Screenshot.png</div>
+                                        <div class="text-xs text-gray-500">Image - 1MB</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+        },
+        'browser': {
+            name: 'Browser',
+            icon: '🌐',
+            width: 900,
+            height: 600,
+            content: `
+                    <div class="h-full flex flex-col">
+                        <div class="bg-gray-100 p-2 flex items-center space-x-2 border-b">
+                            <div class="flex-1 flex items-center bg-white rounded px-3 py-1 border">
+                                <i data-lucide="search" class="w-4 h-4 text-gray-400 mr-2"></i>
+                                <input type="text" class="w-full border-0 focus:ring-0 text-sm" value="https://circleos.com/home" readonly>
+                            </div>
+                            <button class="p-1 hover:bg-gray-200 rounded"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                            <button class="p-1 hover:bg-gray-200 rounded"><i data-lucide="home" class="w-4 h-4"></i></button>
+                        </div>
+                        <div class="flex-1 overflow-auto p-4">
+                            <div class="max-w-4xl mx-auto">
+                                <h1 class="text-3xl font-bold mb-4 text-center text-primary">Welcome to CircleOS Browser</h1>
+                                <p class="text-center text-gray-600 mb-8">Your gateway to the internet</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
+                                        <div class="text-4xl mb-4">📧</div>
+                                        <h3 class="font-semibold mb-2">Email</h3>
+                                        <p class="text-sm text-gray-500">Check your messages</p>
+                                    </div>
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
+                                        <div class="text-4xl mb-4">📺</div>
+                                        <h3 class="font-semibold mb-2">Videos</h3>
+                                        <p class="text-sm text-gray-500">Watch videos online</p>
+                                    </div>
+                                    <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
+                                        <div class="text-4xl mb-4">🎮</div>
+                                        <h3 class="font-semibold mb-2">Games</h3>
+                                        <p class="text-sm text-gray-500">Play games online</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+        },
+        'paint': {
+            name: 'Paint',
+            icon: '🎨',
+            width: 800,
+            height: 600,
+            content: `
+                    <div class="h-full flex">
+                        <div class="w-20 bg-gray-100 border-r p-2 flex flex-col space-y-2">
+                            <button class="w-12 h-12 bg-white border rounded hover:bg-gray-50 flex items-center justify-center" data-tool="brush"><i data-lucide="brush" class="w-6 h-6"></i></button>
+                            <button class="w-12 h-12 bg-white border rounded hover:bg-gray-50 flex items-center justify-center" data-tool="eraser"><i data-lucide="eraser" class="w-6 h-6"></i></button>
+                            <button class="w-12 h-12 bg-white border rounded hover:bg-gray-50 flex items-center justify-center" data-tool="square"><i data-lucide="square" class="w-6 h-6"></i></button>
+                            <button class="w-12 h-12 bg-white border rounded hover:bg-gray-50 flex items-center justify-center" data-tool="circle"><i data-lucide="circle" class="w-6 h-6"></i></button>
+                            <div class="border-t pt-2 mt-2">
+                                <div class="text-xs text-center mb-2">Colors</div>
+                                <div class="grid grid-cols-2 gap-1">
+                                    ${['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFFFFF'].map(color => `
+                                        <button class="w-6 h-6 rounded-full border" style="background-color: ${color}" data-color="${color}"></button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <canvas id="paint-canvas" class="w-full h-full bg-white cursor-crosshair"></canvas>
+                        </div>
+                    </div>
+                `
+        },
+        'settings': {
+            name: 'Settings',
+            icon: '⚙️',
+            width: 600,
+            height: 500,
+            content: `
+                    <div class="h-full">
+                        <div class="flex mb-6">
+                            <button class="px-4 py-2 bg-primary text-white rounded-l-lg">General</button>
+                            <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-lg">Security</button>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-white p-4 rounded-lg border">
+                                <h3 class="font-semibold mb-3">System</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span>System Version</span>
+                                        <span class="text-gray-600">v0.0.1</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span>Auto-lock</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border">
+                                <h3 class="font-semibold mb-3">Personalization</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm mb-1">Theme</label>
+                                        <select class="w-full p-2 border rounded bg-white">
+                                            <option>Pink & Purple</option>
+                                            <option>Blue & Green</option>
+                                            <option>Dark Mode</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border">
+                                <h3 class="font-semibold mb-3">Security</h3>
+                                <div class="space-y-3">
+                                    <button id="change-pin-button" class="w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">Change PIN</button>
+                                    <button id="lock-now-button" class="w-full py-2 bg-primary text-white rounded-lg text-sm">Lock Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+        }
+    };
 
-            notesContainer.insertBefore(note, notesContainer.firstChild);
+    // Global variables
+    let activeWindows = {};
+    let nextWindowId = 1;
+    let isDragging = false;
+    let dragOffset = { x: 0, y: 0 };
+    let activeWindowElement = null;
+    let currentColor = '#000000';
+    let currentTool = 'brush';
+    let isPainting = false;
 
-            // Make note editable
-            note.addEventListener('click', () => {
-                const text = prompt('Edit note:', note.querySelector('p').textContent);
-                if (text !== null) {
-                    note.querySelector('p').textContent = text;
-                }
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeBackground();
+        initializeEventListeners();
+        initializePaintApp();
+        loadSystemState();
+    });
+
+    // Initialize background animation
+    function initializeBackground() {
+        const canvas = document.createElement('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        document.getElementById('bg-animation').appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedX: Math.random() * 0.5 - 0.25,
+                speedY: Math.random() * 0.5 - 0.25,
+                color: `rgba(${Math.random() * 255}, ${Math.random() * 100 + 155}, ${Math.random() * 255}, 0.5)`
             });
         }
 
-        setupCalculator() {
-            const display = document.getElementById('calculator-display');
-            const buttons = document.querySelectorAll('.calc-btn');
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
 
-            buttons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const value = button.dataset.value;
-                    this.handleCalculatorInput(value, display);
-                });
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
             });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    // Initialize event listeners
+    function initializeEventListeners() {
+        // App launchers
+        document.querySelectorAll('[data-app]').forEach(launcher => {
+            launcher.addEventListener('click', () => {
+                const appName = launcher.getAttribute('data-app');
+                openWindow(appName);
+            });
+        });
+
+        // Search functionality
+        document.getElementById('search-button').addEventListener('click', () => {
+            document.getElementById('search-modal').classList.toggle('hidden');
+            document.getElementById('search-input').focus();
+        });
+
+        document.getElementById('search-input').addEventListener('input', handleSearch);
+
+        // Close search modal when clicking outside
+        document.getElementById('search-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'search-modal') {
+                document.getElementById('search-modal').classList.add('hidden');
+            }
+        });
+
+        // System info
+        document.getElementById('system-info').addEventListener('click', showSystemInfo);
+
+        // Lock screen functionality
+        document.getElementById('unlock-button').addEventListener('click', unlockSystem);
+        document.getElementById('pin-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                unlockSystem();
+            }
+        });
+
+        // Settings buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'lock-now-button') {
+                lockSystem();
+            }
+            if (e.target.id === 'change-pin-button') {
+                changePin();
+            }
+        });
+
+        // Click outside to focus window
+        document.getElementById('windows-container').addEventListener('click', (e) => {
+            if (e.target.id === 'windows-container') {
+                focusWindow(null);
+            }
+        });
+    }
+
+    // Handle search
+    function handleSearch(e) {
+        const query = e.target.value.toLowerCase();
+        const results = document.getElementById('search-results');
+
+        if (query.length === 0) {
+            results.innerHTML = '';
+            return;
         }
 
-        handleCalculatorInput(value, display) {
-            const { calculator } = this;
+        const filteredApps = Object.entries(apps).filter(([key, app]) =>
+            app.name.toLowerCase().includes(query)
+        );
 
-            if (/\d/.test(value)) {
-                if (calculator.waitingForOperand) {
-                    display.value = value;
-                    calculator.waitingForOperand = false;
-                } else {
-                    display.value = display.value === '0' ? value : display.value + value;
-                }
-            } else if (value === '.') {
-                if (calculator.waitingForOperand) {
-                    display.value = '0.';
-                    calculator.waitingForOperand = false;
-                } else if (display.value.indexOf('.') === -1) {
-                    display.value += '.';
-                }
-            } else if (['+', '-', '*', '/'].indexOf(value) > -1) {
-                const inputValue = parseFloat(display.value);
+        results.innerHTML = filteredApps.map(([key, app]) => `
+                <div class="flex items-center p-2 hover:bg-white hover:bg-opacity-10 rounded cursor-pointer animate-fade-in" onclick="openWindow('${key}'); document.getElementById('search-modal').classList.add('hidden')">
+                    <span class="text-xl mr-3">${app.icon}</span>
+                    <span>${app.name}</span>
+                </div>
+            `).join('');
+    }
 
-                if (calculator.previousValue === null) {
-                    calculator.previousValue = inputValue;
-                } else if (calculator.operator) {
-                    const currentValue = calculator.previousValue || 0;
-                    const newValue = this.performCalculation(calculator.operator, currentValue, inputValue);
+    // Open a new window
+    function openWindow(appName) {
+        const app = apps[appName];
+        if (!app) return;
 
-                    display.value = String(newValue);
-                    calculator.previousValue = newValue;
-                }
+        const windowId = `window-${nextWindowId++}`;
+        const windowElement = document.createElement('div');
+        windowElement.id = windowId;
+        windowElement.className = 'fixed glass window-shadow rounded-lg overflow-hidden animate-slide-in-center z-20 transition-all duration-200';
+        windowElement.style.width = `${app.width}px`;
+        windowElement.style.height = `${app.height}px`;
+        windowElement.style.left = `calc(50% - ${app.width / 2}px)`;
+        windowElement.style.top = `calc(50% - ${app.height / 2}px)`;
 
-                calculator.waitingForOperand = true;
-                calculator.operator = value;
-            } else if (value === '=') {
-                const inputValue = parseFloat(display.value);
+        windowElement.innerHTML = `
+                <div class="window-header" data-window-id="${windowId}">
+                    <div class="flex items-center">
+                        <span class="text-xl mr-2">${app.icon}</span>
+                        <span>${app.name}</span>
+                    </div>
+                    <div class="flex">
+                        <button class="window-button hover:bg-gray-700" onclick="minimizeWindow('${windowId}')">
+                            <i data-lucide="minus" class="w-4 h-4"></i>
+                        </button>
+                        <button class="window-button hover:bg-gray-700" onclick="maximizeWindow('${windowId}')">
+                            <i data-lucide="maximize" class="w-4 h-4"></i>
+                        </button>
+                        <button class="window-button hover:bg-red-500" onclick="closeWindow('${windowId}')">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="window-content">
+                    ${app.content}
+                </div>
+            `;
 
-                if (calculator.previousValue !== null && calculator.operator) {
-                    const newValue = this.performCalculation(calculator.operator, calculator.previousValue, inputValue);
+        document.getElementById('windows-container').appendChild(windowElement);
+        lucide.createIcons();
 
-                    display.value = String(newValue);
-                    calculator.previousValue = null;
-                    calculator.operator = null;
-                    calculator.waitingForOperand = true;
-                }
-            } else if (value === 'C') {
-                display.value = '0';
-                calculator.previousValue = null;
-                calculator.operator = null;
-                calculator.waitingForOperand = false;
-            } else if (value === '±') {
-                display.value = String(parseFloat(display.value) * -1);
-            } else if (value === '%') {
-                display.value = String(parseFloat(display.value) / 100);
-            }
+        // Add to active windows
+        activeWindows[windowId] = {
+            app: appName,
+            element: windowElement,
+            isMinimized: false,
+            originalSize: { width: app.width, height: app.height },
+            originalPosition: { left: windowElement.style.left, top: windowElement.style.top }
+        };
+
+        // Update sidebar indicator
+        updateSidebarIndicators();
+
+        // Focus this window
+        focusWindow(windowId);
+
+        // Initialize window dragging
+        initializeWindowDragging(windowElement);
+
+        // Initialize app-specific functionality
+        if (appName === 'paint') {
+            initializePaintCanvas(windowId);
+        }
+    }
+
+    // Initialize window dragging
+    function initializeWindowDragging(windowElement) {
+        const header = windowElement.querySelector('.window-header');
+
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.window-button')) return;
+
+            isDragging = true;
+            const rect = windowElement.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+
+            activeWindowElement = windowElement;
+            focusWindow(windowElement.id);
+
+            e.preventDefault();
+        });
+    }
+
+    // Handle mouse movement for dragging
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging || !activeWindowElement) return;
+
+        const container = document.getElementById('windows-container');
+        const containerRect = container.getBoundingClientRect();
+
+        let newX = e.clientX - dragOffset.x - containerRect.left;
+        let newY = e.clientY - dragOffset.y - containerRect.top;
+
+        // Constrain to container
+        newX = Math.max(0, Math.min(newX, containerRect.width - activeWindowElement.offsetWidth));
+        newY = Math.max(0, Math.min(newY, containerRect.height - activeWindowElement.offsetHeight));
+
+        activeWindowElement.style.left = `${newX}px`;
+        activeWindowElement.style.top = `${newY}px`;
+    });
+
+    // Handle mouse up to stop dragging
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        activeWindowElement = null;
+    });
+
+    // Focus a window
+    function focusWindow(windowId) {
+        // Remove focus from all windows
+        Object.values(activeWindows).forEach(window => {
+            window.element.classList.remove('z-30');
+            window.element.classList.add('z-20');
+        });
+
+        // Focus the selected window
+        if (windowId && activeWindows[windowId]) {
+            activeWindows[windowId].element.classList.remove('z-20');
+            activeWindows[windowId].element.classList.add('z-30');
+        }
+    }
+
+    // Minimize a window
+    function minimizeWindow(windowId) {
+        const window = activeWindows[windowId];
+        if (!window) return;
+
+        if (window.isMinimized) {
+            // Restore window
+            window.element.style.display = 'block';
+            window.element.style.width = `${window.originalSize.width}px`;
+            window.element.style.height = `${window.originalSize.height}px`;
+            window.element.style.left = window.originalPosition.left;
+            window.element.style.top = window.originalPosition.top;
+            window.isMinimized = false;
+        } else {
+            // Minimize window
+            window.originalPosition = {
+                left: window.element.style.left,
+                top: window.element.style.top
+            };
+            window.element.style.display = 'none';
+            window.isMinimized = true;
         }
 
-        performCalculation(operator, firstValue, secondValue) {
-            switch (operator) {
-                case '+':
-                    return firstValue + secondValue;
-                case '-':
-                    return firstValue - secondValue;
-                case '*':
-                    return firstValue * secondValue;
-                case '/':
-                    return secondValue !== 0 ? firstValue / secondValue : 'Error';
-                default:
-                    return secondValue;
+        updateSidebarIndicators();
+    }
+
+    // Maximize a window
+    function maximizeWindow(windowId) {
+        const window = activeWindows[windowId];
+        if (!window) return;
+
+        const container = document.getElementById('windows-container');
+        const containerRect = container.getBoundingClientRect();
+
+        if (window.element.style.width === '100%') {
+            // Restore original size
+            window.element.style.width = `${window.originalSize.width}px`;
+            window.element.style.height = `${window.originalSize.height}px`;
+            window.element.style.left = window.originalPosition.left;
+            window.element.style.top = window.originalPosition.top;
+        } else {
+            // Maximize
+            window.originalPosition = {
+                left: window.element.style.left,
+                top: window.element.style.top
+            };
+            window.element.style.width = '100%';
+            window.element.style.height = '100%';
+            window.element.style.left = '0';
+            window.element.style.top = '0';
+        }
+    }
+
+    // Close a window
+    function closeWindow(windowId) {
+        const window = activeWindows[windowId];
+        if (!window) return;
+
+        window.element.classList.add('animate-slide-out-center');
+        setTimeout(() => {
+            window.element.remove();
+            delete activeWindows[windowId];
+            updateSidebarIndicators();
+        }, 200);
+    }
+
+    // Update sidebar indicators
+    function updateSidebarIndicators() {
+        // Clear all indicators
+        document.querySelectorAll('.sidebar-icon').forEach(icon => {
+            icon.classList.remove('active-window', 'minimized-window');
+        });
+
+        // Add indicators for open windows
+        const appWindows = {};
+        Object.values(activeWindows).forEach(window => {
+            if (!appWindows[window.app] || !window.isMinimized) {
+                appWindows[window.app] = window.isMinimized;
             }
+        });
+
+        // Update icons
+        Object.entries(appWindows).forEach(([appName, isMinimized]) => {
+            const icon = document.querySelector(`[data-app="${appName}"]`);
+            if (icon) {
+                icon.classList.add(isMinimized ? 'minimized-window' : 'active-window');
+            }
+        });
+    }
+
+    // Initialize paint app
+    function initializePaintApp() {
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-tool]')) {
+                currentTool = e.target.closest('[data-tool]').dataset.tool;
+                document.querySelectorAll('[data-tool]').forEach(btn => btn.classList.remove('bg-primary', 'text-white'));
+                e.target.closest('[data-tool]').classList.add('bg-primary', 'text-white');
+            }
+
+            if (e.target.closest('[data-color]')) {
+                currentColor = e.target.closest('[data-color]').dataset.color;
+            }
+        });
+    }
+
+    // Initialize paint canvas for a specific window
+    function initializePaintCanvas(windowId) {
+        const windowElement = document.getElementById(windowId);
+        const canvas = windowElement.querySelector('#paint-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
         }
 
-        updateClock() {
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-            // Update digital clock display
-            const digitalClock = document.getElementById('digital-clock');
-            if (digitalClock) {
-                digitalClock.textContent = `${hours}:${minutes}:${seconds}`;
-            }
+        // Drawing functionality
+        canvas.addEventListener('mousedown', (e) => {
+            isPainting = true;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-            // Update date display
-            const dateDisplay = document.getElementById('date-display');
-            if (dateDisplay) {
-                dateDisplay.textContent = now.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            }
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentTool === 'eraser' ? 20 : 2;
+            ctx.globalCompositeOperation = currentTool === 'eraser' ? 'destination-out' : 'source-over';
+        });
 
-            // Update clock hands
-            const hourHand = document.getElementById('hour-hand');
-            const minuteHand = document.getElementById('minute-hand');
-            const secondHand = document.getElementById('second-hand');
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isPainting) return;
 
-            const hourDeg = (hours % 12) * 30 + minutes * 0.5;
-            const minuteDeg = minutes * 6;
-            const secondDeg = seconds * 6;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-            hourHand.style.transform = `translate(-50%, -100%) rotate(${hourDeg}deg)`;
-            minuteHand.style.transform = `translate(-50%, -100%) rotate(${minuteDeg}deg)`;
-            secondHand.style.transform = `translate(-50%, -100%) rotate(${secondDeg}deg)`;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isPainting = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isPainting = false;
+        });
+    }
+
+    // Show system info
+    function showSystemInfo() {
+        alert('CircleOS v0.0.1\nA beautiful and functional operating system simulation.\n\nFeatures:\n- Multi-window support\n- Drag and drop\n- Paint application\n- File manager\n- And more!');
+    }
+
+    // Lock system
+    function lockSystem() {
+        document.getElementById('lock-screen').classList.remove('hidden');
+        document.getElementById('pin-input').value = '';
+        saveSystemState();
+    }
+
+    // Unlock system
+    function unlockSystem() {
+        const pin = document.getElementById('pin-input').value;
+        const savedPin = localStorage.getItem('circleos-pin') || '1234';
+
+        if (pin === savedPin) {
+            document.getElementById('lock-screen').classList.add('hidden');
+        } else {
+            alert('Incorrect PIN. Try again.');
+            document.getElementById('pin-input').value = '';
         }
+    }
 
-        createParticles() {
-            const container = document.getElementById('particles-container');
-            const particleCount = 50;
+    // Change PIN
+    function changePin() {
+        const currentPin = prompt('Enter current PIN:');
+        const savedPin = localStorage.getItem('circleos-pin') || '1234';
 
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                const size = Math.random() * 4 + 1;
+        if (currentPin === savedPin) {
+            const newPin = prompt('Enter new PIN (4 digits):');
+            if (newPin && newPin.length === 4 && !isNaN(newPin)) {
+                localStorage.setItem('circleos-pin', newPin);
+                alert('PIN changed successfully!');
+            } else {
+                alert('Invalid PIN. Must be 4 digits.');
+            }
+        } else {
+            alert('Current PIN is incorrect.');
+        }
+    }
 
-                particle.style.position = 'absolute';
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.background = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.5 + 0.3})`;
-                particle.style.borderRadius = '50%';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.boxShadow = `0 0 ${size * 2}px ${size}px rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.3})`;
+    // Save system state
+    function saveSystemState() {
+        const state = {
+            activeWindows: Object.keys(activeWindows).map(id => ({
+                id,
+                app: activeWindows[id].app,
+                position: {
+                    left: activeWindows[id].element.style.left,
+                    top: activeWindows[id].element.style.top
+                },
+                size: {
+                    width: activeWindows[id].element.style.width,
+                    height: activeWindows[id].element.style.height
+                },
+                isMinimized: activeWindows[id].isMinimized
+            }))
+        };
+        localStorage.setItem('circleos-state', JSON.stringify(state));
+    }
 
-                // Animation
-                const duration = Math.random() * 20 + 10;
-                const delay = Math.random() * 5;
-
-                particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
-
-                container.appendChild(particle);
+    // Load system state
+    function loadSystemState() {
+        const savedState = localStorage.getItem('circleos-state');
+        if (savedState) {
+            try {
+                const state = JSON.parse(savedState);
+                // You can implement state restoration here if needed
+            } catch (e) {
+                console.error('Failed to load system state:', e);
             }
         }
     }
 
-    // Initialize the OS when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        new CircleOS();
-    });
-
-    // Add keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        // Ctrl + Shift + B to bypass setup
-        if (e.ctrlKey && e.shiftKey && e.key === 'B') {
-            e.preventDefault();
-            const os = window.circleOS || new CircleOS();
-            os.forceBypassSetup();
-        }
-
-        // Windows key to toggle start menu
-        if (e.key === 'Meta' || e.key === 'Windows') {
-            e.preventDefault();
-            const startMenu = document.getElementById('start-menu');
-            if (startMenu) {
-                startMenu.classList.toggle('hidden');
+    // Auto-lock after 1 minute of inactivity
+    let inactivityTimer;
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+            if (localStorage.getItem('circleos-autolock') !== 'false') {
+                lockSystem();
             }
-        }
+        }, 60000); // 1 minute
+    }
 
-        // L key to lock (when start menu is open)
-        if (e.key === 'l' && !document.getElementById('start-menu').classList.contains('hidden')) {
-            const os = window.circleOS || new CircleOS();
-            os.lockSystem();
-        }
+    // Reset timer on user activity
+    ['mousedown', 'mousemove', 'keypress', 'touchstart'].forEach(event => {
+        document.addEventListener(event, resetInactivityTimer);
     });
+
+    resetInactivityTimer();
+
+    // Handle window before unload to save state
+    window.addEventListener('beforeunload', saveSystemState);
 </script>
 </body>
 </html>
