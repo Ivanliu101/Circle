@@ -78,8 +78,46 @@
 <!-- Background Animation -->
 <div id="bg-animation" class="fixed inset-0 z-0 opacity-20"></div>
 
+<!-- Welcome Screen -->
+<div id="welcome-screen" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="text-center text-white animate-fade-in">
+        <div class="text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-400">CircleOS</div>
+        <div class="text-2xl mb-8">✨ 下一代操作系统体验</div>
+        <div class="text-lg mb-12 cursor-pointer animate-pulse" onclick="startSystem()">点击开始</div>
+    </div>
+</div>
+
+<!-- Setup Wizard -->
+<div id="setup-wizard" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+    <div class="glass p-8 rounded-2xl w-96 animate-slide-in-center">
+        <h1 class="text-2xl font-bold text-center text-white mb-6">欢迎使用 CircleOS</h1>
+        <div id="setup-step-1">
+            <div class="mb-4">
+                <label for="username" class="block text-sm font-medium text-white mb-2">用户名</label>
+                <input type="text" id="username" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入用户名">
+            </div>
+            <button onclick="nextSetupStep(2)" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">下一步</button>
+        </div>
+        <div id="setup-step-2" class="hidden">
+            <div class="mb-4">
+                <label for="pin" class="block text-sm font-medium text-white mb-2">设置 PIN 码</label>
+                <input type="password" id="pin" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
+                <div class="text-xs text-white text-center mt-2">请设置 4 位数字 PIN 码</div>
+            </div>
+            <button onclick="nextSetupStep(3)" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">下一步</button>
+        </div>
+        <div id="setup-step-3" class="hidden">
+            <div class="mb-4">
+                <label for="confirm-pin" class="block text-sm font-medium text-white mb-2">确认 PIN 码</label>
+                <input type="password" id="confirm-pin" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
+            </div>
+            <button onclick="completeSetup()" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">完成</button>
+        </div>
+    </div>
+</div>
+
 <!-- Main Container -->
-<div class="relative z-10 flex h-screen">
+<div id="main-container" class="relative z-10 flex h-screen hidden">
 
     <!-- Left Sidebar -->
     <div class="sidebar glass w-16 flex flex-col items-center py-4">
@@ -249,29 +287,14 @@
                                 <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">🎵 Music</button>
                             </div>
                         </div>
-                        <div class="flex-1 p-4 overflow-auto">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border">
-                                    <span class="text-2xl mr-3">📁</span>
-                                    <div>
-                                        <div class="font-medium">Projects</div>
-                                        <div class="text-xs text-gray-500">Folder</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border">
-                                    <span class="text-2xl mr-3">📄</span>
-                                    <div>
-                                        <div class="font-medium">Resume.pdf</div>
-                                        <div class="text-xs text-gray-500">PDF - 2MB</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border">
-                                    <span class="text-2xl mr-3">📷</span>
-                                    <div>
-                                        <div class="font-medium">Screenshot.png</div>
-                                        <div class="text-xs text-gray-500">Image - 1MB</div>
-                                    </div>
-                                </div>
+                        <div id="files-dropzone" class="flex-1 p-4 overflow-auto border-2 border-dashed border-gray-300 rounded-lg m-2" ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                            <div class="text-center mb-6">
+                                <div class="text-2xl mb-2">📁</div>
+                                <div class="font-medium text-gray-600">拖放文件到此处</div>
+                                <div class="text-sm text-gray-500">或双击文件打开</div>
+                            </div>
+                            <div id="files-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Files will be added here dynamically -->
                             </div>
                         </div>
                     </div>
@@ -293,24 +316,14 @@
                             <button class="p-1 hover:bg-gray-200 rounded"><i data-lucide="home" class="w-4 h-4"></i></button>
                         </div>
                         <div class="flex-1 overflow-auto p-4">
-                            <div class="max-w-4xl mx-auto">
-                                <h1 class="text-3xl font-bold mb-4 text-center text-primary">Welcome to CircleOS Browser</h1>
-                                <p class="text-center text-gray-600 mb-8">Your gateway to the internet</p>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
-                                        <div class="text-4xl mb-4">📧</div>
-                                        <h3 class="font-semibold mb-2">Email</h3>
-                                        <p class="text-sm text-gray-500">Check your messages</p>
-                                    </div>
-                                    <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
-                                        <div class="text-4xl mb-4">📺</div>
-                                        <h3 class="font-semibold mb-2">Videos</h3>
-                                        <p class="text-sm text-gray-500">Watch videos online</p>
-                                    </div>
-                                    <div class="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
-                                        <div class="text-4xl mb-4">🎮</div>
-                                        <h3 class="font-semibold mb-2">Games</h3>
-                                        <p class="text-sm text-gray-500">Play games online</p>
+                            <div class="max-w-4xl mx-auto text-center">
+                                <div class="text-6xl mb-6">🚧</div>
+                                <h1 class="text-3xl font-bold mb-4 text-primary">浏览器开发中</h1>
+                                <p class="text-gray-600 mb-8">该功能正在开发中，敬请期待...</p>
+                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-center text-yellow-600">
+                                        <i data-lucide="info" class="w-5 h-5 mr-2"></i>
+                                        <span>这是一个模拟浏览器，实际功能将在未来版本中推出</span>
                                     </div>
                                 </div>
                             </div>
@@ -353,10 +366,10 @@
             content: `
                     <div class="h-full">
                         <div class="flex mb-6">
-                            <button class="px-4 py-2 bg-primary text-white rounded-l-lg">General</button>
-                            <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-lg">Security</button>
+                            <button class="px-4 py-2 bg-primary text-white rounded-l-lg" onclick="showSettingsTab('general')">General</button>
+                            <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-r-lg" onclick="showSettingsTab('security')">Security</button>
                         </div>
-                        <div class="space-y-6">
+                        <div id="settings-general" class="space-y-6">
                             <div class="bg-white p-4 rounded-lg border">
                                 <h3 class="font-semibold mb-3">System</h3>
                                 <div class="space-y-3">
@@ -365,9 +378,13 @@
                                         <span class="text-gray-600">v0.0.1</span>
                                     </div>
                                     <div class="flex justify-between items-center">
+                                        <span>Username</span>
+                                        <span class="text-gray-600" id="settings-username">Loading...</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
                                         <span>Auto-lock</span>
                                         <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <input type="checkbox" class="sr-only peer" id="auto-lock-toggle" checked>
                                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                                         </label>
                                     </div>
@@ -386,11 +403,20 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div id="settings-security" class="space-y-6 hidden">
                             <div class="bg-white p-4 rounded-lg border">
                                 <h3 class="font-semibold mb-3">Security</h3>
                                 <div class="space-y-3">
-                                    <button id="change-pin-button" class="w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">Change PIN</button>
-                                    <button id="lock-now-button" class="w-full py-2 bg-primary text-white rounded-lg text-sm">Lock Now</button>
+                                    <button id="change-pin-button" class="w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">修改 PIN 码</button>
+                                    <button id="lock-now-button" class="w-full py-2 bg-primary text-white rounded-lg text-sm">立即锁定</button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border">
+                                <h3 class="font-semibold mb-3">Data Management</h3>
+                                <div class="space-y-3">
+                                    <button onclick="clearUserData()" class="w-full py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm">清除所有数据</button>
+                                    <div class="text-xs text-gray-500">注意：此操作将删除所有用户数据并重置系统</div>
                                 </div>
                             </div>
                         </div>
@@ -408,14 +434,90 @@
     let currentColor = '#000000';
     let currentTool = 'brush';
     let isPainting = false;
+    let userFiles = [];
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
         initializeBackground();
         initializeEventListeners();
         initializePaintApp();
-        loadSystemState();
+        checkFirstTime();
     });
+
+    // Check if first time loading
+    function checkFirstTime() {
+        const isFirstTime = !localStorage.getItem('circleos-username');
+        if (isFirstTime) {
+            // First time - show welcome screen
+            document.getElementById('welcome-screen').classList.remove('hidden');
+        } else {
+            // Not first time - show welcome screen briefly then main interface
+            document.getElementById('welcome-screen').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('welcome-screen').classList.add('hidden');
+                document.getElementById('main-container').classList.remove('hidden');
+                loadSystemState();
+            }, 2000);
+        }
+    }
+
+    // Start system from welcome screen
+    function startSystem() {
+        document.getElementById('welcome-screen').classList.add('hidden');
+        const isFirstTime = !localStorage.getItem('circleos-username');
+        if (isFirstTime) {
+            document.getElementById('setup-wizard').classList.remove('hidden');
+        } else {
+            document.getElementById('main-container').classList.remove('hidden');
+            loadSystemState();
+        }
+    }
+
+    // Setup wizard navigation
+    function nextSetupStep(step) {
+        if (step === 2) {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert('请输入用户名');
+                return;
+            }
+            document.getElementById('setup-step-1').classList.add('hidden');
+            document.getElementById('setup-step-2').classList.remove('hidden');
+        } else if (step === 3) {
+            const pin = document.getElementById('pin').value;
+            if (pin.length !== 4 || isNaN(pin)) {
+                alert('请输入4位数字PIN码');
+                return;
+            }
+            document.getElementById('setup-step-2').classList.add('hidden');
+            document.getElementById('setup-step-3').classList.remove('hidden');
+        }
+    }
+
+    // Complete setup
+    function completeSetup() {
+        const username = document.getElementById('username').value.trim();
+        const pin = document.getElementById('pin').value;
+        const confirmPin = document.getElementById('confirm-pin').value;
+
+        if (pin !== confirmPin) {
+            alert('PIN码不匹配，请重新输入');
+            return;
+        }
+
+        // Save user data
+        localStorage.setItem('circleos-username', username);
+        localStorage.setItem('circleos-pin', pin);
+
+        // Hide setup wizard and show main interface
+        document.getElementById('setup-wizard').classList.add('hidden');
+        document.getElementById('main-container').classList.remove('hidden');
+
+        // Show welcome message
+        setTimeout(() => {
+            alert(`欢迎使用 CircleOS，${username}！`);
+        }, 500);
+    }
 
     // Initialize background animation
     function initializeBackground() {
@@ -426,40 +528,131 @@
 
         const ctx = canvas.getContext('2d');
         const particles = [];
-        const particleCount = 50;
+        const particleCount = 80;
+        const streams = [];
+        const streamCount = 5;
 
+        // Create particles
         for (let i = 0; i < particleCount; i++) {
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                size: Math.random() * 3 + 1,
-                speedX: Math.random() * 0.5 - 0.25,
-                speedY: Math.random() * 0.5 - 0.25,
-                color: `rgba(${Math.random() * 255}, ${Math.random() * 100 + 155}, ${Math.random() * 255}, 0.5)`
+                size: Math.random() * 4 + 1,
+                speedX: Math.random() * 0.8 - 0.4,
+                speedY: Math.random() * 0.8 - 0.4,
+                color: `rgba(${Math.random() * 200 + 55}, ${Math.random() * 100 + 155}, ${Math.random() * 200 + 55}, 0.6)`,
+                alpha: Math.random() * 0.5 + 0.3
+            });
+        }
+
+        // Create streams
+        for (let i = 0; i < streamCount; i++) {
+            streams.push({
+                x: Math.random() * canvas.width,
+                y: -50,
+                speed: Math.random() * 2 + 1,
+                width: Math.random() * 200 + 100,
+                opacity: Math.random() * 0.3 + 0.1
             });
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw streams
+            streams.forEach(stream => {
+                const gradient = ctx.createLinearGradient(stream.x - stream.width/2, stream.y, stream.x + stream.width/2, stream.y + 200);
+                gradient.addColorStop(0, `rgba(236, 72, 153, ${stream.opacity * 0.3})`);
+                gradient.addColorStop(0.5, `rgba(139, 92, 246, ${stream.opacity})`);
+                gradient.addColorStop(1, `rgba(236, 72, 153, ${stream.opacity * 0.3})`);
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(stream.x - stream.width/2, stream.y);
+                ctx.bezierCurveTo(
+                    stream.x - stream.width/4, stream.y + 100,
+                    stream.x + stream.width/4, stream.y + 100,
+                    stream.x + stream.width/2, stream.y
+                );
+                ctx.lineTo(stream.x + stream.width/2, stream.y + 200);
+                ctx.bezierCurveTo(
+                    stream.x + stream.width/4, stream.y + 100,
+                    stream.x - stream.width/4, stream.y + 100,
+                    stream.x - stream.width/2, stream.y + 200
+                );
+                ctx.closePath();
+                ctx.fill();
+
+                stream.y += stream.speed;
+                if (stream.y > canvas.height + 200) {
+                    stream.y = -50;
+                    stream.x = Math.random() * canvas.width;
+                }
+            });
+
+            // Draw particles
             particles.forEach(particle => {
+                ctx.save();
+                ctx.globalAlpha = particle.alpha;
                 ctx.fillStyle = particle.color;
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Add glow effect
+                ctx.shadowColor = particle.color;
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.restore();
+
                 particle.x += particle.speedX;
                 particle.y += particle.speedY;
 
+                // Bounce off edges
                 if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
                 if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
+
+                // Slow down over time
+                particle.speedX *= 0.999;
+                particle.speedY *= 0.999;
+
+                // Randomly add some energy
+                if (Math.random() < 0.01) {
+                    particle.speedX += (Math.random() - 0.5) * 0.5;
+                    particle.speedY += (Math.random() - 0.5) * 0.5;
+                }
             });
+
             requestAnimationFrame(animate);
         }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
         animate();
     }
 
     // Initialize event listeners
     function initializeEventListeners() {
+        // Load user data on settings open
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-app="settings"]')) {
+                setTimeout(() => {
+                    document.getElementById('settings-username').textContent = localStorage.getItem('circleos-username') || 'Guest';
+                    document.getElementById('auto-lock-toggle').checked = localStorage.getItem('circleos-autolock') !== 'false';
+                }, 100);
+            }
+        });
+
+        // Auto-lock toggle
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'auto-lock-toggle') {
+                localStorage.setItem('circleos-autolock', e.target.checked ? 'true' : 'false');
+            }
+        });
         // App launchers
         document.querySelectorAll('[data-app]').forEach(launcher => {
             launcher.addEventListener('click', () => {
@@ -595,6 +788,10 @@
         // Initialize app-specific functionality
         if (appName === 'paint') {
             initializePaintCanvas(windowId);
+        } else if (appName === 'files') {
+            setTimeout(() => {
+                loadFiles();
+            }, 100);
         }
     }
 
@@ -818,9 +1015,139 @@
         alert('CircleOS v0.0.1\nA beautiful and functional operating system simulation.\n\nFeatures:\n- Multi-window support\n- Drag and drop\n- Paint application\n- File manager\n- And more!');
     }
 
+    // Handle file drop
+    function handleFileDrop(event) {
+        event.preventDefault();
+        const dropzone = document.getElementById('files-dropzone');
+        dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+        dropzone.classList.add('border-gray-300');
+
+        const files = Array.from(event.dataTransfer.files);
+        files.forEach(file => {
+            const fileData = {
+                id: Date.now() + Math.random(),
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                date: new Date().toLocaleDateString()
+            };
+
+            userFiles.push(fileData);
+            addFileToUI(fileData);
+        });
+
+        saveFiles();
+    }
+
+    // Handle drag over
+    function handleDragOver(event) {
+        event.preventDefault();
+        const dropzone = document.getElementById('files-dropzone');
+        dropzone.classList.remove('border-gray-300');
+        dropzone.classList.add('border-blue-500', 'bg-blue-50');
+    }
+
+    // Handle drag leave
+    function handleDragLeave(event) {
+        event.preventDefault();
+        const dropzone = document.getElementById('files-dropzone');
+        dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+        dropzone.classList.add('border-gray-300');
+    }
+
+    // Add file to UI
+    function addFileToUI(file) {
+        const filesList = document.getElementById('files-list');
+        if (!filesList) return;
+
+        const fileIcon = getFileIcon(file.type);
+        const fileSize = formatFileSize(file.size);
+
+        const fileElement = document.createElement('div');
+        fileElement.className = 'flex items-center p-3 bg-white rounded-lg hover:bg-gray-50 cursor-pointer border animate-fade-in';
+        fileElement.setAttribute('data-file-id', file.id);
+        fileElement.innerHTML = `
+                <span class="text-2xl mr-3">${fileIcon}</span>
+                <div class="flex-1">
+                    <div class="font-medium truncate" title="${file.name}">${file.name}</div>
+                    <div class="text-xs text-gray-500">${fileSize} - ${file.date}</div>
+                </div>
+            `;
+
+        // Double click to open file
+        fileElement.addEventListener('dblclick', () => {
+            openFile(file);
+        });
+
+        filesList.appendChild(fileElement);
+    }
+
+    // Get file icon based on type
+    function getFileIcon(type) {
+        if (type.startsWith('image/')) return '📷';
+        if (type.startsWith('text/')) return '📄';
+        if (type.includes('pdf')) return '📄';
+        if (type.includes('word')) return '📄';
+        if (type.includes('excel')) return '📊';
+        if (type.includes('powerpoint')) return '📺';
+        if (type.includes('zip')) return '📦';
+        if (type.startsWith('audio/')) return '🎵';
+        if (type.startsWith('video/')) return '🎬';
+        return '📄';
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Open file
+    function openFile(file) {
+        alert(`正在打开文件: ${file.name}\n\n文件类型: ${file.type}\n文件大小: ${formatFileSize(file.size)}`);
+    }
+
+    // Save files to localStorage
+    function saveFiles() {
+        localStorage.setItem('circleos-files', JSON.stringify(userFiles));
+    }
+
+    // Load files from localStorage
+    function loadFiles() {
+        const savedFiles = localStorage.getItem('circleos-files');
+        if (savedFiles) {
+            userFiles = JSON.parse(savedFiles);
+            userFiles.forEach(file => {
+                addFileToUI(file);
+            });
+        }
+    }
+
+    // Show settings tab
+    function showSettingsTab(tab) {
+        document.getElementById('settings-general').classList.add('hidden');
+        document.getElementById('settings-security').classList.add('hidden');
+        document.getElementById('settings-' + tab).classList.remove('hidden');
+    }
+
+    // Clear user data
+    function clearUserData() {
+        if (confirm('确定要清除所有用户数据吗？此操作不可撤销。')) {
+            localStorage.clear();
+            alert('所有数据已清除。系统将重新启动。');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    }
+
     // Lock system
     function lockSystem() {
-        document.getElementById('lock-screen').classList.remove('hidden');
+        document.getElementById('main-container').classList.add('hidden');
+        document.getElementById('welcome-screen').classList.remove('hidden');
         document.getElementById('pin-input').value = '';
         saveSystemState();
     }
@@ -832,8 +1159,9 @@
 
         if (pin === savedPin) {
             document.getElementById('lock-screen').classList.add('hidden');
+            document.getElementById('main-container').classList.remove('hidden');
         } else {
-            alert('Incorrect PIN. Try again.');
+            alert('PIN码错误，请重试');
             document.getElementById('pin-input').value = '';
         }
     }
