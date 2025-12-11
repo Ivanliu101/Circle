@@ -41,18 +41,18 @@
                 box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
             }
             .sidebar-icon {
-                @apply relative flex items-center justify-center h-12 w-12 mt-2 mb-2 mx-auto shadow-lg
-                bg-gray-800 text-primary hover:bg-primary hover:text-white
-                rounded-3xl hover:rounded-xl transition-all duration-300 ease-linear
+                @apply relative flex items-center justify-center h-12 w-12 mt-2 mb-2 mx-auto
+                bg-purple-100 text-purple-800 hover:bg-purple-200
+                rounded-full hover:rounded-xl transition-all duration-300 ease-linear
                 cursor-pointer;
             }
             .sidebar-tooltip {
                 @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
-                text-white bg-gray-900
+                text-purple-800 bg-white
                 text-xs font-bold transition-all duration-100 scale-0 origin-left;
             }
             .sidebar-hr {
-                @apply bg-gray-700 border border-gray-700 rounded-full mx-2;
+                @apply bg-purple-200 border border-purple-200 rounded-full mx-2;
             }
             .window-header {
                 @apply flex items-center justify-between p-2 bg-gray-800 text-white rounded-t-lg cursor-move;
@@ -81,9 +81,18 @@
 <!-- Welcome Screen -->
 <div id="welcome-screen" class="fixed inset-0 z-50 flex items-center justify-center">
     <div class="text-center text-white animate-fade-in">
-        <div class="text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-400">CircleOS</div>
-        <div class="text-2xl mb-8">✨ 下一代操作系统体验</div>
-        <div class="text-lg mb-12 cursor-pointer animate-pulse" onclick="startSystem()">点击开始</div>
+        <div class="text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">CircleOS</div>
+        <div class="text-lg mb-12 animate-pulse">正在初始化系统...</div>
+    </div>
+</div>
+
+<!-- Debug Mode Panel -->
+<div id="debug-panel" class="hidden fixed bottom-4 right-4 glass p-4 rounded-lg z-50">
+    <div class="text-white text-sm mb-2 font-bold">DEBUG MODE</div>
+    <div class="space-y-2">
+        <button onclick="showDebugLog()" class="w-full py-1 px-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm text-white">Log</button>
+        <button onclick="forceEnterDesktop()" class="w-full py-1 px-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm text-white">强制进入桌面</button>
+        <button onclick="resetAllData()" class="w-full py-1 px-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm text-white">重置所有资料</button>
     </div>
 </div>
 
@@ -118,9 +127,10 @@
 
 <!-- Main Container -->
 <div id="main-container" class="relative z-10 flex h-screen hidden">
+    <!-- System Info Button -->
 
     <!-- Left Sidebar -->
-    <div class="sidebar glass w-16 flex flex-col items-center py-4">
+    <div class="sidebar bg-white w-16 flex flex-col items-center py-4 shadow-none">
         <!-- Search -->
         <div class="sidebar-icon group mb-4" id="search-button">
             <i data-lucide="search" class="w-6 h-6"></i>
@@ -128,18 +138,11 @@
         </div>
 
         <!-- Apps -->
-        <div class="sidebar-icon group" data-app="vs-code">
-            <span class="text-xl">💻</span>
-            <span class="sidebar-tooltip group-hover:scale-100">VS Code</span>
-        </div>
         <div class="sidebar-icon group" data-app="notepad">
             <span class="text-xl">📝</span>
             <span class="sidebar-tooltip group-hover:scale-100">Notepad</span>
         </div>
-        <div class="sidebar-icon group" data-app="calendar">
-            <span class="text-xl">📅</span>
-            <span class="sidebar-tooltip group-hover:scale-100">Calendar</span>
-        </div>
+
         <div class="sidebar-icon group" data-app="files">
             <span class="text-xl">📁</span>
             <span class="sidebar-tooltip group-hover:scale-100">Files</span>
@@ -152,9 +155,21 @@
             <span class="text-xl">🎨</span>
             <span class="sidebar-tooltip group-hover:scale-100">Paint</span>
         </div>
+        <div class="sidebar-icon group" data-app="calculator">
+            <span class="text-xl">🧮</span>
+            <span class="sidebar-tooltip group-hover:scale-100">计算器</span>
+        </div>
+        <div class="sidebar-icon group" data-app="weather">
+            <span class="text-xl">🌤️</span>
+            <span class="sidebar-tooltip group-hover:scale-100">天气</span>
+        </div>
+        <div class="sidebar-icon group" data-app="music">
+            <span class="text-xl">🎵</span>
+            <span class="sidebar-tooltip group-hover:scale-100">音乐</span>
+        </div>
         <div class="sidebar-icon group" data-app="settings">
             <span class="text-xl">⚙️</span>
-            <span class="sidebar-tooltip group-hover:scale-100">Settings</span>
+            <span class="sidebar-tooltip group-hover:scale-100">设置</span>
         </div>
 
         <hr class="sidebar-hr my-4">
@@ -203,76 +218,17 @@
 
     // App definitions
     const apps = {
-        'vs-code': {
-            name: 'VS Code',
-            icon: '💻',
-            width: 800,
-            height: 600,
-            content: `
-                    <div class="flex h-full bg-gray-900 text-white">
-                        <div class="w-48 bg-gray-800 p-4">
-                            <div class="text-sm text-gray-400 mb-2">FILES</div>
-                            <div class="space-y-1">
-                                <div class="flex items-center text-sm hover:text-primary cursor-pointer"><i data-lucide="file-code" class="w-4 h-4 mr-2"></i>main.js</div>
-                                <div class="flex items-center text-sm hover:text-primary cursor-pointer"><i data-lucide="file-code" class="w-4 h-4 mr-2"></i>style.css</div>
-                                <div class="flex items-center text-sm hover:text-primary cursor-pointer"><i data-lucide="file-code" class="w-4 h-4 mr-2"></i>index.html</div>
-                            </div>
-                        </div>
-                        <div class="flex-1 flex flex-col">
-                            <div class="bg-gray-800 p-2 flex items-center space-x-2 border-b border-gray-700">
-                                <span class="text-sm">main.js - Visual Studio Code</span>
-                            </div>
-                            <div class="flex-1 p-4 font-mono text-sm overflow-auto">
-                                <pre class="text-green-400">// Welcome to CircleOS VS Code</pre>
-                                <pre class="text-blue-400">function <span class="text-yellow-300">greet</span>() {</pre>
-                                <pre class="text-white">  <span class="text-purple-400">console</span>.<span class="text-yellow-300">log</span>(<span class="text-green-300">"Hello, CircleOS!"</span>);</pre>
-                                <pre class="text-blue-400">}</pre>
-                                <pre class="text-white"><span class="text-yellow-300">greet</span>();</pre>
-                            </div>
-                        </div>
-                    </div>
-                `
-        },
+
         'notepad': {
             name: 'Notepad',
             icon: '📝',
             width: 600,
             height: 400,
             content: `
-                    <textarea class="w-full h-full p-4 bg-white border-0 focus:ring-0 resize-none" placeholder="Start typing..."></textarea>
+                    <textarea class="w-full h-full p-4 bg-white border-0 focus:ring-0 resize-none" placeholder="开始输入..."></textarea>
                 `
         },
-        'calendar': {
-            name: 'Calendar',
-            icon: '📅',
-            width: 700,
-            height: 500,
-            content: `
-                    <div class="h-full">
-                        <div class="flex justify-between items-center mb-4">
-                            <button class="text-primary hover:text-primary/80"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
-                            <h2 class="text-xl font-bold">June 2024</h2>
-                            <button class="text-primary hover:text-primary/80"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
-                        </div>
-                        <div class="grid grid-cols-7 gap-1 text-center mb-2">
-                            <div class="text-sm font-semibold text-gray-600">Sun</div>
-                            <div class="text-sm font-semibold text-gray-600">Mon</div>
-                            <div class="text-sm font-semibold text-gray-600">Tue</div>
-                            <div class="text-sm font-semibold text-gray-600">Wed</div>
-                            <div class="text-sm font-semibold text-gray-600">Thu</div>
-                            <div class="text-sm font-semibold text-gray-600">Fri</div>
-                            <div class="text-sm font-semibold text-gray-600">Sat</div>
-                        </div>
-                        <div class="grid grid-cols-7 gap-1">
-                            ${Array(30).fill(0).map((_, i) => `
-                                <div class="h-12 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer ${i === 14 ? 'bg-primary text-white' : ''}">
-                                    ${i + 1}
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `
-        },
+
         'files': {
             name: 'Files',
             icon: '📁',
@@ -358,6 +314,126 @@
                     </div>
                 `
         },
+        'calculator': {
+            name: '计算器',
+            icon: '🧮',
+            width: 400,
+            height: 500,
+            content: `
+                    <div class="w-full h-full bg-white p-4">
+                        <div class="bg-gray-100 rounded-lg p-2 mb-4">
+                            <input type="text" id="calc-display" class="w-full h-16 text-right text-2xl font-mono bg-white border rounded p-2" readonly value="0">
+                        </div>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="calcClear()" class="h-12 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">C</button>
+                            <button onclick="calcDelete()" class="h-12 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">⌫</button>
+                            <button onclick="calcAppend('/')" class="h-12 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">/</button>
+                            <button onclick="calcAppend('*')" class="h-12 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">×</button>
+
+                            <button onclick="calcAppend('7')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">7</button>
+                            <button onclick="calcAppend('8')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">8</button>
+                            <button onclick="calcAppend('9')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">9</button>
+                            <button onclick="calcAppend('-')" class="h-12 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">-</button>
+
+                            <button onclick="calcAppend('4')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">4</button>
+                            <button onclick="calcAppend('5')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">5</button>
+                            <button onclick="calcAppend('6')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">6</button>
+                            <button onclick="calcAppend('+')" class="h-12 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors">+</button>
+
+                            <button onclick="calcAppend('1')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">1</button>
+                            <button onclick="calcAppend('2')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">2</button>
+                            <button onclick="calcAppend('3')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">3</button>
+                            <button onclick="calcCalculate()" class="h-28 bg-primary text-white rounded hover:bg-primary/80 transition-colors row-span-2">=</button>
+
+                            <button onclick="calcAppend('0')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors col-span-2">0</button>
+                            <button onclick="calcAppend('.')" class="h-12 bg-gray-200 rounded hover:bg-gray-300 transition-colors">.</button>
+                        </div>
+                    </div>
+                `
+        },
+        'weather': {
+            name: '天气',
+            icon: '🌤️',
+            width: 500,
+            height: 400,
+            content: `
+                    <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 p-6 text-white">
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-bold">北京市</h2>
+                            <p class="text-sm opacity-80">2025年12月11日 星期四</p>
+                        </div>
+                        <div class="flex items-center justify-center mb-8">
+                            <div class="text-8xl mr-4">☀️</div>
+                            <div>
+                                <div class="text-4xl font-bold">22°C</div>
+                                <div class="text-sm opacity-80">晴朗</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white bg-opacity-20 p-4 rounded-lg backdrop-blur-sm">
+                                <div class="text-sm opacity-80">湿度</div>
+                                <div class="text-xl">45%</div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-4 rounded-lg backdrop-blur-sm">
+                                <div class="text-sm opacity-80">风速</div>
+                                <div class="text-xl">3.2 m/s</div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-4 rounded-lg backdrop-blur-sm">
+                                <div class="text-sm opacity-80">气压</div>
+                                <div class="text-xl">1013 hPa</div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-4 rounded-lg backdrop-blur-sm">
+                                <div class="text-sm opacity-80">能见度</div>
+                                <div class="text-xl">10 km</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <button onclick="refreshWeather()" class="px-4 py-2 bg-white bg-opacity-20 rounded hover:bg-opacity-30 transition-colors backdrop-blur-sm">
+                                刷新天气
+                            </button>
+                        </div>
+                    </div>
+                `
+        },
+        'music': {
+            name: '音乐',
+            icon: '🎵',
+            width: 600,
+            height: 400,
+            content: `
+                    <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-white">
+                        <div class="text-center mb-6">
+                            <h2 class="text-2xl font-bold">音乐播放器</h2>
+                            <p class="text-sm opacity-80">享受您的音乐时光</p>
+                        </div>
+                        <div class="flex items-center justify-center mb-8">
+                            <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-4xl backdrop-blur-sm">
+                                🎵
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-white bg-opacity-20 p-4 rounded-lg backdrop-blur-sm">
+                                <div class="font-bold mb-1">正在播放</div>
+                                <div class="text-sm opacity-80">CircleOS 主题曲</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span>1:23</span>
+                                    <span>3:45</span>
+                                </div>
+                                <div class="w-full bg-white bg-opacity-30 rounded-full h-2">
+                                    <div class="bg-white h-2 rounded-full" style="width: 35%"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-center space-x-6">
+                                <button onclick="musicAction('prev')" class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors backdrop-blur-sm">⏮️</button>
+                                <button onclick="musicAction('play')" class="w-16 h-16 bg-white bg-opacity-30 rounded-full flex items-center justify-center hover:bg-opacity-40 transition-colors backdrop-blur-sm">▶️</button>
+                                <button onclick="musicAction('next')" class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-opacity-30 transition-colors backdrop-blur-sm">⏭️</button>
+                            </div>
+                        </div>
+                    </div>
+                `
+        },
         'settings': {
             name: 'Settings',
             icon: '⚙️',
@@ -435,6 +511,8 @@
     let currentTool = 'brush';
     let isPainting = false;
     let userFiles = [];
+    let calcExpression = '';
+    let isMusicPlaying = false;
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
@@ -461,15 +539,296 @@
         }
     }
 
-    // Start system from welcome screen
-    function startSystem() {
-        document.getElementById('welcome-screen').classList.add('hidden');
-        const isFirstTime = !localStorage.getItem('circleos-username');
-        if (isFirstTime) {
-            document.getElementById('setup-wizard').classList.remove('hidden');
+    // Update system time
+    function updateSystemTime() {
+        const now = new Date();
+        const timeStr = now.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+        // Update time in system info modal
+        const timeElement = document.getElementById('system-time');
+        if (timeElement) {
+            timeElement.textContent = timeStr;
+        }
+
+        // Update desktop time
+        const desktopTimeElement = document.getElementById('desktop-time');
+        if (desktopTimeElement) {
+            desktopTimeElement.textContent = timeStr;
+        }
+    }
+
+    // Debug mode functions
+    let debugMode = false;
+    let debugInfo = null;
+
+    function toggleDebugMode() {
+        debugMode = !debugMode;
+        const panel = document.getElementById('debug-panel');
+        if (debugMode) {
+            panel.classList.remove('hidden');
+            if (!debugInfo) {
+                showDebugInfo();
+            }
         } else {
-            document.getElementById('main-container').classList.remove('hidden');
-            loadSystemState();
+            panel.classList.add('hidden');
+            if (debugInfo) {
+                debugInfo.remove();
+                debugInfo = null;
+            }
+        }
+    }
+
+    function showDebugLog() {
+        console.log('=== CircleOS Debug Log ===');
+        console.log('Active Windows:', activeWindows);
+        console.log('User Files:', userFiles);
+        console.log('Local Storage:', localStorage);
+        alert('调试日志已输出到控制台');
+    }
+
+    function showDebugInfo() {
+        if (debugInfo) return;
+
+        debugInfo = document.createElement('div');
+        debugInfo.className = 'fixed top-4 left-4 bg-black bg-opacity-70 text-green-400 font-mono text-xs p-2 rounded z-50';
+        debugInfo.innerHTML = `
+                <div>DEBUG MODE ACTIVE</div>
+                <div>FPS: <span id="debug-fps">60</span></div>
+                <div>Memory: <span id="debug-memory">0</span>MB</div>
+                <div>Windows: <span id="debug-windows">0</span></div>
+                <div>Files: <span id="debug-files">0</span></div>
+                <div>Uptime: <span id="debug-uptime">0</span>s</div>
+            `;
+        document.body.appendChild(debugInfo);
+
+        // Update debug info
+        let startTime = Date.now();
+        let frameCount = 0;
+
+        setInterval(() => {
+            frameCount++;
+            const uptime = Math.floor((Date.now() - startTime) / 1000);
+            const fps = Math.round(frameCount / (uptime || 1) * 10) / 10;
+
+            document.getElementById('debug-fps').textContent = fps;
+            document.getElementById('debug-windows').textContent = Object.keys(activeWindows).length;
+            document.getElementById('debug-files').textContent = userFiles.length;
+            document.getElementById('debug-uptime').textContent = uptime;
+        }, 100);
+    }
+
+    function forceEnterDesktop() {
+        document.getElementById('welcome-screen').classList.add('hidden');
+        document.getElementById('main-container').classList.remove('hidden');
+    }
+
+    // Calculator functions
+    function calcAppend(value) {
+        const displays = document.querySelectorAll('[id="calc-display"]');
+        displays.forEach(display => {
+            if (display.value === '0' && value !== '.') {
+                display.value = value;
+            } else {
+                display.value += value;
+            }
+            calcExpression = display.value;
+        });
+    }
+
+    function calcClear() {
+        const displays = document.querySelectorAll('[id="calc-display"]');
+        displays.forEach(display => {
+            display.value = '0';
+            calcExpression = '';
+        });
+    }
+
+    function calcDelete() {
+        const displays = document.querySelectorAll('[id="calc-display"]');
+        displays.forEach(display => {
+            if (display.value.length > 1) {
+                display.value = display.value.slice(0, -1);
+            } else {
+                display.value = '0';
+            }
+            calcExpression = display.value;
+        });
+    }
+
+    function calcCalculate() {
+        const displays = document.querySelectorAll('[id="calc-display"]');
+        displays.forEach(display => {
+            try {
+                // Replace × with * for evaluation
+                const expression = calcExpression.replace(/×/g, '*');
+                const result = eval(expression);
+                display.value = result;
+                calcExpression = result.toString();
+            } catch (e) {
+                display.value = 'Error';
+                calcExpression = '';
+            }
+        });
+    }
+
+    // Weather functions
+    function refreshWeather() {
+        const weatherApps = document.querySelectorAll('[data-app="weather"]');
+        weatherApps.forEach(app => {
+            const button = app.querySelector('button');
+            if (button) {
+                const originalText = button.textContent;
+                button.textContent = '刷新中...';
+                button.disabled = true;
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    // Update date
+                    const dateElement = app.querySelector('.text-sm.opacity-80');
+                    if (dateElement && dateElement.textContent.includes('年')) {
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('zh-CN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            weekday: 'long'
+                        });
+                        dateElement.textContent = dateStr;
+                    }
+                    showNotification('天气数据已更新！');
+                }, 1500);
+            }
+        });
+    }
+
+    // Music player functions
+    function musicAction(action) {
+        const musicApps = document.querySelectorAll('[data-app="music"]');
+        musicApps.forEach(app => {
+            const playButton = app.querySelector('button:nth-child(2)');
+            if (playButton) {
+                if (action === 'play') {
+                    isMusicPlaying = !isMusicPlaying;
+                    playButton.textContent = isMusicPlaying ? '⏸️' : '▶️';
+                    showNotification(isMusicPlaying ? '音乐开始播放' : '音乐已暂停');
+                } else if (action === 'prev') {
+                    showNotification('播放上一首');
+                } else if (action === 'next') {
+                    showNotification('播放下一首');
+                }
+            }
+        });
+    }
+
+    // Keyboard shortcuts
+    function handleKeyboardShortcuts(event) {
+        // Ctrl/Cmd + key combinations
+        if (event.ctrlKey || event.metaKey) {
+            switch (event.key.toLowerCase()) {
+                case 'n':
+                    event.preventDefault();
+                    openWindow('notepad');
+                    break;
+                case 'f':
+                    event.preventDefault();
+                    openWindow('files');
+                    break;
+                case 'c':
+                    event.preventDefault();
+                    openWindow('calculator');
+                    break;
+                case 's':
+                    event.preventDefault();
+                    saveAllData();
+                    showNotification('数据已保存');
+                    break;
+                case 'l':
+                    event.preventDefault();
+                    lockSystem();
+                    break;
+            }
+        }
+
+        // F1 for help
+        if (event.key === 'F1') {
+            event.preventDefault();
+            showHelp();
+        }
+
+        // F12 for debug mode
+        if (event.key === 'F12') {
+            event.preventDefault();
+            toggleDebugMode();
+        }
+    }
+
+    // Show notification
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-in-right';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('animate-slide-out-right');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Show help
+    function showHelp() {
+        const helpModal = document.createElement('div');
+        helpModal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+        helpModal.innerHTML = `
+                <div class="glass p-8 rounded-2xl w-96 animate-fade-in max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white">帮助中心</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-white hover:text-gray-200">✕</button>
+                    </div>
+                    <div class="space-y-4 text-white">
+                        <div>
+                            <h3 class="font-semibold mb-2">键盘快捷键</h3>
+                            <div class="text-sm space-y-1">
+                                <div>Ctrl/Cmd + N - 新建记事本</div>
+                                <div>Ctrl/Cmd + F - 打开文件管理器</div>
+                                <div>Ctrl/Cmd + C - 打开计算器</div>
+                                <div>Ctrl/Cmd + S - 保存数据</div>
+                                <div>Ctrl/Cmd + L - 锁定系统</div>
+                                <div>F1 - 显示帮助</div>
+                                <div>F12 - 切换调试模式</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-2">系统特性</h3>
+                            <div class="text-sm space-y-1">
+                                <div>• 多窗口管理</div>
+                                <div>• 数据自动保存</div>
+                                <div>• 页面离开自动锁定</div>
+                                <div>• 4位PIN码保护</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        document.body.appendChild(helpModal);
+    }
+
+    function resetAllData() {
+        if (confirm('确定要重置所有数据吗？')) {
+            localStorage.clear();
+            userFiles = [];
+            alert('所有数据已重置');
+            window.location.reload();
         }
     }
 
@@ -527,100 +886,62 @@
         document.getElementById('bg-animation').appendChild(canvas);
 
         const ctx = canvas.getContext('2d');
-        const particles = [];
-        const particleCount = 80;
-        const streams = [];
-        const streamCount = 5;
+        const lines = [];
+        const lineCount = 15;
 
-        // Create particles
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 4 + 1,
-                speedX: Math.random() * 0.8 - 0.4,
-                speedY: Math.random() * 0.8 - 0.4,
-                color: `rgba(${Math.random() * 200 + 55}, ${Math.random() * 100 + 155}, ${Math.random() * 200 + 55}, 0.6)`,
-                alpha: Math.random() * 0.5 + 0.3
-            });
-        }
-
-        // Create streams
-        for (let i = 0; i < streamCount; i++) {
-            streams.push({
-                x: Math.random() * canvas.width,
-                y: -50,
-                speed: Math.random() * 2 + 1,
-                width: Math.random() * 200 + 100,
-                opacity: Math.random() * 0.3 + 0.1
+        // Create pink lines
+        for (let i = 0; i < lineCount; i++) {
+            lines.push({
+                x1: Math.random() * canvas.width,
+                y1: Math.random() * canvas.height,
+                x2: Math.random() * canvas.width,
+                y2: Math.random() * canvas.height,
+                thickness: Math.random() * 3 + 1,
+                opacity: Math.random() * 0.5 + 0.2,
+                speed: Math.random() * 0.5 + 0.2,
+                angle: Math.random() * Math.PI * 2
             });
         }
 
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw solid purple background
+            ctx.fillStyle = '#6B21A8';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw streams
-            streams.forEach(stream => {
-                const gradient = ctx.createLinearGradient(stream.x - stream.width/2, stream.y, stream.x + stream.width/2, stream.y + 200);
-                gradient.addColorStop(0, `rgba(236, 72, 153, ${stream.opacity * 0.3})`);
-                gradient.addColorStop(0.5, `rgba(139, 92, 246, ${stream.opacity})`);
-                gradient.addColorStop(1, `rgba(236, 72, 153, ${stream.opacity * 0.3})`);
-
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.moveTo(stream.x - stream.width/2, stream.y);
-                ctx.bezierCurveTo(
-                    stream.x - stream.width/4, stream.y + 100,
-                    stream.x + stream.width/4, stream.y + 100,
-                    stream.x + stream.width/2, stream.y
-                );
-                ctx.lineTo(stream.x + stream.width/2, stream.y + 200);
-                ctx.bezierCurveTo(
-                    stream.x + stream.width/4, stream.y + 100,
-                    stream.x - stream.width/4, stream.y + 100,
-                    stream.x - stream.width/2, stream.y + 200
-                );
-                ctx.closePath();
-                ctx.fill();
-
-                stream.y += stream.speed;
-                if (stream.y > canvas.height + 200) {
-                    stream.y = -50;
-                    stream.x = Math.random() * canvas.width;
-                }
-            });
-
-            // Draw particles
-            particles.forEach(particle => {
+            // Draw pink lines
+            lines.forEach(line => {
                 ctx.save();
-                ctx.globalAlpha = particle.alpha;
-                ctx.fillStyle = particle.color;
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.globalAlpha = line.opacity;
+                ctx.strokeStyle = '#EC4899';
+                ctx.lineWidth = line.thickness;
+                ctx.lineCap = 'round';
 
                 // Add glow effect
-                ctx.shadowColor = particle.color;
-                ctx.shadowBlur = 10;
-                ctx.fill();
+                ctx.shadowColor = '#EC4899';
+                ctx.shadowBlur = 15;
+
+                ctx.beginPath();
+                ctx.moveTo(line.x1, line.y1);
+                ctx.lineTo(line.x2, line.y2);
+                ctx.stroke();
                 ctx.restore();
 
-                particle.x += particle.speedX;
-                particle.y += particle.speedY;
+                // Animate lines
+                line.angle += line.speed * 0.01;
+                line.x1 += Math.cos(line.angle) * line.speed;
+                line.y1 += Math.sin(line.angle) * line.speed;
+                line.x2 += Math.cos(line.angle + Math.PI/2) * line.speed;
+                line.y2 += Math.sin(line.angle + Math.PI/2) * line.speed;
 
-                // Bounce off edges
-                if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
-                if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
-
-                // Slow down over time
-                particle.speedX *= 0.999;
-                particle.speedY *= 0.999;
-
-                // Randomly add some energy
-                if (Math.random() < 0.01) {
-                    particle.speedX += (Math.random() - 0.5) * 0.5;
-                    particle.speedY += (Math.random() - 0.5) * 0.5;
-                }
+                // Wrap around edges
+                if (line.x1 < 0) line.x1 = canvas.width;
+                if (line.x1 > canvas.width) line.x1 = 0;
+                if (line.y1 < 0) line.y1 = canvas.height;
+                if (line.y1 > canvas.height) line.y1 = 0;
+                if (line.x2 < 0) line.x2 = canvas.width;
+                if (line.x2 > canvas.width) line.x2 = 0;
+                if (line.y2 < 0) line.y2 = canvas.height;
+                if (line.y2 > canvas.height) line.y2 = 0;
             });
 
             requestAnimationFrame(animate);
@@ -637,6 +958,24 @@
 
     // Initialize event listeners
     function initializeEventListeners() {
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Page hidden - go to welcome screen
+                document.getElementById('main-container').classList.add('hidden');
+                document.getElementById('welcome-screen').classList.remove('hidden');
+                saveAllData();
+            }
+        });
+
+        // Handle before unload
+        window.addEventListener('beforeunload', () => {
+            // Save all application data
+            saveAllData();
+        });
+
+        // Update system time
+        setInterval(updateSystemTime, 1000);
         // Load user data on settings open
         document.addEventListener('click', (e) => {
             if (e.target.closest('[data-app="settings"]')) {
@@ -738,8 +1077,9 @@
         windowElement.className = 'fixed glass window-shadow rounded-lg overflow-hidden animate-slide-in-center z-20 transition-all duration-200';
         windowElement.style.width = `${app.width}px`;
         windowElement.style.height = `${app.height}px`;
-        windowElement.style.left = `calc(50% - ${app.width / 2}px)`;
-        windowElement.style.top = `calc(50% - ${app.height / 2}px)`;
+        windowElement.style.left = '50%';
+        windowElement.style.top = '50%';
+        windowElement.style.transform = 'translate(-50%, -50%)';
 
         windowElement.innerHTML = `
                 <div class="window-header" data-window-id="${windowId}">
@@ -792,6 +1132,31 @@
             setTimeout(() => {
                 loadFiles();
             }, 100);
+        } else if (appName === 'notepad') {
+            setTimeout(() => {
+                // Load saved notepad data
+                const appData = localStorage.getItem('circleos-app-data');
+                if (appData) {
+                    const data = JSON.parse(appData);
+                    const notepadIndex = Object.keys(activeWindows).filter(id =>
+                        activeWindows[id].app === 'notepad'
+                    ).length - 1;
+
+                    const savedData = data[`notepad-${notepadIndex}`];
+                    if (savedData) {
+                        const textarea = windowElement.querySelector('textarea');
+                        if (textarea) {
+                            textarea.value = savedData;
+                        }
+                    }
+                }
+
+                // Save data on change
+                const textarea = windowElement.querySelector('textarea');
+                if (textarea) {
+                    textarea.addEventListener('input', saveAllData);
+                }
+            }, 100);
         }
     }
 
@@ -828,8 +1193,10 @@
         newX = Math.max(0, Math.min(newX, containerRect.width - activeWindowElement.offsetWidth));
         newY = Math.max(0, Math.min(newY, containerRect.height - activeWindowElement.offsetHeight));
 
+        // Update position
         activeWindowElement.style.left = `${newX}px`;
         activeWindowElement.style.top = `${newY}px`;
+        activeWindowElement.style.transform = 'none';
     });
 
     // Handle mouse up to stop dragging
@@ -893,6 +1260,7 @@
             window.element.style.height = `${window.originalSize.height}px`;
             window.element.style.left = window.originalPosition.left;
             window.element.style.top = window.originalPosition.top;
+            window.element.style.transform = 'translate(-50%, -50%)';
         } else {
             // Maximize
             window.originalPosition = {
@@ -903,6 +1271,7 @@
             window.element.style.height = '100%';
             window.element.style.left = '0';
             window.element.style.top = '0';
+            window.element.style.transform = 'none';
         }
     }
 
@@ -1012,7 +1381,178 @@
 
     // Show system info
     function showSystemInfo() {
-        alert('CircleOS v0.0.1\nA beautiful and functional operating system simulation.\n\nFeatures:\n- Multi-window support\n- Drag and drop\n- Paint application\n- File manager\n- And more!');
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+        modal.innerHTML = `
+                <div class="glass p-6 rounded-2xl w-96 animate-slide-in-center">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-white">System Info</h2>
+                        <button onclick="this.closest('.fixed').remove()" class="text-white hover:text-gray-300">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="mb-4 space-y-2">
+                        <button onclick="rebootSystem()" class="w-full py-2 bg-primary hover:bg-primary/80 text-white rounded-lg">重启系统</button>
+                    </div>
+                    <div class="text-white text-sm space-y-2">
+                        <div><strong>System:</strong> CircleOS v1</div>
+                        <div><strong>User:</strong> ${localStorage.getItem('circleos-username') || 'Guest'}</div>
+                        <div><strong>Mode:</strong> ${localStorage.getItem('circleos-mode') || 'Standard'}</div>
+                        <div><strong>Windows:</strong> ${Object.keys(activeWindows).length}</div>
+                        <div><strong>Files:</strong> ${userFiles.length}</div>
+                        <div><strong>Time:</strong> <span id="system-time"></span></div>
+                    </div>
+                </div>
+            `;
+        document.body.appendChild(modal);
+        lucide.createIcons();
+
+        // Update time
+        updateSystemTime();
+    }
+
+    // Reboot system
+    function rebootSystem() {
+        showBootScreen();
+    }
+
+    // Shutdown system - removed as per requirements
+    function shutdownSystem() {
+        alert('关机功能已禁用');
+    }
+
+    // Show boot screen
+    function showBootScreen() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black z-50 flex flex-col items-center justify-center';
+        modal.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">CircleOS</div>
+                    <div class="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
+                        <div id="boot-progress" class="h-full bg-primary" style="width: 0%"></div>
+                    </div>
+                    <div id="boot-status" class="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200 text-sm">正在启动系统...</div>
+                </div>
+            `;
+        document.body.appendChild(modal);
+
+        let progress = 0;
+        const progressBar = document.getElementById('boot-progress');
+        const statusText = document.getElementById('boot-status');
+        let rKeyCount = 0;
+        let tKeyCount = 0;
+
+        const bootSteps = [
+            '初始化系统...',
+            '加载用户配置...',
+            '检查文件系统...',
+            '启动服务...',
+            '准备桌面...',
+            '完成启动'
+        ];
+
+        // Listen for key presses during boot
+        function handleBootKeyPress(e) {
+            if (e.key.toLowerCase() === 'r') {
+                rKeyCount++;
+                if (rKeyCount >= 3) {
+                    clearInterval(bootInterval);
+                    modal.remove();
+                    document.removeEventListener('keydown', handleBootKeyPress);
+                    enterSafeMode();
+                }
+            } else if (e.key.toLowerCase() === 't') {
+                tKeyCount++;
+                if (tKeyCount >= 3) {
+                    clearInterval(bootInterval);
+                    modal.remove();
+                    document.removeEventListener('keydown', handleBootKeyPress);
+                    enterTerminalMode();
+                }
+            } else if (e.key.toLowerCase() === 'd') {
+                // Enable debug mode on next boot
+                localStorage.setItem('circleos-debug-mode', 'true');
+            } else {
+                rKeyCount = 0;
+                tKeyCount = 0;
+            }
+        }
+
+        document.addEventListener('keydown', handleBootKeyPress);
+
+        const bootInterval = setInterval(() => {
+            progress += 2;
+            progressBar.style.width = progress + '%';
+
+            const stepIndex = Math.floor(progress / 20);
+            if (stepIndex < bootSteps.length) {
+                statusText.textContent = bootSteps[stepIndex];
+            }
+
+            if (progress >= 100) {
+                clearInterval(bootInterval);
+                document.removeEventListener('keydown', handleBootKeyPress);
+                setTimeout(() => {
+                    modal.remove();
+                    document.getElementById('main-container').classList.remove('hidden');
+                    document.getElementById('welcome-screen').classList.add('hidden');
+
+                    // Check if debug mode should be enabled
+                    if (localStorage.getItem('circleos-debug-mode') === 'true') {
+                        toggleDebugMode();
+                        showDebugInfo();
+                    }
+                }, 500);
+            }
+        }, 100);
+    }
+
+    // Enter safe mode
+    function enterSafeMode() {
+        localStorage.setItem('circleos-mode', 'Safe Mode');
+        // Redirect to safe mode page
+        window.location.href = 'safe_mode.html';
+    }
+
+    // Exit safe mode
+    function exitSafeMode() {
+        localStorage.setItem('circleos-mode', 'Standard');
+        const safeModeDiv = document.getElementById('safe-mode');
+        if (safeModeDiv) {
+            safeModeDiv.remove();
+        }
+        showBootScreen();
+    }
+
+    // Enter terminal mode
+    function enterTerminalMode() {
+        const terminalDiv = document.createElement('div');
+        terminalDiv.className = 'fixed inset-0 bg-black z-50 flex flex-col items-center justify-center';
+        terminalDiv.innerHTML = `
+                <div class="text-center text-white">
+                    <div class="text-4xl font-bold mb-8">终端模式</div>
+                    <div class="bg-gray-900 p-4 rounded-lg mb-8 text-green-400 font-mono">
+                        <div>Welcome to CircleOS Terminal</div>
+                        <div>这个功能正在开发中...</div>
+                        <div id="countdown">3秒后自动重启...</div>
+                    </div>
+                </div>
+            `;
+        document.body.appendChild(terminalDiv);
+
+        let countdown = 3;
+        const countdownEl = document.getElementById('countdown');
+
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            countdownEl.textContent = `${countdown}秒后自动重启...`;
+
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                terminalDiv.remove();
+                showBootScreen();
+            }
+        }, 1000);
     }
 
     // Handle file drop
@@ -1149,7 +1689,7 @@
         document.getElementById('main-container').classList.add('hidden');
         document.getElementById('welcome-screen').classList.remove('hidden');
         document.getElementById('pin-input').value = '';
-        saveSystemState();
+        saveAllData();
     }
 
     // Unlock system
@@ -1160,6 +1700,7 @@
         if (pin === savedPin) {
             document.getElementById('lock-screen').classList.add('hidden');
             document.getElementById('main-container').classList.remove('hidden');
+            loadSystemState();
         } else {
             alert('PIN码错误，请重试');
             document.getElementById('pin-input').value = '';
@@ -1184,9 +1725,10 @@
         }
     }
 
-    // Save system state
-    function saveSystemState() {
-        const state = {
+    // Save all application data
+    function saveAllData() {
+        // Save window state
+        const windowState = {
             activeWindows: Object.keys(activeWindows).map(id => ({
                 id,
                 app: activeWindows[id].app,
@@ -1201,7 +1743,21 @@
                 isMinimized: activeWindows[id].isMinimized
             }))
         };
-        localStorage.setItem('circleos-state', JSON.stringify(state));
+        localStorage.setItem('circleos-state', JSON.stringify(windowState));
+
+        // Save application data
+        const appData = {};
+
+        // Save notepad data - fix for data loss issue
+        const notepadWindows = document.querySelectorAll('[data-app="notepad"]');
+        notepadWindows.forEach((el, index) => {
+            const textarea = el.querySelector('textarea');
+            if (textarea) {
+                appData[`notepad-${index}`] = textarea.value;
+            }
+        });
+
+        localStorage.setItem('circleos-app-data', JSON.stringify(appData));
     }
 
     // Load system state
@@ -1210,9 +1766,23 @@
         if (savedState) {
             try {
                 const state = JSON.parse(savedState);
-                // You can implement state restoration here if needed
+                // Restore application data
+                loadAppData();
             } catch (e) {
                 console.error('Failed to load system state:', e);
+            }
+        }
+    }
+
+    // Load application data
+    function loadAppData() {
+        const appData = localStorage.getItem('circleos-app-data');
+        if (appData) {
+            try {
+                const data = JSON.parse(appData);
+                // Data will be loaded when apps are opened
+            } catch (e) {
+                console.error('Failed to load app data:', e);
             }
         }
     }

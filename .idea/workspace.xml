@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="37ff70d3-b094-4c9b-9e7a-cfcdec2410d9" name="Changes" comment="First setup" />
+    <list default="true" id="37ff70d3-b094-4c9b-9e7a-cfcdec2410d9" name="Changes" comment="v1.1">
+      <change afterPath="$PROJECT_DIR$/animations.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/animations.css " afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/safe_mode.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,7 +63,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1765446698087</updated>
-      <workItem from="1765446699198" duration="305000" />
+      <workItem from="1765446699198" duration="12257000" />
     </task>
     <task id="LOCAL-00001" summary="First setup">
       <option name="closed" value="true" />
@@ -65,7 +73,55 @@
       <option name="project" value="LOCAL" />
       <updated>1765446821970</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="First setup">
+      <option name="closed" value="true" />
+      <created>1765447009592</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765447009592</updated>
+    </task>
+    <task id="LOCAL-00003" summary="v0.0.1">
+      <option name="closed" value="true" />
+      <created>1765449078941</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1765449078941</updated>
+    </task>
+    <task id="LOCAL-00004" summary="v7 But have error">
+      <option name="closed" value="true" />
+      <created>1765451002277</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1765451002277</updated>
+    </task>
+    <task id="LOCAL-00005" summary="v1 But have error">
+      <option name="closed" value="true" />
+      <created>1765452138801</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1765452138801</updated>
+    </task>
+    <task id="LOCAL-00006" summary="v1.1 But have error">
+      <option name="closed" value="true" />
+      <created>1765456275534</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1765456275534</updated>
+    </task>
+    <task id="LOCAL-00007" summary="v1.1">
+      <option name="closed" value="true" />
+      <created>1765457928094</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1765457928094</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -73,6 +129,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="First setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="First setup" />
+    <MESSAGE value="v0.0.1" />
+    <MESSAGE value="v7 But have error" />
+    <MESSAGE value="v1 But have error" />
+    <MESSAGE value="v1.1 But have error" />
+    <MESSAGE value="v1.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="v1.1" />
   </component>
 </project>
