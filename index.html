@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CircleOS v0.0.1</title>
+    <title>CircleOS v1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -167,6 +167,10 @@
             <span class="text-xl">🕐</span>
             <span class="sidebar-tooltip group-hover:scale-100">时钟</span>
         </div>
+        <div class="sidebar-icon group" data-app="update">
+            <span class="text-xl">🔄</span>
+            <span class="sidebar-tooltip group-hover:scale-100">更新</span>
+        </div>
         <div class="sidebar-icon group" data-app="settings">
             <span class="text-xl">⚙️</span>
             <span class="sidebar-tooltip group-hover:scale-100">设置</span>
@@ -178,6 +182,10 @@
         <div class="sidebar-icon group" id="lock-button">
             <i data-lucide="lock" class="w-6 h-6"></i>
             <span class="sidebar-tooltip group-hover:scale-100">锁定系统</span>
+        </div>
+        <div class="sidebar-icon group" id="restart-button">
+            <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+            <span class="sidebar-tooltip group-hover:scale-100">重启系统</span>
         </div>
         <div class="sidebar-icon group mt-auto" id="system-info">
             <i data-lucide="info" class="w-6 h-6"></i>
@@ -201,6 +209,19 @@
     <!-- Windows Container -->
     <div id="windows-container" class="flex-1 relative overflow-hidden">
         <!-- Windows will be dynamically created here -->
+    </div>
+
+    <!-- Restart Confirmation Dialog -->
+    <div id="restart-dialog" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="glass p-8 rounded-2xl w-96 animate-fade-in text-center">
+            <div class="text-4xl mb-4">⚠️</div>
+            <h2 class="text-2xl font-bold text-white mb-4">确认重启系统？</h2>
+            <p class="text-white text-opacity-80 mb-6">重启将关闭所有打开的应用程序。确定要继续吗？</p>
+            <div class="flex space-x-4">
+                <button onclick="cancelRestart()" class="flex-1 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors duration-200">取消</button>
+                <button onclick="confirmRestart()" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">确认重启</button>
+            </div>
+        </div>
     </div>
 
     <!-- Lock Screen -->
@@ -461,6 +482,77 @@
                             <div id="clock-date" class="text-xl mb-6">YYYY-MM-DD</div>
                             <button onclick="toggleClockFullscreen(this)" class="px-6 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors duration-200 backdrop-blur-sm">
                                 全屏模式
+                            </button>
+                        </div>
+                    </div>
+                `
+        },
+        'update': {
+            name: '系统更新',
+            icon: '🔄',
+            width: 500,
+            height: 400,
+            content: `
+                    <div class="h-full flex flex-col bg-white">
+                        <div class="flex-1 p-6">
+                            <div class="text-center mb-8">
+                                <div class="text-6xl mb-4">🔄</div>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-2">System Update</h2>
+                                <p class="text-gray-600">CircleOS v1</p>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3">Current Version</h3>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Version:</span>
+                                    <span class="font-mono text-blue-600">v1</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-gray-600">Build:</span>
+                                    <span class="font-mono text-blue-600">2025.12.11</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                                <div class="flex items-start">
+                                    <div class="text-green-500 mr-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-green-800 font-semibold mb-1">Your system is up to date</h3>
+                                        <p class="text-green-700 text-sm">No updates available at this time.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <h3 class="text-lg font-semibold text-gray-800">What's New in v1:</h3>
+                                <div class="space-y-2">
+                                    <div class="flex items-start">
+                                        <span class="text-purple-500 mr-2">•</span>
+                                        <span class="text-gray-700">macOS-like window management with improved dragging and resizing</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="text-purple-500 mr-2">•</span>
+                                        <span class="text-gray-700">Enhanced browser with tab handling</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="text-purple-500 mr-2">•</span>
+                                        <span class="text-gray-700">Improved security with instant system locking</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="text-purple-500 mr-2">•</span>
+                                        <span class="text-gray-700">New Update Center for system information</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t p-4 flex justify-end">
+                            <button onclick="closeWindow(this.closest('.window').id)" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                                Close
                             </button>
                         </div>
                     </div>
@@ -1118,8 +1210,7 @@
         // Focus this window
         focusWindow(windowId);
 
-        // Initialize window dragging
-        initializeWindowDragging(windowElement);
+        // Window dragging disabled as requested
 
         // Initialize app-specific functionality
         if (appName === 'paint') {
@@ -1173,62 +1264,97 @@
     // Initialize window dragging and resizing
     function initializeWindowDragging(windowElement) {
         const header = windowElement.querySelector('.window-header');
-        const resizeHandle = windowElement.querySelector('.window-resize-handle');
+        let isDragging = false;
+        let dragStartX, dragStartY;
+        let windowStartLeft, windowStartTop;
 
         // Window dragging
         header.addEventListener('mousedown', (e) => {
+            // Don't drag if clicking on window buttons
             if (e.target.closest('.window-button')) return;
 
             isDragging = true;
-            const rect = windowElement.getBoundingClientRect();
-            dragOffset.x = e.clientX - rect.left;
-            dragOffset.y = e.clientY - rect.top;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
 
-            activeWindowElement = windowElement;
+            // Get current window position
+            const computedStyle = window.getComputedStyle(windowElement);
+            windowStartLeft = parseInt(computedStyle.left) || 0;
+            windowStartTop = parseInt(computedStyle.top) || 0;
+
+            // Focus window
             focusWindow(windowElement.id);
 
             e.preventDefault();
         });
 
-        // Window resizing
-        let isResizing = false;
-
-        resizeHandle.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            const rect = windowElement.getBoundingClientRect();
-            dragOffset.x = e.clientX - rect.right;
-            dragOffset.y = e.clientY - rect.bottom;
-
-            activeWindowElement = windowElement;
-            focusWindow(windowElement.id);
-
-            e.preventDefault();
-        });
-
-        // Handle resize on mouse move
+        // Handle mouse move for dragging
         document.addEventListener('mousemove', (e) => {
-            if (!isResizing || !activeWindowElement) return;
+            if (!isDragging) return;
 
             const container = document.getElementById('windows-container');
             const containerRect = container.getBoundingClientRect();
 
-            let newWidth = e.clientX - dragOffset.x - containerRect.left;
-            let newHeight = e.clientY - dragOffset.y - containerRect.top;
+            // Calculate new position
+            const deltaX = e.clientX - dragStartX;
+            const deltaY = e.clientY - dragStartY;
 
-            // Minimum size constraints
-            newWidth = Math.max(300, newWidth);
-            newHeight = Math.max(200, newHeight);
+            let newLeft = windowStartLeft + deltaX;
+            let newTop = windowStartTop + deltaY;
 
-            // Update window size
-            activeWindowElement.style.width = `${newWidth}px`;
-            activeWindowElement.style.height = `${newHeight}px`;
-            activeWindowElement.style.transform = 'none';
+            // Constrain to container boundaries
+            newLeft = Math.max(0, Math.min(newLeft, containerRect.width - windowElement.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, containerRect.height - windowElement.offsetHeight));
+
+            // Update position
+            windowElement.style.left = `${newLeft}px`;
+            windowElement.style.top = `${newTop}px`;
+            windowElement.style.transform = 'none';
         });
 
-        // Stop resizing on mouse up
+        // Stop dragging on mouse up
         document.addEventListener('mouseup', () => {
-            isResizing = false;
+            isDragging = false;
         });
+    }
+
+    // Maximize/minimize window function
+    function toggleMaximize(windowElement) {
+        const container = document.getElementById('windows-container');
+        const containerRect = container.getBoundingClientRect();
+
+        // Check if already maximized
+        if (windowElement.classList.contains('maximized')) {
+            // Restore to previous size and position
+            const restoreData = windowElement.dataset.restoreData;
+            if (restoreData) {
+                const { width, height, left, top } = JSON.parse(restoreData);
+                windowElement.style.width = `${width}px`;
+                windowElement.style.height = `${height}px`;
+                windowElement.style.left = `${left}px`;
+                windowElement.style.top = `${top}px`;
+            }
+            windowElement.classList.remove('maximized');
+        } else {
+            // Save current size and position
+            const rect = windowElement.getBoundingClientRect();
+            const containerLeft = containerRect.left;
+            const containerTop = containerRect.top;
+
+            windowElement.dataset.restoreData = JSON.stringify({
+                width: rect.width,
+                height: rect.height,
+                left: rect.left - containerLeft,
+                top: rect.top - containerTop
+            });
+
+            // Maximize to fill container
+            windowElement.style.width = `${containerRect.width}px`;
+            windowElement.style.height = `${containerRect.height}px`;
+            windowElement.style.left = '0px';
+            windowElement.style.top = '0px';
+            windowElement.classList.add('maximized');
+        }
     }
 
     // Handle mouse movement for dragging
@@ -1306,24 +1432,28 @@
         const container = document.getElementById('windows-container');
         const containerRect = container.getBoundingClientRect();
 
-        if (window.element.style.width === '100%') {
-            // Restore original size
+        if (window.element.classList.contains('maximized')) {
+            // Restore original size and position
             window.element.style.width = `${window.originalSize.width}px`;
             window.element.style.height = `${window.originalSize.height}px`;
             window.element.style.left = window.originalPosition.left;
             window.element.style.top = window.originalPosition.top;
             window.element.style.transform = 'translate(-50%, -50%)';
+            window.element.classList.remove('maximized');
         } else {
-            // Maximize
+            // Save original size and position
             window.originalPosition = {
                 left: window.element.style.left,
                 top: window.element.style.top
             };
-            window.element.style.width = '100%';
-            window.element.style.height = '100%';
-            window.element.style.left = '0';
-            window.element.style.top = '0';
+
+            // Maximize to fill container
+            window.element.style.width = `${containerRect.width}px`;
+            window.element.style.height = `${containerRect.height}px`;
+            window.element.style.left = '0px';
+            window.element.style.top = '0px';
             window.element.style.transform = 'none';
+            window.element.classList.add('maximized');
         }
     }
 
@@ -1731,10 +1861,18 @@
 
     // Lock system
     function lockSystem() {
+        // Hide main container and show lock screen
         document.getElementById('main-container').classList.add('hidden');
         document.getElementById('lock-screen').classList.remove('hidden');
         document.getElementById('pin-input').value = '';
+
+        // Update lock screen time immediately
+        updateLockScreenTime();
+
+        // Save current system state
         saveAllData();
+
+        console.log('System locked');
     }
 
     // Unlock system
