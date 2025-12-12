@@ -42,17 +42,17 @@
             }
             .sidebar-icon {
                 @apply relative flex items-center justify-center h-12 w-12 mt-2 mb-2 mx-auto
-                bg-purple-100 text-purple-800 hover:bg-purple-200
+                bg-gray-100 text-gray-600 hover:bg-gray-200
                 rounded-full hover:rounded-xl transition-all duration-300 ease-linear
                 cursor-pointer;
             }
             .sidebar-tooltip {
                 @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
-                text-purple-800 bg-white
+                text-gray-600 bg-white
                 text-xs font-bold transition-all duration-100 scale-0 origin-left;
             }
             .sidebar-hr {
-                @apply bg-purple-200 border border-purple-200 rounded-full mx-2;
+                @apply bg-gray-200 border border-gray-200 rounded-full mx-2;
             }
             .window-header {
                 @apply flex items-center justify-between p-2 bg-gray-800 text-white rounded-t-lg cursor-move;
@@ -72,6 +72,9 @@
             .clock-fullscreen {
                 @apply z-50 !important;
             }
+            .window-count {
+                @apply text-xs bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center ml-1;
+            }
         }
     </style>
     <link rel="stylesheet" href="animations.css">
@@ -82,44 +85,18 @@
 <div id="bg-animation" class="fixed inset-0 z-0 opacity-20"></div>
 
 <!-- Welcome Screen -->
-<div id="welcome-screen" class="fixed inset-0 z-50 flex items-center justify-center">
+<div id="welcome-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400">
     <div class="text-center text-white animate-fade-in">
-        <div class="text-6xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">CircleOS</div>
-        <div class="text-lg mb-4 animate-pulse">正在初始化系统...</div>
-        <div class="text-sm text-gray-200">这可能会花费一点时间，如果无法进入请重新载入</div>
+        <div class="text-8xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">CircleOS</div>
+        <button onclick="startSystem()" class="px-8 py-3 bg-transparent hover:bg-white/10 text-gray-300 font-medium rounded-lg transition-colors duration-200">
+            Click anywhere to enter
+        </button>
     </div>
 </div>
 
 
 
-<!-- Setup Wizard -->
-<div id="setup-wizard" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-    <div class="glass p-8 rounded-2xl w-96 animate-slide-in-center">
-        <h1 class="text-2xl font-bold text-center text-white mb-6">欢迎使用 CircleOS</h1>
-        <div id="setup-step-1">
-            <div class="mb-4">
-                <label for="username" class="block text-sm font-medium text-white mb-2">用户名</label>
-                <input type="text" id="username" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入用户名">
-            </div>
-            <button onclick="nextSetupStep(2)" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">下一步</button>
-        </div>
-        <div id="setup-step-2" class="hidden">
-            <div class="mb-4">
-                <label for="pin" class="block text-sm font-medium text-white mb-2">设置 PIN 码</label>
-                <input type="password" id="pin" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
-                <div class="text-xs text-white text-center mt-2">请设置 4 位数字 PIN 码</div>
-            </div>
-            <button onclick="nextSetupStep(3)" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">下一步</button>
-        </div>
-        <div id="setup-step-3" class="hidden">
-            <div class="mb-4">
-                <label for="confirm-pin" class="block text-sm font-medium text-white mb-2">确认 PIN 码</label>
-                <input type="password" id="confirm-pin" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
-            </div>
-            <button onclick="completeSetup()" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">完成</button>
-        </div>
-    </div>
-</div>
+
 
 <!-- Main Container -->
 <div id="main-container" class="relative z-10 flex h-screen hidden">
@@ -153,39 +130,51 @@
         </div>
         <div class="sidebar-icon group" data-app="calculator">
             <span class="text-xl">🧮</span>
-            <span class="sidebar-tooltip group-hover:scale-100">计算器</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Calculator</span>
         </div>
         <div class="sidebar-icon group" data-app="weather">
             <span class="text-xl">🌤️</span>
-            <span class="sidebar-tooltip group-hover:scale-100">天气</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Weather</span>
         </div>
         <div class="sidebar-icon group" data-app="music">
             <span class="text-xl">🎵</span>
-            <span class="sidebar-tooltip group-hover:scale-100">音乐</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Music</span>
         </div>
         <div class="sidebar-icon group" data-app="clock">
             <span class="text-xl">🕐</span>
-            <span class="sidebar-tooltip group-hover:scale-100">时钟</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Clock</span>
         </div>
         <div class="sidebar-icon group" data-app="update">
             <span class="text-xl">🔄</span>
-            <span class="sidebar-tooltip group-hover:scale-100">更新</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Update</span>
+        </div>
+        <div class="sidebar-icon group" data-app="video">
+            <span class="text-xl">🎬</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Video Player</span>
+        </div>
+        <div class="sidebar-icon group" data-app="games">
+            <span class="text-xl">🎮</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Game Center</span>
+        </div>
+        <div class="sidebar-icon group" data-app="terminal">
+            <span class="text-xl">💻</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Terminal</span>
+        </div>
+        <div class="sidebar-icon group" data-app="gallery">
+            <span class="text-xl">🖼️</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Gallery</span>
         </div>
         <div class="sidebar-icon group" data-app="settings">
             <span class="text-xl">⚙️</span>
-            <span class="sidebar-tooltip group-hover:scale-100">设置</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Settings</span>
         </div>
 
         <hr class="sidebar-hr my-4">
 
-        <!-- System Info -->
-        <div class="sidebar-icon group" id="lock-button">
-            <i data-lucide="lock" class="w-6 h-6"></i>
-            <span class="sidebar-tooltip group-hover:scale-100">锁定系统</span>
-        </div>
+
         <div class="sidebar-icon group" id="restart-button">
             <i data-lucide="refresh-cw" class="w-6 h-6"></i>
-            <span class="sidebar-tooltip group-hover:scale-100">重启系统</span>
+            <span class="sidebar-tooltip group-hover:scale-100">Restart System</span>
         </div>
         <div class="sidebar-icon group mt-auto" id="system-info">
             <i data-lucide="info" class="w-6 h-6"></i>
@@ -224,28 +213,317 @@
         </div>
     </div>
 
-    <!-- Lock Screen -->
-    <div id="lock-screen" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
-        <div class="glass p-8 rounded-2xl w-96 animate-fade-in text-center">
-            <h1 class="text-4xl font-bold text-white mb-8">Circle</h1>
 
-            <!-- Liquid Glass Clock -->
-            <div class="glass p-6 rounded-2xl mb-8 backdrop-blur-md border border-white/30">
-                <div id="lock-screen-time" class="text-5xl font-bold text-white mb-2">00:00:00</div>
-                <div id="lock-screen-date" class="text-lg text-white/80">YYYY-MM-DD</div>
-            </div>
-
-            <div class="mb-6">
-                <input type="password" id="pin-input" maxlength="4" class="w-full p-3 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="****">
-            </div>
-            <button id="unlock-button" class="w-full py-3 bg-primary hover:bg-primary/80 text-white font-semibold rounded-lg transition-colors duration-200">Unlock</button>
-        </div>
-    </div>
 </div>
 
 <script>
     // Initialize Lucide icons
     lucide.createIcons();
+
+
+
+    // Start the system
+    function startSystem() {
+        clearTimeout(autoStartTimer);
+
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const mainContainer = document.getElementById('main-container');
+
+        // Add fade out animation to welcome screen
+        welcomeScreen.classList.add('animate-fade-out');
+
+        setTimeout(() => {
+            welcomeScreen.classList.add('hidden');
+            mainContainer.classList.remove('hidden');
+
+            // Initialize system components
+            initializeSystem();
+        }, 500);
+    }
+
+    // Initialize system components
+    function initializeSystem() {
+        console.log('CircleOS v1 starting up...');
+
+        // Initialize background animation
+        initializeBackgroundAnimation();
+
+        // Initialize app launchers
+        initializeAppLaunchers();
+
+        // Initialize clock
+        initializeClock();
+
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('Welcome to CircleOS v1');
+        }, 1000);
+
+        console.log('System initialization complete!');
+    }
+
+    // Initialize app launchers
+    function initializeAppLaunchers() {
+        document.querySelectorAll('[data-app]').forEach(launcher => {
+            launcher.addEventListener('click', () => {
+                const appName = launcher.getAttribute('data-app');
+                openWindow(appName);
+            });
+        });
+    }
+
+    // Initialize background animation
+    function initializeBackgroundAnimation() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('bg-animation');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        container.appendChild(canvas);
+
+        const particles = [];
+        const particleCount = 50;
+        const lines = [];
+        const lineCount = 20;
+
+        // Create particles
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1,
+                color: `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.2})`,
+                speedX: Math.random() * 0.5 - 0.25,
+                speedY: Math.random() * 0.5 - 0.25
+            });
+        }
+
+        // Create lines
+        for (let i = 0; i < lineCount; i++) {
+            lines.push({
+                x1: Math.random() * canvas.width,
+                y1: Math.random() * canvas.height,
+                x2: Math.random() * canvas.width,
+                y2: Math.random() * canvas.height,
+                color: `rgba(255, 255, 255, ${Math.random() * 0.15 + 0.1})`,
+                thickness: Math.random() * 1 + 0.5,
+                speed: Math.random() * 0.2 + 0.1
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and animate lines
+            lines.forEach(line => {
+                ctx.beginPath();
+                ctx.moveTo(line.x1, line.y1);
+                ctx.lineTo(line.x2, line.y2);
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.stroke();
+
+                // Animate lines
+                line.x1 += Math.sin(Date.now() * 0.001) * line.speed;
+                line.y1 += Math.cos(Date.now() * 0.001) * line.speed;
+                line.x2 += Math.cos(Date.now() * 0.001) * line.speed;
+                line.y2 += Math.sin(Date.now() * 0.001) * line.speed;
+
+                // Wrap around screen
+                if (line.x1 < 0) line.x1 = canvas.width;
+                if (line.x1 > canvas.width) line.x1 = 0;
+                if (line.y1 < 0) line.y1 = canvas.height;
+                if (line.y1 > canvas.height) line.y1 = 0;
+                if (line.x2 < 0) line.x2 = canvas.width;
+                if (line.x2 > canvas.width) line.x2 = 0;
+                if (line.y2 < 0) line.y2 = canvas.height;
+                if (line.y2 > canvas.height) line.y2 = 0;
+            });
+
+            // Draw and animate particles
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            });
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    }
+
+    // Start auto timer when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        // Remove auto-start functionality
+        // startAutoStartTimer();
+
+        // Make entire welcome screen clickable
+        const welcomeScreen = document.getElementById('welcome-screen');
+        welcomeScreen.addEventListener('click', (e) => {
+            // Only trigger if clicking on the background or button
+            if (e.target === welcomeScreen || e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                startSystem();
+            }
+        });
+    });
+
+
+
+    // Start the system
+    function startSystem() {
+        clearTimeout(autoStartTimer);
+
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const mainContainer = document.getElementById('main-container');
+
+        // Add fade out animation to welcome screen
+        welcomeScreen.classList.add('animate-fade-out');
+
+        setTimeout(() => {
+            welcomeScreen.classList.add('hidden');
+            mainContainer.classList.remove('hidden');
+
+            // Initialize system components
+            initializeSystem();
+        }, 500);
+    }
+
+    // Initialize system components
+    function initializeSystem() {
+        console.log('CircleOS v1 starting up...');
+
+        // Initialize background animation
+        initializeBackgroundAnimation();
+
+        // Initialize app launchers
+        initializeAppLaunchers();
+
+        // Initialize clock
+        initializeClock();
+
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('Welcome to CircleOS v1');
+        }, 1000);
+
+        console.log('System initialization complete!');
+    }
+
+    // Initialize app launchers
+    function initializeAppLaunchers() {
+        document.querySelectorAll('[data-app]').forEach(launcher => {
+            launcher.addEventListener('click', () => {
+                const appName = launcher.getAttribute('data-app');
+                openWindow(appName);
+            });
+        });
+    }
+
+    // Initialize background animation
+    function initializeBackgroundAnimation() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('bg-animation');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        container.appendChild(canvas);
+
+        const particles = [];
+        const particleCount = 50;
+        const lines = [];
+        const lineCount = 20;
+
+        // Create particles
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1,
+                color: `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.2})`,
+                speedX: Math.random() * 0.5 - 0.25,
+                speedY: Math.random() * 0.5 - 0.25
+            });
+        }
+
+        // Create lines
+        for (let i = 0; i < lineCount; i++) {
+            lines.push({
+                x1: Math.random() * canvas.width,
+                y1: Math.random() * canvas.height,
+                x2: Math.random() * canvas.width,
+                y2: Math.random() * canvas.height,
+                color: `rgba(255, 255, 255, ${Math.random() * 0.15 + 0.1})`,
+                thickness: Math.random() * 1 + 0.5,
+                speed: Math.random() * 0.2 + 0.1
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and animate lines
+            lines.forEach(line => {
+                ctx.beginPath();
+                ctx.moveTo(line.x1, line.y1);
+                ctx.lineTo(line.x2, line.y2);
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.stroke();
+
+                // Animate lines
+                line.x1 += Math.sin(Date.now() * 0.001) * line.speed;
+                line.y1 += Math.cos(Date.now() * 0.001) * line.speed;
+                line.x2 += Math.cos(Date.now() * 0.001) * line.speed;
+                line.y2 += Math.sin(Date.now() * 0.001) * line.speed;
+
+                // Wrap around screen
+                if (line.x1 < 0) line.x1 = canvas.width;
+                if (line.x1 > canvas.width) line.x1 = 0;
+                if (line.y1 < 0) line.y1 = canvas.height;
+                if (line.y1 > canvas.height) line.y1 = 0;
+                if (line.x2 < 0) line.x2 = canvas.width;
+                if (line.x2 > canvas.width) line.x2 = 0;
+                if (line.y2 < 0) line.y2 = canvas.height;
+                if (line.y2 > canvas.height) line.y2 = 0;
+            });
+
+            // Draw and animate particles
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+            });
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    }
 
     // App definitions
     const apps = {
@@ -258,12 +536,12 @@
             content: `
                     <div class="h-full flex flex-col">
                         <div class="bg-gray-100 p-2 flex items-center space-x-2 border-b">
-                            <button onclick="exportNotepad(this)" class="px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 text-sm">导出文件(txt)</button>
-                            <button onclick="importNotepad(this)" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">导入文件(txt)</button>
-                            <button onclick="saveNotepad(this)" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">存檔</button>
+                            <button onclick="exportNotepad(this)" class="px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 text-sm" data-i18n="export">Export File (txt)</button>
+                            <button onclick="importNotepad(this)" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm" data-i18n="import">Import File (txt)</button>
+                            <button onclick="saveNotepad(this)" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm" data-i18n="save">Save</button>
                             <input type="file" id="notepad-file-input" accept=".txt" class="hidden">
                         </div>
-                        <textarea class="w-full flex-1 p-4 bg-white border-0 focus:ring-0 resize-none" placeholder="开始输入..."></textarea>
+                        <textarea class="w-full flex-1 p-4 bg-white border-0 focus:ring-0 resize-none" data-i18n-placeholder="startTyping" placeholder="Start typing..."></textarea>
                     </div>
                 `
         },
@@ -277,16 +555,16 @@
                     <div class="h-full flex flex-col">
                         <div class="bg-gray-100 p-4 rounded-t-lg border-b">
                             <div class="flex items-center space-x-2">
-                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">📁 Documents</button>
-                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">📷 Pictures</button>
+                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">📁 <span data-i18n="documents">Documents</span></button>
+                                <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">📷 <span data-i18n="pictures">Pictures</span></button>
                                 <button class="px-3 py-1 bg-white border rounded hover:bg-gray-50 text-sm">🎵 Music</button>
                             </div>
                         </div>
                         <div id="files-dropzone" class="flex-1 p-4 overflow-auto border-2 border-dashed border-gray-300 rounded-lg m-2" ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                             <div class="text-center mb-6">
                                 <div class="text-2xl mb-2">📁</div>
-                                <div class="font-medium text-gray-600">拖放文件到此处</div>
-                                <div class="text-sm text-gray-500">或双击文件打开</div>
+                                <div class="font-medium text-gray-600" data-i18n="dropFiles">Drop files here</div>
+                                <div class="text-sm text-gray-500" data-i18n="orDoubleClick">Or double-click to open files</div>
                             </div>
                             <div id="files-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <!-- Files will be added here dynamically -->
@@ -305,7 +583,7 @@
                         <div class="bg-gray-100 p-2 flex items-center space-x-2 border-b">
                             <div class="flex-1 flex items-center bg-white rounded px-3 py-1 border">
                                 <i data-lucide="search" class="w-4 h-4 text-gray-400 mr-2"></i>
-                                <input type="text" id="browser-url" class="w-full border-0 focus:ring-0 text-sm" value="https://www.baidu.com" placeholder="输入网址...">
+                                <input type="text" id="browser-url" class="w-full border-0 focus:ring-0 text-sm" value="https://www.google.com" data-i18n-placeholder="enterUrl" placeholder="Enter URL...">
                             </div>
                             <button onclick="navigateBrowser(this)" class="p-1 hover:bg-gray-200 rounded"><i data-lucide="search" class="w-4 h-4"></i></button>
                             <button onclick="refreshBrowser(this)" class="p-1 hover:bg-gray-200 rounded"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
@@ -315,10 +593,10 @@
                             <div id="browser-loading" class="hidden absolute inset-0 bg-white flex items-center justify-center z-10">
                                 <div class="text-center">
                                     <div class="text-2xl mb-2">⏳</div>
-                                    <div class="text-gray-600">加载中...</div>
+                                    <div class="text-gray-600" data-i18n="loading">Loading...</div>
                                 </div>
                             </div>
-                            <iframe id="browser-frame" class="w-full h-full border-0" src="https://www.baidu.com"></iframe>
+                            <iframe id="browser-frame" class="w-full h-full border-0" src="https://www.google.com"></iframe>
                         </div>
                     </div>
                 `
@@ -336,7 +614,7 @@
                             <button class="w-12 h-12 bg-white border rounded hover:bg-gray-50 flex items-center justify-center" data-tool="square"><i data-lucide="square" class="w-6 h-6"></i></button>
                             <button class="w-12 h-12 bg-white border rounded hover:bg-gray-50 flex items-center justify-center" data-tool="circle"><i data-lucide="circle" class="w-6 h-6"></i></button>
                             <div class="border-t pt-2 mt-2">
-                                <div class="text-xs text-center mb-2">Colors</div>
+                                <div class="text-xs text-center mb-2" data-i18n="colors">Colors</div>
                                 <div class="grid grid-cols-2 gap-1">
                                     ${['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFFFFF'].map(color => `
                                         <button class="w-6 h-6 rounded-full border" style="background-color: ${color}" data-color="${color}"></button>
@@ -351,7 +629,7 @@
                 `
         },
         'calculator': {
-            name: '计算器',
+            name: 'Calculator',
             icon: '🧮',
             width: 400,
             height: 500,
@@ -388,7 +666,7 @@
                 `
         },
         'weather': {
-            name: '天气',
+            name: 'Weather',
             icon: '🌤️',
             width: 500,
             height: 400,
@@ -432,7 +710,7 @@
                 `
         },
         'music': {
-            name: '音乐',
+            name: 'Music',
             icon: '🎵',
             width: 600,
             height: 400,
@@ -471,7 +749,7 @@
                 `
         },
         'clock': {
-            name: '时钟',
+            name: 'Clock',
             icon: '🕐',
             width: 400,
             height: 200,
@@ -488,7 +766,7 @@
                 `
         },
         'update': {
-            name: '系统更新',
+            name: 'System Update',
             icon: '🔄',
             width: 500,
             height: 400,
@@ -558,8 +836,147 @@
                     </div>
                 `
         },
+        'video': {
+            name: 'Video Player',
+            icon: '🎬',
+            width: 800,
+            height: 600,
+            content: `
+                    <div class="h-full flex flex-col bg-black">
+                        <div class="bg-gray-900 p-4 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-xl">🎬</span>
+                                <span class="text-white font-semibold">视频播放器</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="videoAction('play')" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 text-sm">播放</button>
+                                <button onclick="videoAction('pause')" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm">暂停</button>
+                                <button onclick="videoAction('stop')" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm">停止</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex items-center justify-center bg-black">
+                            <div class="text-center text-white">
+                                <div class="text-6xl mb-4">🎥</div>
+                                <h3 class="text-xl font-semibold mb-2">视频播放器</h3>
+                                <p class="text-gray-400">点击播放按钮开始播放视频</p>
+                                <div class="mt-6 text-sm text-gray-500">
+                                    <p>支持格式：MP4, WebM, AVI</p>
+                                    <p>期待更多功能...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-900 p-4">
+                            <div class="flex justify-between text-white text-sm mb-2">
+                                <span>00:00</span>
+                                <span>05:30</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `
+        },
+        'games': {
+            name: 'Game Center',
+            icon: '🎮',
+            width: 700,
+            height: 500,
+            content: `
+                    <div class="h-full flex flex-col bg-gradient-to-br from-indigo-600 to-purple-700">
+                        <div class="p-6 text-center">
+                            <h2 class="text-3xl font-bold text-white mb-2" data-i18n="gameCenter">Game Center</h2>
+                            <p class="text-purple-200" data-i18n="welcomeToGames">Welcome to CircleOS Game World</p>
+                        </div>
+                        <div class="flex-1 p-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg backdrop-blur-sm hover:bg-opacity-20 transition-all cursor-pointer" onclick="startShootingGame()">
+                                    <div class="text-4xl mb-3">🎯</div>
+                                    <h3 class="text-xl font-semibold text-white mb-2" data-i18n="shootingGame">Shooting Game</h3>
+                                    <p class="text-purple-200 text-sm" data-i18n="shootingGameDesc">Classic shooting game that tests your reflexes</p>
+                                </div>
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg backdrop-blur-sm hover:bg-opacity-20 transition-all cursor-pointer" onclick="startRunningGame()">
+                                    <div class="text-4xl mb-3">🏃</div>
+                                    <h3 class="text-xl font-semibold text-white mb-2" data-i18n="runningGame">Running Game</h3>
+                                    <p class="text-purple-200 text-sm" data-i18n="runningGameDesc">Exciting running experience, challenge your limits</p>
+                                </div>
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg backdrop-blur-sm hover:bg-opacity-20 transition-all cursor-pointer" onclick="startPuzzleGame()">
+                                    <div class="text-4xl mb-3">🧩</div>
+                                    <h3 class="text-xl font-semibold text-white mb-2" data-i18n="puzzleGame">Puzzle Game</h3>
+                                    <p class="text-purple-200 text-sm" data-i18n="puzzleGameDesc">Fun puzzle games to exercise your brain</p>
+                                </div>
+                                <div class="bg-white bg-opacity-10 p-4 rounded-lg backdrop-blur-sm hover:bg-opacity-20 transition-all cursor-pointer" onclick="startCardGame()">
+                                    <div class="text-4xl mb-3">🎲</div>
+                                    <h3 class="text-xl font-semibold text-white mb-2" data-i18n="cardGame">Card Game</h3>
+                                    <p class="text-purple-200 text-sm" data-i18n="cardGameDesc">Strategy card games to showcase your wisdom</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 text-center text-purple-200 text-sm">
+                            <p data-i18n="moreGames">More games are under development, stay tuned!</p>
+                        </div>
+                    </div>
+                `
+        },
+        'terminal': {
+            name: 'Terminal',
+            icon: '💻',
+            width: 800,
+            height: 600,
+            content: `
+                    <div class="h-full flex flex-col bg-black text-green-400 font-mono">
+                        <div class="bg-gray-900 p-2 flex items-center justify-between border-b border-green-800">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xl">💻</span>
+                                <span class="text-white font-semibold">Terminal</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="clearTerminal(this)" class="px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-700 text-sm">Clear</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 p-4 overflow-auto" id="terminal-output">
+                            <div class="mb-2">
+                                <span class="text-purple-400">CircleOS Terminal v1.0</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-green-400">Welcome to CircleOS Terminal</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-yellow-400">Type 'help' for available commands</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-900 p-2 border-t border-green-800">
+                            <div class="flex items-center">
+                                <span class="text-green-400 mr-2">user@circleos:~$</span>
+                                <input type="text" id="terminal-input" class="flex-1 bg-transparent border-0 focus:ring-0 text-green-400 outline-none" placeholder="Enter command...">
+                            </div>
+                        </div>
+                    </div>
+                `
+        },
+        'gallery': {
+            name: 'Gallery',
+            icon: '🖼️',
+            width: 800,
+            height: 600,
+            content: `
+                    <div class="h-full flex flex-col">
+                        <div class="bg-gray-100 p-4 border-b">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Gallery</h3>
+                                <button onclick="uploadImage()" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 text-sm">Upload Image</button>
+                            </div>
+                        </div>
+                        <div class="flex-1 p-4 overflow-auto">
+                            <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                <!-- Gallery images will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                `
+        },
         'settings': {
-            name: 'Settings',
+            name: '设置',
             icon: '⚙️',
             width: 600,
             height: 500,
@@ -625,6 +1042,225 @@
         }
     };
 
+    // Language support
+    const translations = {
+        en: {
+            welcome: "Initializing system...",
+            welcomeHint: "This may take a moment. If it doesn't load, please reload.",
+            clickToEnter: "Click to Enter System",
+            usageGuide: "Usage Guide",
+            terms: "Terms of Service",
+            agree: "Agree",
+            disagree: "Disagree",
+            startUsing: "Start Using",
+            notepad: "Notepad",
+            files: "Files",
+            browser: "Browser",
+            paint: "Paint",
+            calculator: "Calculator",
+            weather: "Weather",
+            music: "Music",
+            clock: "Clock",
+            update: "Update",
+            settings: "Settings",
+            video: "Video Player",
+            games: "Game Center",
+            search: "Search",
+            restart: "Restart System",
+            systemInfo: "System Info",
+            close: "Close",
+            minimize: "Minimize",
+            maximize: "Maximize",
+            export: "Export File (txt)",
+            import: "Import File (txt)",
+            save: "Save",
+            startTyping: "Start typing...",
+            documents: "Documents",
+            pictures: "Pictures",
+            dropFiles: "Drop files here",
+            orDoubleClick: "Or double-click to open files",
+            enterUrl: "Enter URL...",
+            loading: "Loading...",
+            colors: "Colors",
+            fullscreen: "Fullscreen Mode",
+            systemUpdate: "System Update",
+            currentVersion: "Current Version",
+            build: "Build",
+            upToDate: "Your system is up to date",
+            noUpdates: "No updates available at this time.",
+            whatsNew: "What's New in v1:",
+            general: "General",
+            security: "Security",
+            personalization: "Personalization",
+            theme: "Theme",
+            autoLock: "Auto-lock",
+            changePin: "Change PIN",
+            lockNow: "Lock Now",
+            dataManagement: "Data Management",
+            clearData: "Clear All Data",
+            clearDataHint: "Note: This will delete all user data and reset the system",
+            videoPlayer: "Video Player",
+            play: "Play",
+            pause: "Pause",
+            stop: "Stop",
+            supportedFormats: "Supported formats: MP4, WebM, AVI",
+            moreFeatures: "More features coming soon...",
+            gameCenter: "Game Center",
+            welcomeToGames: "Welcome to CircleOS Game World",
+            shootingGame: "Shooting Game",
+            shootingGameDesc: "Classic shooting game that tests your reflexes",
+            runningGame: "Running Game",
+            runningGameDesc: "Exciting running experience, challenge your limits",
+            puzzleGame: "Puzzle Game",
+            puzzleGameDesc: "Fun puzzle games to exercise your brain",
+            cardGame: "Card Game",
+            cardGameDesc: "Strategy card games to showcase your wisdom",
+            moreGames: "More games are under development, stay tuned!",
+            language: "Language",
+            english: "English",
+            chinese: "中文",
+            searchApps: "Search apps...",
+            system: "System",
+            systemVersion: "System Version",
+            username: "Username",
+            themeOptions: {
+                pinkPurple: "Pink & Purple",
+                blueGreen: "Blue & Green",
+                darkMode: "Dark Mode"
+            }
+        },
+        zh: {
+            welcome: "正在初始化系统...",
+            welcomeHint: "这可能会花费一点时间，如果无法进入请重新载入",
+            clickToEnter: "点击进入系统",
+            usageGuide: "使用说明",
+            terms: "使用条款",
+            agree: "同意",
+            disagree: "不同意",
+            startUsing: "开始使用",
+            notepad: "记事本",
+            files: "文件",
+            browser: "浏览器",
+            paint: "画图",
+            calculator: "计算器",
+            weather: "天气",
+            music: "音乐",
+            clock: "时钟",
+            update: "更新",
+            settings: "设置",
+            video: "视频播放器",
+            games: "游戏中心",
+            search: "搜索",
+            restart: "重启系统",
+            systemInfo: "系统信息",
+            close: "关闭",
+            minimize: "最小化",
+            maximize: "最大化",
+            export: "导出文件(txt)",
+            import: "导入文件(txt)",
+            save: "存檔",
+            startTyping: "开始输入...",
+            documents: "文档",
+            pictures: "图片",
+            dropFiles: "拖放文件到此处",
+            orDoubleClick: "或双击文件打开",
+            enterUrl: "输入网址...",
+            loading: "加载中...",
+            colors: "颜色",
+            fullscreen: "全屏模式",
+            systemUpdate: "系统更新",
+            currentVersion: "当前版本",
+            build: "构建",
+            upToDate: "您的系统是最新的",
+            noUpdates: "目前没有可用的更新。",
+            whatsNew: "v1 中的新功能：",
+            general: "通用",
+            security: "安全",
+            personalization: "个性化",
+            theme: "主题",
+            autoLock: "自动锁定",
+            changePin: "修改 PIN 码",
+            lockNow: "立即锁定",
+            dataManagement: "数据管理",
+            clearData: "清除所有数据",
+            clearDataHint: "注意：此操作将删除所有用户数据并重置系统",
+            videoPlayer: "视频播放器",
+            play: "播放",
+            pause: "暂停",
+            stop: "停止",
+            supportedFormats: "支持格式：MP4, WebM, AVI",
+            moreFeatures: "期待更多功能...",
+            gameCenter: "游戏中心",
+            welcomeToGames: "欢迎来到 CircleOS 游戏世界",
+            shootingGame: "射击游戏",
+            shootingGameDesc: "经典的射击游戏，考验你的反应能力",
+            runningGame: "跑酷游戏",
+            runningGameDesc: "刺激的跑酷体验，挑战你的极限",
+            puzzleGame: "益智游戏",
+            puzzleGameDesc: "有趣的益智游戏，锻炼你的大脑",
+            cardGame: "卡牌游戏",
+            cardGameDesc: "策略卡牌游戏，展示你的智慧",
+            moreGames: "更多游戏正在开发中，敬请期待！",
+            language: "语言",
+            english: "English",
+            chinese: "中文",
+            searchApps: "搜索应用...",
+            system: "系统",
+            systemVersion: "系统版本",
+            username: "用户名",
+            themeOptions: {
+                pinkPurple: "粉紫主题",
+                blueGreen: "蓝绿主题",
+                darkMode: "深色模式"
+            }
+        }
+    };
+
+    let currentLanguage = 'en'; // Default language
+
+    function t(key) {
+        return translations[currentLanguage][key] || key;
+    }
+
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        localStorage.setItem('circleos-language', lang);
+        updateUI();
+    }
+
+    function updateUI() {
+        // Update all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[currentLanguage][key]) {
+                el.textContent = translations[currentLanguage][key];
+            }
+        });
+
+        // Update placeholders
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (translations[currentLanguage][key]) {
+                el.placeholder = translations[currentLanguage][key];
+            }
+        });
+
+        // Update tooltips
+        document.querySelectorAll('[data-i18n-tooltip]').forEach(el => {
+            const key = el.getAttribute('data-i18n-tooltip');
+            const tooltip = el.querySelector('.sidebar-tooltip');
+            if (tooltip && translations[currentLanguage][key]) {
+                tooltip.textContent = translations[currentLanguage][key];
+            }
+        });
+
+        // Update button texts in settings
+        const langSelect = document.getElementById('language-select');
+        if (langSelect) {
+            langSelect.value = currentLanguage;
+        }
+    }
+
     // Global variables
     let activeWindows = {};
     let nextWindowId = 1;
@@ -640,8 +1276,15 @@
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
+        // Load saved language
+        const savedLanguage = localStorage.getItem('circleos-language');
+        if (savedLanguage) {
+            currentLanguage = savedLanguage;
+        }
+
         initializeBackground();
         initializeEventListeners();
+        updateUI();
         initializePaintApp();
         checkFirstTime();
     });
@@ -1100,28 +1743,17 @@
         });
 
         // Lock button
-        document.getElementById('lock-button').addEventListener('click', lockSystem);
+
+
+        // Restart button
+        document.getElementById('restart-button').addEventListener('click', showRestartDialog);
 
         // System info
         document.getElementById('system-info').addEventListener('click', showSystemInfo);
 
-        // Lock screen functionality
-        document.getElementById('unlock-button').addEventListener('click', unlockSystem);
-        document.getElementById('pin-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                unlockSystem();
-            }
-        });
 
-        // Settings buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'lock-now-button') {
-                lockSystem();
-            }
-            if (e.target.id === 'change-pin-button') {
-                changePin();
-            }
-        });
+
+        // Settings buttons - removed lock functionality
 
         // Click outside to focus window
         document.getElementById('windows-container').addEventListener('click', (e) => {
@@ -1162,17 +1794,47 @@
         const windowElement = document.createElement('div');
         windowElement.id = windowId;
         windowElement.className = 'fixed glass window-shadow rounded-lg overflow-hidden animate-slide-in-center z-20 transition-all duration-200';
-        windowElement.style.width = `${app.width}px`;
-        windowElement.style.height = `${app.height}px`;
-        windowElement.style.left = '50%';
-        windowElement.style.top = '50%';
-        windowElement.style.transform = 'translate(-50%, -50%)';
+
+        // Get screen dimensions and limit window size for small screens
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const maxWidth = Math.min(app.width, screenWidth * 0.8);
+        const maxHeight = Math.min(app.height, screenHeight * 0.8);
+
+        windowElement.style.width = `${maxWidth}px`;
+        windowElement.style.height = `${maxHeight}px`;
+
+        // Calculate position to avoid overlapping
+        const appWindows = Object.keys(activeWindows).filter(id =>
+            activeWindows[id].app === appName && !activeWindows[id].isMinimized
+        );
+
+        if (appWindows.length === 0) {
+            // First window - center it
+            windowElement.style.left = '50%';
+            windowElement.style.top = '50%';
+            windowElement.style.transform = 'translate(-50%, -50%)';
+        } else {
+            // Subsequent windows - cascade them
+            const offset = 30; // Offset for cascading effect
+            const positionIndex = appWindows.length;
+            const startX = (screenWidth - maxWidth) / 2;
+            const startY = (screenHeight - maxHeight) / 2;
+
+            const newX = Math.max(10, Math.min(startX + (positionIndex * offset), screenWidth - maxWidth - 10));
+            const newY = Math.max(10, Math.min(startY + (positionIndex * offset), screenHeight - maxHeight - 10));
+
+            windowElement.style.left = `${newX}px`;
+            windowElement.style.top = `${newY}px`;
+            windowElement.style.transform = 'none';
+        }
 
         windowElement.innerHTML = `
                 <div class="window-header" data-window-id="${windowId}">
                     <div class="flex items-center">
                         <span class="text-xl mr-2">${app.icon}</span>
                         <span>${app.name}</span>
+                        <span class="window-count ml-1 text-xs bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center">${appWindows.length + 1}</span>
                     </div>
                     <div class="flex">
                         <button class="window-button hover:bg-gray-700" onclick="minimizeWindow('${windowId}')">
@@ -1194,6 +1856,13 @@
 
         document.getElementById('windows-container').appendChild(windowElement);
         lucide.createIcons();
+
+        // Initialize app-specific functionality
+        if (appName === 'terminal') {
+            initializeTerminal(windowElement);
+        } else if (appName === 'gallery') {
+            initializeGallery(windowElement);
+        }
 
         // Add to active windows
         activeWindows[windowId] = {
@@ -1462,12 +2131,33 @@
         const window = activeWindows[windowId];
         if (!window) return;
 
+        const appName = window.app;
+
         window.element.classList.add('animate-slide-out-center');
         setTimeout(() => {
             window.element.remove();
             delete activeWindows[windowId];
             updateSidebarIndicators();
+
+            // Update window counts for all windows of the same app
+            updateWindowCounts(appName);
         }, 200);
+    }
+
+    function updateWindowCounts(appName) {
+        const appWindows = Object.keys(activeWindows).filter(id =>
+            activeWindows[id].app === appName && !activeWindows[id].isMinimized
+        );
+
+        appWindows.forEach((windowId, index) => {
+            const windowElement = activeWindows[windowId].element;
+            if (windowElement) {
+                const countElement = windowElement.querySelector('.window-count');
+                if (countElement) {
+                    countElement.textContent = index + 1;
+                }
+            }
+        });
     }
 
     // Update sidebar indicators
@@ -1859,54 +2549,41 @@
         }
     }
 
-    // Lock system
-    function lockSystem() {
-        // Hide main container and show lock screen
-        document.getElementById('main-container').classList.add('hidden');
-        document.getElementById('lock-screen').classList.remove('hidden');
-        document.getElementById('pin-input').value = '';
+    // Restart dialog functions
+    function showRestartDialog() {
+        document.getElementById('restart-dialog').classList.remove('hidden');
+    }
 
-        // Update lock screen time immediately
-        updateLockScreenTime();
+    function cancelRestart() {
+        document.getElementById('restart-dialog').classList.add('hidden');
+    }
 
-        // Save current system state
+    function confirmRestart() {
+        // Save data before restarting
         saveAllData();
 
-        console.log('System locked');
+        // Close restart dialog
+        document.getElementById('restart-dialog').classList.add('hidden');
+
+        // Show restarting message
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.innerHTML = `
+                <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50">
+                    <div class="text-center text-white">
+                        <div class="text-6xl mb-8">🔄</div>
+                        <h2 class="text-2xl font-bold mb-4">正在重启系统...</h2>
+                        <p class="text-gray-300">请稍候，系统正在重新启动</p>
+                    </div>
+                </div>
+            `;
+
+        // Reload the page after a short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
     }
 
-    // Unlock system
-    function unlockSystem() {
-        const pin = document.getElementById('pin-input').value;
-        const savedPin = localStorage.getItem('circleos-pin') || '1234';
 
-        if (pin === savedPin) {
-            document.getElementById('lock-screen').classList.add('hidden');
-            document.getElementById('main-container').classList.remove('hidden');
-            loadSystemState();
-        } else {
-            alert('PIN码错误，请重试');
-            document.getElementById('pin-input').value = '';
-        }
-    }
-
-    // Change PIN
-    function changePin() {
-        const currentPin = prompt('Enter current PIN:');
-        const savedPin = localStorage.getItem('circleos-pin') || '1234';
-
-        if (currentPin === savedPin) {
-            const newPin = prompt('Enter new PIN (4 digits):');
-            if (newPin && newPin.length === 4 && !isNaN(newPin)) {
-                localStorage.setItem('circleos-pin', newPin);
-                alert('PIN changed successfully!');
-            } else {
-                alert('Invalid PIN. Must be 4 digits.');
-            }
-        } else {
-            alert('Current PIN is incorrect.');
-        }
-    }
 
     // Save all application data
     function saveAllData() {
