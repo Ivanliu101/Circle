@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CircleOS - 更新中</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .update-container {
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .system-name {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            height: 4px;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #fff;
+            transition: width 0.3s ease;
+        }
+        
+        .update-status {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .update-info {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+        }
+        
+        .warning-message {
+            position: absolute;
+            bottom: 50px;
+            font-size: 14px;
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .version-info {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="update-container">
+        <div class="system-name">Circle</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="update-status" id="updateStatus">检查更新中...</div>
+        <div class="update-info" id="updateInfo">正在验证系统版本</div>
+    </div>
+    
+    <div class="warning-message">
+        禁止关闭网站
+    </div>
+    
+    <div class="version-info">
+        当前版本: Beta 53
+    </div>
+
+    <script>
+        let progress = 0;
+        let statusMessages = [
+            '检查更新中...',
+            '验证系统版本...',
+            '下载更新文件...',
+            '准备安装...',
+            '安装更新...',
+            '配置系统...',
+            '完成更新...'
+        ];
+        
+        let infoMessages = [
+            '正在验证系统版本',
+            '连接到更新服务器',
+            '下载必要的更新文件',
+            '准备安装更新组件',
+            '正在安装新功能',
+            '配置系统设置',
+            '更新完成，准备重启'
+        ];
+        
+        function updateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const updateStatus = document.getElementById('updateStatus');
+            const updateInfo = document.getElementById('updateInfo');
+            
+            progress += Math.random() * 5;
+            if (progress >= 100) {
+                progress = 100;
+                
+                updateStatus.textContent = '当前已是最新版本';
+                updateInfo.textContent = '无需更新，系统将自动返回';
+                
+                setTimeout(() => {
+                    window.location.href = 'click-to-enter.html';
+                }, 3000);
+                
+                return;
+            }
+            
+            progressBar.style.width = progress + '%';
+            
+            const statusIndex = Math.min(Math.floor(progress / 15), statusMessages.length - 1);
+            updateStatus.textContent = statusMessages[statusIndex];
+            updateInfo.textContent = infoMessages[statusIndex];
+            
+            setTimeout(updateProgress, 200);
+        }
+        
+        // 开始更新进度
+        setTimeout(updateProgress, 1000);
+        
+        // 防止用户关闭页面
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+    </script>
+</body>
+</html>

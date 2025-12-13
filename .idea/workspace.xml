@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37ff70d3-b094-4c9b-9e7a-cfcdec2410d9" name="Changes" comment="v1.1">
-      <change afterPath="$PROJECT_DIR$/animations.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/animations.css " afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/safe_mode.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+    <list default="true" id="37ff70d3-b094-4c9b-9e7a-cfcdec2410d9" name="Changes" comment="v1.1 Beta-6">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,30 +22,42 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Ivanliu101&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Ivanliu101/Circle.git&quot;,
+    &quot;accountId&quot;: &quot;916893cc-a0b0-47b9-8d0d-96f4b7136a05&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="36h6wzJpp50942dlnvGa93u404x" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "JavaScript Debug.index.html.executor": "Debug",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Debug&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -63,7 +72,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1765446698087</updated>
-      <workItem from="1765446699198" duration="12257000" />
+      <workItem from="1765446699198" duration="17721000" />
+      <workItem from="1765499520280" duration="800000" />
+      <workItem from="1765554532798" duration="597000" />
+      <workItem from="1765594463359" duration="1429000" />
     </task>
     <task id="LOCAL-00001" summary="First setup">
       <option name="closed" value="true" />
@@ -121,7 +133,55 @@
       <option name="project" value="LOCAL" />
       <updated>1765457928094</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="v1.1 Beta-1">
+      <option name="closed" value="true" />
+      <created>1765462142102</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1765462142102</updated>
+    </task>
+    <task id="LOCAL-00009" summary="v1.1 Beta-2">
+      <option name="closed" value="true" />
+      <created>1765463148748</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1765463148748</updated>
+    </task>
+    <task id="LOCAL-00010" summary="v1.1 Beta-3&#10;已成功修复 CircleOS 系统的所有 Bug 并添加了新功能：1 修复了时钟全屏模式的显示问题2 修复了锁定画面显示问题3 添加了侧边栏锁定按钮4 为记事本添加了文件导入 / 导出和保存功能5 将浏览器升级为真正可浏览的应用&#10;所有功能都已测试完毕，系统运行稳定。用户现在可以享受更完整的操作系统体验，包括文件管理、网页浏览和系统安全锁定等功能。">
+      <option name="closed" value="true" />
+      <created>1765463634253</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1765463634253</updated>
+    </task>
+    <task id="LOCAL-00011" summary="v1.1 Beta-4&#10;任务已完成，准备总结&#10;已成功修复 CircleOS 系统的所有问题并完成功能改进：1 修复了浏览器窗口大小问题，现在打开时尺寸更大2 添加了窗口大小调整功能，用户可以通过右下角拖动来改变窗口大小3 修复了锁定画面显示问题，现在能正常显示 Circle 标题、液态玻璃时钟和 PIN 码输入区域4 将终端模式和安全模式的界面文本全部改为英文&#10;所有功能都已测试完毕，系统运行稳定。用户现在可以享受更完整、更稳定的操作系统体验。">
+      <option name="closed" value="true" />
+      <created>1765464078424</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1765464078424</updated>
+    </task>
+    <task id="LOCAL-00012" summary="v1.1 Beta-5&#10;本次更新内容：1 移除了窗口拖拽功能，解决了之前的拖拽问题2 恢复了原始的渐变文字 Logo 设计3 修复了锁定画面显示问题，确保时间和日期正常显示4 优化了窗口最大化功能，现在可以正确填满整个屏幕5 移除了更新中心的手动检查按钮，系统将自动推送更新">
+      <option name="closed" value="true" />
+      <created>1765466225847</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1765466225847</updated>
+    </task>
+    <task id="LOCAL-00013" summary="v1.1 Beta-6">
+      <option name="closed" value="true" />
+      <created>1765497751267</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1765497751267</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -134,6 +194,12 @@
     <MESSAGE value="v1 But have error" />
     <MESSAGE value="v1.1 But have error" />
     <MESSAGE value="v1.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="v1.1" />
+    <MESSAGE value="v1.1 Beta-1" />
+    <MESSAGE value="v1.1 Beta-2" />
+    <MESSAGE value="v1.1 Beta-3&#10;已成功修复 CircleOS 系统的所有 Bug 并添加了新功能：1 修复了时钟全屏模式的显示问题2 修复了锁定画面显示问题3 添加了侧边栏锁定按钮4 为记事本添加了文件导入 / 导出和保存功能5 将浏览器升级为真正可浏览的应用&#10;所有功能都已测试完毕，系统运行稳定。用户现在可以享受更完整的操作系统体验，包括文件管理、网页浏览和系统安全锁定等功能。" />
+    <MESSAGE value="v1.1 Beta-4&#10;任务已完成，准备总结&#10;已成功修复 CircleOS 系统的所有问题并完成功能改进：1 修复了浏览器窗口大小问题，现在打开时尺寸更大2 添加了窗口大小调整功能，用户可以通过右下角拖动来改变窗口大小3 修复了锁定画面显示问题，现在能正常显示 Circle 标题、液态玻璃时钟和 PIN 码输入区域4 将终端模式和安全模式的界面文本全部改为英文&#10;所有功能都已测试完毕，系统运行稳定。用户现在可以享受更完整、更稳定的操作系统体验。" />
+    <MESSAGE value="v1.1 Beta-5&#10;本次更新内容：1 移除了窗口拖拽功能，解决了之前的拖拽问题2 恢复了原始的渐变文字 Logo 设计3 修复了锁定画面显示问题，确保时间和日期正常显示4 优化了窗口最大化功能，现在可以正确填满整个屏幕5 移除了更新中心的手动检查按钮，系统将自动推送更新" />
+    <MESSAGE value="v1.1 Beta-6" />
+    <option name="LAST_COMMIT_MESSAGE" value="v1.1 Beta-6" />
   </component>
 </project>
