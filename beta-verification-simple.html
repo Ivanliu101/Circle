@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circle OS - Beta 47</title>
-    
+
     <style>
         /* CSS Styles Start */
-        
+
         /* ----------------------- 
            1. Minimalist Theme Background 
            ----------------------- */
@@ -117,7 +117,7 @@
             display: none;
             animation: fadeIn 0.3s ease;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -159,14 +159,14 @@
         .launch-time {
             font-size: 1.5em;
             font-weight: bold;
-            color: #FFFFFF; 
+            color: #FFFFFF;
             letter-spacing: 2px;
             padding: 10px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.5);
             border-bottom: 1px solid rgba(255, 255, 255, 0.5);
             margin: 20px 0;
         }
-        
+
         /* Beta badge */
         .beta-badge {
             position: absolute;
@@ -181,7 +181,7 @@
             letter-spacing: 1px;
             z-index: 2;
         }
-        
+
         .note {
             margin-top: 20px;
             font-size: 0.9em;
@@ -191,129 +191,129 @@
     </style>
 </head>
 <body>
-    
-    <div class="line-container">
-        <div class="moving-line" style="--rotation: 5deg;"></div>
-        <div class="moving-line" style="--rotation: -10deg;"></div>
-        <div class="moving-line" style="--rotation: 15deg;"></div>
+
+<div class="line-container">
+    <div class="moving-line" style="--rotation: 5deg;"></div>
+    <div class="moving-line" style="--rotation: -10deg;"></div>
+    <div class="moving-line" style="--rotation: 15deg;"></div>
+</div>
+
+<div class="content-container">
+    <div class="system-title">
+        CIRCLE OS
     </div>
 
-    <div class="content-container">
-        <div class="system-title">
-            CIRCLE OS
-        </div>
-        
-        <div class="system-subtitle">
-            System verification
-        </div>
-
-        <div class="launch-time">
-            2025.12.15 21:00 CST
-        </div>
-        
-        <div class="note">
-            Welcome back. The new experience will be live at the scheduled time.
-        </div>
-    </div>
-    
-    <!-- Hidden password section -->
-    <div class="password-section" style="display: none;">
-        <input type="text" class="password-input" id="passwordField" maxlength="4" autocomplete="off">
-    </div>
-    
-    <div class="beta-badge" onclick="togglePasswordSection()">
-        BETA 53
+    <div class="system-subtitle">
+        System verification
     </div>
 
-    <script>
-        let passwordSectionVisible = false;
-        
-        function togglePasswordSection() {
-            const passwordSection = document.querySelector('.password-section');
-            passwordSectionVisible = !passwordSectionVisible;
-            
-            if (passwordSectionVisible) {
-                passwordSection.style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('passwordField').focus();
-                }, 100);
-            } else {
-                passwordSection.style.display = 'none';
-            }
+    <div class="launch-time">
+        2025.12.15 21:00 CST
+    </div>
+
+    <div class="note">
+        Welcome back. The new experience will be live at the scheduled time.
+    </div>
+</div>
+
+<!-- Hidden password section -->
+<div class="password-section" style="display: none;">
+    <input type="text" class="password-input" id="passwordField" maxlength="4" autocomplete="off">
+</div>
+
+<div class="beta-badge" onclick="togglePasswordSection()">
+    BETA 53
+</div>
+
+<script>
+    let passwordSectionVisible = false;
+
+    function togglePasswordSection() {
+        const passwordSection = document.querySelector('.password-section');
+        passwordSectionVisible = !passwordSectionVisible;
+
+        if (passwordSectionVisible) {
+            passwordSection.style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('passwordField').focus();
+            }, 100);
+        } else {
+            passwordSection.style.display = 'none';
         }
-        
-        // 添加事件监听器
-        document.addEventListener('DOMContentLoaded', function() {
-            const betaBadge = document.getElementById('betaBadge');
-            betaBadge.addEventListener('click', togglePasswordSection);
-        });
-        
-        function verifyPassword() {
-            const password = document.getElementById('passwordField').value;
-            const errorMessage = document.getElementById('errorMessage');
-            
-            if (password === '2030') {
-                // Correct password
-                errorMessage.style.display = 'none';
-                
-                // Navigate to boot screen
-                window.location.href = 'boot.html';
-            } else if (password.length === 4) {
-                // Incorrect password
-                errorMessage.style.display = 'block';
-                document.getElementById('passwordField').value = '';
-                
-                // Shake effect
-                const passwordField = document.getElementById('passwordField');
-                passwordField.style.animation = 'shake 0.5s ease-in-out';
-                setTimeout(() => {
-                    passwordField.style.animation = '';
-                }, 500);
-                
-                // Keep focus on password field
-                setTimeout(() => {
-                    passwordField.focus();
-                }, 550);
-            }
+    }
+
+    // 添加事件监听器
+    document.addEventListener('DOMContentLoaded', function() {
+        const betaBadge = document.getElementById('betaBadge');
+        betaBadge.addEventListener('click', togglePasswordSection);
+    });
+
+    function verifyPassword() {
+        const password = document.getElementById('passwordField').value;
+        const errorMessage = document.getElementById('errorMessage');
+
+        if (password === '2030') {
+            // Correct password
+            errorMessage.style.display = 'none';
+
+            // Navigate to boot screen
+            window.location.href = 'boot.html';
+        } else if (password.length === 4) {
+            // Incorrect password
+            errorMessage.style.display = 'block';
+            document.getElementById('passwordField').value = '';
+
+            // Shake effect
+            const passwordField = document.getElementById('passwordField');
+            passwordField.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                passwordField.style.animation = '';
+            }, 500);
+
+            // Keep focus on password field
+            setTimeout(() => {
+                passwordField.focus();
+            }, 550);
         }
-        
-        // Add shake animation
-        const style = document.createElement('style');
-        style.textContent = `
+    }
+
+    // Add shake animation
+    const style = document.createElement('style');
+    style.textContent = `
             @keyframes shake {
                 0%, 100% { transform: translateX(0); }
                 25% { transform: translateX(-5px); }
                 75% { transform: translateX(5px); }
             }
         `;
-        document.head.appendChild(style);
-        
-        // Auto-verify when 4 digits are entered
-        document.getElementById('passwordField').addEventListener('input', function(e) {
-            if (e.target.value.length === 4) {
-                verifyPassword();
-            } else {
-                document.getElementById('errorMessage').style.display = 'none';
-            }
-        });
-        
-        // Keyboard support
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && passwordSectionVisible) {
-                verifyPassword();
-            } else if (e.key === 'Escape' && passwordSectionVisible) {
-                togglePasswordSection();
-            }
-        });
-        
-        // Click outside to hide password section
-        document.addEventListener('click', (e) => {
-            if (passwordSectionVisible && 
-                !e.target.closest('.password-section') && 
-                !e.target.closest('.beta-badge')) {
-                togglePasswordSection();
-            }
-        });
-    </script>
+    document.head.appendChild(style);
+
+    // Auto-verify when 4 digits are entered
+    document.getElementById('passwordField').addEventListener('input', function(e) {
+        if (e.target.value.length === 4) {
+            verifyPassword();
+        } else {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && passwordSectionVisible) {
+            verifyPassword();
+        } else if (e.key === 'Escape' && passwordSectionVisible) {
+            togglePasswordSection();
+        }
+    });
+
+    // Click outside to hide password section
+    document.addEventListener('click', (e) => {
+        if (passwordSectionVisible &&
+            !e.target.closest('.password-section') &&
+            !e.target.closest('.beta-badge')) {
+            togglePasswordSection();
+        }
+    });
+</script>
 </body>
 </html>

@@ -12,7 +12,7 @@
             height: 100vh;
             overflow: hidden;
         }
-        
+
         .taskbar {
             position: fixed;
             bottom: 0;
@@ -27,7 +27,7 @@
             padding: 0 20px;
             z-index: 1000;
         }
-        
+
         .start-button {
             background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple));
             border: none;
@@ -42,18 +42,18 @@
             gap: 8px;
             transition: all 0.3s ease;
         }
-        
+
         .start-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
         }
-        
+
         .taskbar-icons {
             display: flex;
             gap: 10px;
             margin-right: auto;
         }
-        
+
         .taskbar-icon {
             width: 40px;
             height: 40px;
@@ -66,23 +66,23 @@
             transition: all 0.3s ease;
             border: 2px solid transparent;
         }
-        
+
         .taskbar-icon:hover {
             background: rgba(255, 105, 180, 0.2);
             border-color: var(--primary-pink);
         }
-        
+
         .taskbar-icon.active {
             background: rgba(255, 105, 180, 0.3);
             border-color: var(--primary-pink);
         }
-        
+
         .tray {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        
+
         .tray-icon {
             width: 30px;
             height: 30px;
@@ -94,11 +94,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .tray-icon:hover {
             background: rgba(255, 105, 180, 0.2);
         }
-        
+
         .taskbar-clock {
             background: rgba(255, 255, 255, 0.1);
             padding: 8px 15px;
@@ -108,11 +108,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .taskbar-clock:hover {
             background: rgba(255, 105, 180, 0.2);
         }
-        
+
         .start-menu {
             position: fixed;
             bottom: 60px;
@@ -126,17 +126,17 @@
             display: none;
             z-index: 999;
         }
-        
+
         .start-menu.show {
             display: block;
             animation: slideUp 0.3s ease;
         }
-        
+
         @keyframes slideUp {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
+
         .start-menu-header {
             background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple));
             padding: 15px 20px;
@@ -144,11 +144,11 @@
             font-weight: bold;
             font-size: 18px;
         }
-        
+
         .start-menu-items {
             padding: 10px 0;
         }
-        
+
         .start-menu-item {
             display: flex;
             align-items: center;
@@ -159,24 +159,24 @@
             color: var(--text-primary);
             text-decoration: none;
         }
-        
+
         .start-menu-item:hover {
             background: rgba(255, 105, 180, 0.2);
         }
-        
+
         .start-menu-item i {
             width: 24px;
             text-align: center;
             font-size: 20px;
         }
-        
+
         .desktop-icons {
             position: absolute;
             top: 20px;
             left: 20px;
             z-index: 10;
         }
-        
+
         .desktop-icon {
             display: flex;
             flex-direction: column;
@@ -189,12 +189,12 @@
             border-radius: 15px;
             width: 100px;
         }
-        
+
         .desktop-icon:hover {
             background: rgba(255, 105, 180, 0.2);
             transform: translateY(-2px);
         }
-        
+
         .desktop-icon-icon {
             width: 48px;
             height: 48px;
@@ -206,7 +206,7 @@
             font-size: 24px;
             box-shadow: var(--shadow-glow);
         }
-        
+
         .desktop-icon-label {
             font-size: 12px;
             color: var(--text-primary);
@@ -216,116 +216,116 @@
     </style>
 </head>
 <body>
-    <!-- 紫色动态线条 -->
-    <div class="purple-line"></div>
-    <div class="purple-line"></div>
-    <div class="purple-line"></div>
-    
-    <div class="desktop" id="desktop">
-        <!-- 桌面图标 -->
-        <div class="desktop-icons">
-            <div class="desktop-icon" onclick="openSettings()">
-                <div class="desktop-icon-icon">⚙️</div>
-                <div class="desktop-icon-label">设置</div>
-            </div>
-        </div>
-        
-        <!-- 任务栏 -->
-        <div class="taskbar">
-            <button class="start-button" onclick="toggleStartMenu()">
-                <span>☰</span>
-                <span>开始</span>
-            </button>
-            
-            <div class="taskbar-icons" id="taskbarIcons">
-                <!-- 任务栏图标将动态添加 -->
-            </div>
-            
-            <div class="tray">
-                <div class="tray-icon" title="返回主画面" onclick="goToMainScreen()">🏠</div>
-                <div class="taskbar-clock" id="taskbarClock">00:00</div>
-            </div>
-        </div>
-        
-        <!-- 开始菜单 -->
-        <div class="start-menu" id="startMenu">
-            <div class="start-menu-header">
-                CircleOS 开始菜单
-            </div>
-            <div class="start-menu-items">
-                <a href="#" class="start-menu-item" onclick="openSettings(); return false;">
-                    <i>⚙️</i>
-                    <span>设置</span>
-                </a>
-                <a href="#" class="start-menu-item" onclick="checkForUpdates(); return false;">
-                    <i>🔄</i>
-                    <span>更新</span>
-                </a>
-                <a href="#" class="start-menu-item" onclick="lockSystem(); return false;">
-                    <i>🔒</i>
-                    <span>锁定系统</span>
-                </a>
-                <a href="#" class="start-menu-item" onclick="restartSystem(); return false;">
-                    <i>🔄</i>
-                    <span>重启</span>
-                </a>
-                <a href="#" class="start-menu-item" onclick="shutdownSystem(); return false;">
-                    <i>⏻️</i>
-                    <span>关机</span>
-                </a>
-            </div>
+<!-- 紫色动态线条 -->
+<div class="purple-line"></div>
+<div class="purple-line"></div>
+<div class="purple-line"></div>
+
+<div class="desktop" id="desktop">
+    <!-- 桌面图标 -->
+    <div class="desktop-icons">
+        <div class="desktop-icon" onclick="openSettings()">
+            <div class="desktop-icon-icon">⚙️</div>
+            <div class="desktop-icon-label">设置</div>
         </div>
     </div>
 
-    <script src="assets/scripts/utils.js"></script>
-    <script>
-        let startMenuOpen = false;
-        
-        function toggleStartMenu() {
-            const startMenu = document.getElementById('startMenu');
-            startMenuOpen = !startMenuOpen;
-            
-            if (startMenuOpen) {
-                startMenu.classList.add('show');
-            } else {
-                startMenu.classList.remove('show');
-            }
+    <!-- 任务栏 -->
+    <div class="taskbar">
+        <button class="start-button" onclick="toggleStartMenu()">
+            <span>☰</span>
+            <span>开始</span>
+        </button>
+
+        <div class="taskbar-icons" id="taskbarIcons">
+            <!-- 任务栏图标将动态添加 -->
+        </div>
+
+        <div class="tray">
+            <div class="tray-icon" title="返回主画面" onclick="goToMainScreen()">🏠</div>
+            <div class="taskbar-clock" id="taskbarClock">00:00</div>
+        </div>
+    </div>
+
+    <!-- 开始菜单 -->
+    <div class="start-menu" id="startMenu">
+        <div class="start-menu-header">
+            CircleOS 开始菜单
+        </div>
+        <div class="start-menu-items">
+            <a href="#" class="start-menu-item" onclick="openSettings(); return false;">
+                <i>⚙️</i>
+                <span>设置</span>
+            </a>
+            <a href="#" class="start-menu-item" onclick="checkForUpdates(); return false;">
+                <i>🔄</i>
+                <span>更新</span>
+            </a>
+            <a href="#" class="start-menu-item" onclick="lockSystem(); return false;">
+                <i>🔒</i>
+                <span>锁定系统</span>
+            </a>
+            <a href="#" class="start-menu-item" onclick="restartSystem(); return false;">
+                <i>🔄</i>
+                <span>重启</span>
+            </a>
+            <a href="#" class="start-menu-item" onclick="shutdownSystem(); return false;">
+                <i>⏻️</i>
+                <span>关机</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="assets/scripts/utils.js"></script>
+<script>
+    let startMenuOpen = false;
+
+    function toggleStartMenu() {
+        const startMenu = document.getElementById('startMenu');
+        startMenuOpen = !startMenuOpen;
+
+        if (startMenuOpen) {
+            startMenu.classList.add('show');
+        } else {
+            startMenu.classList.remove('show');
         }
-        
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('zh-CN', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            document.getElementById('taskbarClock').textContent = timeString;
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('taskbarClock').textContent = timeString;
+    }
+
+    function openSettings() {
+        // 检查设置窗口是否已打开
+        const existingSettingsWindow = windowManager.windows.find(w => w.title === '系统设置');
+        if (existingSettingsWindow) {
+            windowManager.setActiveWindow(existingSettingsWindow.id);
+            return;
         }
-        
-        function openSettings() {
-            // 检查设置窗口是否已打开
-            const existingSettingsWindow = windowManager.windows.find(w => w.title === '系统设置');
-            if (existingSettingsWindow) {
-                windowManager.setActiveWindow(existingSettingsWindow.id);
-                return;
-            }
-            
-            // 加载设置应用内容
-            fetch('apps/app-settings.html')
-                .then(response => response.text())
-                .then(html => {
-                    const settingsWindowId = windowManager.createWindow({
-                        title: '系统设置',
-                        content: html,
-                        width: 600,
-                        height: 500
-                    });
-                    
-                    // 添加到任务栏
-                    addTaskbarIcon('⚙️', '系统设置', settingsWindowId);
-                    
-                    // 执行设置页面的脚本
-                    const script = document.createElement('script');
-                    script.textContent = `
+
+        // 加载设置应用内容
+        fetch('apps/app-settings.html')
+            .then(response => response.text())
+            .then(html => {
+                const settingsWindowId = windowManager.createWindow({
+                    title: '系统设置',
+                    content: html,
+                    width: 600,
+                    height: 500
+                });
+
+                // 添加到任务栏
+                addTaskbarIcon('⚙️', '系统设置', settingsWindowId);
+
+                // 执行设置页面的脚本
+                const script = document.createElement('script');
+                script.textContent = `
                         // 设置页面的脚本
                         document.getElementById('saveSettings').onclick = function() {
                             const username = document.getElementById('username').value;
@@ -347,134 +347,134 @@
                             removeTaskbarIcon(${settingsWindowId});
                         };
                     `;
-                    
-                    const windowContent = windowManager.windows.find(w => w.id === settingsWindowId).element.querySelector('.window-content');
-                    windowContent.appendChild(script);
-                })
-                .catch(error => {
-                    console.error('Failed to load settings:', error);
-                    showNotification('无法加载设置页面', 'error');
+
+                const windowContent = windowManager.windows.find(w => w.id === settingsWindowId).element.querySelector('.window-content');
+                windowContent.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Failed to load settings:', error);
+                showNotification('无法加载设置页面', 'error');
+            });
+    }
+
+    function addTaskbarIcon(icon, title, windowId) {
+        const taskbarIcons = document.getElementById('taskbarIcons');
+        const iconElement = document.createElement('div');
+        iconElement.className = 'taskbar-icon active';
+        iconElement.title = title;
+        iconElement.innerHTML = icon;
+        iconElement.dataset.windowId = windowId;
+
+        iconElement.onclick = () => {
+            const windowObj = windowManager.windows.find(w => w.id === windowId);
+            if (windowObj) {
+                windowManager.setActiveWindow(windowId);
+            }
+        };
+
+        taskbarIcons.appendChild(iconElement);
+    }
+
+    function removeTaskbarIcon(windowId) {
+        const taskbarIcons = document.getElementById('taskbarIcons');
+        const iconElement = taskbarIcons.querySelector(`[data-window-id="${windowId}"]`);
+        if (iconElement) {
+            iconElement.remove();
+        }
+    }
+
+    function lockSystem() {
+        const confirmLock = confirm('确定要锁定系统吗？');
+        if (confirmLock) {
+            showNotification('系统已锁定', 'info');
+            setTimeout(() => {
+                window.location.href = 'lock-screen.html';
+            }, 1000);
+        }
+    }
+
+    function checkForUpdates() {
+        // 检查更新窗口是否已打开
+        const existingUpdateWindow = windowManager.windows.find(w => w.title === '系统更新');
+        if (existingUpdateWindow) {
+            windowManager.setActiveWindow(existingUpdateWindow.id);
+            return;
+        }
+
+        // 加载更新检查器应用内容
+        fetch('apps/app-update-checker.html')
+            .then(response => response.text())
+            .then(html => {
+                const updateWindowId = windowManager.createWindow({
+                    title: '系统更新',
+                    content: html,
+                    width: 500,
+                    height: 450
                 });
+
+                // 添加到任务栏
+                addTaskbarIcon('🔄', '系统更新', updateWindowId);
+            })
+            .catch(error => {
+                console.error('Failed to load update checker:', error);
+                showNotification('无法加载更新检查器', 'error');
+            });
+    }
+
+    function restartSystem() {
+        const confirmRestart = confirm('确定要重启系统吗？');
+        if (confirmRestart) {
+            showNotification('正在重启系统...', 'info');
+            setTimeout(() => {
+                window.location.href = 'boot.html';
+            }, 1000);
         }
-        
-        function addTaskbarIcon(icon, title, windowId) {
-            const taskbarIcons = document.getElementById('taskbarIcons');
-            const iconElement = document.createElement('div');
-            iconElement.className = 'taskbar-icon active';
-            iconElement.title = title;
-            iconElement.innerHTML = icon;
-            iconElement.dataset.windowId = windowId;
-            
-            iconElement.onclick = () => {
-                const windowObj = windowManager.windows.find(w => w.id === windowId);
-                if (windowObj) {
-                    windowManager.setActiveWindow(windowId);
-                }
-            };
-            
-            taskbarIcons.appendChild(iconElement);
-        }
-        
-        function removeTaskbarIcon(windowId) {
-            const taskbarIcons = document.getElementById('taskbarIcons');
-            const iconElement = taskbarIcons.querySelector(`[data-window-id="${windowId}"]`);
-            if (iconElement) {
-                iconElement.remove();
-            }
-        }
-        
-        function lockSystem() {
-            const confirmLock = confirm('确定要锁定系统吗？');
-            if (confirmLock) {
-                showNotification('系统已锁定', 'info');
+    }
+
+    function shutdownSystem() {
+        const confirmShutdown = confirm('确定要关机吗？');
+        if (confirmShutdown) {
+            showNotification('正在关机...', 'info');
+            setTimeout(() => {
+                // 关闭当前标签页
+                window.close();
+
+                // 如果无法关闭（不是由脚本打开的标签页），显示提示
                 setTimeout(() => {
-                    window.location.href = 'lock-screen.html';
-                }, 1000);
-            }
+                    alert('请手动关闭浏览器窗口以完成关机');
+                }, 100);
+            }, 1000);
         }
-        
-        function checkForUpdates() {
-            // 检查更新窗口是否已打开
-            const existingUpdateWindow = windowManager.windows.find(w => w.title === '系统更新');
-            if (existingUpdateWindow) {
-                windowManager.setActiveWindow(existingUpdateWindow.id);
-                return;
-            }
-            
-            // 加载更新检查器应用内容
-            fetch('apps/app-update-checker.html')
-                .then(response => response.text())
-                .then(html => {
-                    const updateWindowId = windowManager.createWindow({
-                        title: '系统更新',
-                        content: html,
-                        width: 500,
-                        height: 450
-                    });
-                    
-                    // 添加到任务栏
-                    addTaskbarIcon('🔄', '系统更新', updateWindowId);
-                })
-                .catch(error => {
-                    console.error('Failed to load update checker:', error);
-                    showNotification('无法加载更新检查器', 'error');
-                });
+    }
+
+    // 点击桌面空白处关闭开始菜单
+    document.getElementById('desktop').addEventListener('click', (e) => {
+        if (startMenuOpen && !e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
+            toggleStartMenu();
         }
-        
-        function restartSystem() {
-            const confirmRestart = confirm('确定要重启系统吗？');
-            if (confirmRestart) {
-                showNotification('正在重启系统...', 'info');
-                setTimeout(() => {
-                    window.location.href = 'boot.html';
-                }, 1000);
-            }
-        }
-        
-        function shutdownSystem() {
-            const confirmShutdown = confirm('确定要关机吗？');
-            if (confirmShutdown) {
-                showNotification('正在关机...', 'info');
-                setTimeout(() => {
-                    // 关闭当前标签页
-                    window.close();
-                    
-                    // 如果无法关闭（不是由脚本打开的标签页），显示提示
-                    setTimeout(() => {
-                        alert('请手动关闭浏览器窗口以完成关机');
-                    }, 100);
-                }, 1000);
-            }
-        }
-        
-        // 点击桌面空白处关闭开始菜单
-        document.getElementById('desktop').addEventListener('click', (e) => {
-            if (startMenuOpen && !e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
-                toggleStartMenu();
-            }
-        });
-        
-        function goToMainScreen() {
-            window.location.href = 'click-to-enter.html';
-        }
-        
-        // 系统初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeSystem();
-            updateClock();
-            
-            // 每秒更新时钟
-            setInterval(updateClock, 1000);
-            
-            showNotification('欢迎使用 CircleOS！', 'success');
-            
-            // 监听窗口关闭事件，更新任务栏
-            const originalCloseWindow = windowManager.closeWindow.bind(windowManager);
-            windowManager.closeWindow = (id) => {
-                removeTaskbarIcon(id);
-                originalCloseWindow(id);
-            };
-        });
-    </script>
+    });
+
+    function goToMainScreen() {
+        window.location.href = 'click-to-enter.html';
+    }
+
+    // 系统初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeSystem();
+        updateClock();
+
+        // 每秒更新时钟
+        setInterval(updateClock, 1000);
+
+        showNotification('欢迎使用 CircleOS！', 'success');
+
+        // 监听窗口关闭事件，更新任务栏
+        const originalCloseWindow = windowManager.closeWindow.bind(windowManager);
+        windowManager.closeWindow = (id) => {
+            removeTaskbarIcon(id);
+            originalCloseWindow(id);
+        };
+    });
+</script>
 </body>
 </html>

@@ -9,7 +9,7 @@
         body {
             background: #000;
         }
-        
+
         .boot-container {
             display: flex;
             flex-direction: column;
@@ -21,7 +21,7 @@
             z-index: 10;
             background: #000;
         }
-        
+
         .boot-logo {
             width: 150px;
             height: 150px;
@@ -37,7 +37,7 @@
             box-shadow: var(--shadow-glow);
             position: relative;
         }
-        
+
         .boot-logo::before {
             content: '';
             position: absolute;
@@ -50,32 +50,32 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
         }
-        
+
         .boot-logo span {
             position: relative;
             z-index: 1;
             color: white;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
-        
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
-        
+
         .boot-text {
             font-size: 24px;
             margin-bottom: 20px;
             color: var(--text-primary);
         }
-        
+
         .boot-status {
             font-size: 18px;
             color: var(--text-secondary);
             margin-bottom: 30px;
             min-height: 25px;
         }
-        
+
         .progress-bar {
             width: 300px;
             height: 8px;
@@ -84,7 +84,7 @@
             overflow: hidden;
             margin-bottom: 20px;
         }
-        
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary-pink), var(--primary-purple));
@@ -92,13 +92,13 @@
             transition: width 0.3s ease;
             border-radius: 4px;
         }
-        
+
         .boot-options {
             margin-top: 40px;
             display: flex;
             gap: 20px;
         }
-        
+
         .boot-option-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid var(--primary-pink);
@@ -109,7 +109,7 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
         }
-        
+
         .boot-option-btn:hover {
             background: rgba(255, 105, 180, 0.2);
             transform: translateY(-2px);
@@ -117,95 +117,95 @@
     </style>
 </head>
 <body>
-    <div class="boot-container">
-        <div class="boot-logo"><span>C</span></div>
-        <div class="boot-text">CircleOS</div>
-        <div class="boot-status" id="bootStatus">正在加载系统...</div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <div class="boot-options">
-            <button class="boot-option-btn" onclick="startNormalBoot()">正常启动</button>
-            <button class="boot-option-btn" onclick="startSafeMode()">安全模式</button>
-        </div>
+<div class="boot-container">
+    <div class="boot-logo"><span>C</span></div>
+    <div class="boot-text">CircleOS</div>
+    <div class="boot-status" id="bootStatus">正在加载系统...</div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
     </div>
+    <div class="boot-options">
+        <button class="boot-option-btn" onclick="startNormalBoot()">正常启动</button>
+        <button class="boot-option-btn" onclick="startSafeMode()">安全模式</button>
+    </div>
+</div>
 
-    <script src="assets/scripts/utils.js"></script>
-    <script>
-        let bootProgress = 0;
-        let bootInterval;
-        
-        // 启动进度模拟
-        function startBootProcess() {
-            bootInterval = setInterval(() => {
-                bootProgress += Math.random() * 10;
-                if (bootProgress >= 100) {
-                    bootProgress = 100;
-                    clearInterval(bootInterval);
-                    completeBoot();
-                }
-                
-                updateBootStatus();
-            }, 500);
-        }
-        
-        function updateBootStatus() {
-            const progressFill = document.getElementById('progressFill');
-            const bootStatus = document.getElementById('bootStatus');
-            
-            progressFill.style.width = bootProgress + '%';
-            
-            const statusMessages = [
-                '正在初始化系统...',
-                '加载系统文件...',
-                '配置硬件设备...',
-                '启动核心服务...',
-                '加载用户配置...',
-                '准备桌面环境...',
-                '系统启动完成！'
-            ];
-            
-            const statusIndex = Math.min(Math.floor(bootProgress / 15), statusMessages.length - 1);
-            bootStatus.textContent = statusMessages[statusIndex];
-        }
-        
-        function completeBoot() {
-            setTimeout(() => {
-                console.log('Boot completed, navigating to click-to-enter screen...');
-                window.location.href = 'click-to-enter.html';
-            }, 1000);
-        }
-        
-        function startNormalBoot() {
-            document.querySelector('.boot-options').style.display = 'none';
-            startBootProcess();
-        }
-        
-        function startSafeMode() {
-            globalState.isSafeMode = true;
-            setTimeout(() => {
-                window.location.href = 'safe-mode.html';
-            }, 500);
-        }
-        
-        // 系统初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeSystem();
-            
-            // 自动开始启动过程
-            setTimeout(() => {
-                startNormalBoot();
-            }, 1000);
-        });
-        
-        // 键盘快捷键
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                // 取消自动启动
+<script src="assets/scripts/utils.js"></script>
+<script>
+    let bootProgress = 0;
+    let bootInterval;
+
+    // 启动进度模拟
+    function startBootProcess() {
+        bootInterval = setInterval(() => {
+            bootProgress += Math.random() * 10;
+            if (bootProgress >= 100) {
+                bootProgress = 100;
                 clearInterval(bootInterval);
-                document.querySelector('.boot-options').style.display = 'flex';
+                completeBoot();
             }
-        });
-    </script>
+
+            updateBootStatus();
+        }, 500);
+    }
+
+    function updateBootStatus() {
+        const progressFill = document.getElementById('progressFill');
+        const bootStatus = document.getElementById('bootStatus');
+
+        progressFill.style.width = bootProgress + '%';
+
+        const statusMessages = [
+            '正在初始化系统...',
+            '加载系统文件...',
+            '配置硬件设备...',
+            '启动核心服务...',
+            '加载用户配置...',
+            '准备桌面环境...',
+            '系统启动完成！'
+        ];
+
+        const statusIndex = Math.min(Math.floor(bootProgress / 15), statusMessages.length - 1);
+        bootStatus.textContent = statusMessages[statusIndex];
+    }
+
+    function completeBoot() {
+        setTimeout(() => {
+            console.log('Boot completed, navigating to click-to-enter screen...');
+            window.location.href = 'click-to-enter.html';
+        }, 1000);
+    }
+
+    function startNormalBoot() {
+        document.querySelector('.boot-options').style.display = 'none';
+        startBootProcess();
+    }
+
+    function startSafeMode() {
+        globalState.isSafeMode = true;
+        setTimeout(() => {
+            window.location.href = 'safe-mode.html';
+        }, 500);
+    }
+
+    // 系统初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeSystem();
+
+        // 自动开始启动过程
+        setTimeout(() => {
+            startNormalBoot();
+        }, 1000);
+    });
+
+    // 键盘快捷键
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            // 取消自动启动
+            clearInterval(bootInterval);
+            document.querySelector('.boot-options').style.display = 'flex';
+        }
+    });
+</script>
 </body>
 </html>
