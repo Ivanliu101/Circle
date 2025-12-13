@@ -18,7 +18,7 @@
             cursor: pointer;
             user-select: none;
         }
-
+        
         .click-content {
             background: rgba(45, 0, 89, 0.9);
             border: 2px solid var(--primary-pink);
@@ -29,12 +29,12 @@
             transition: all 0.3s ease;
             min-width: 300px;
         }
-
+        
         .click-content:hover {
             transform: scale(1.05);
             box-shadow: 0 0 40px rgba(255, 105, 180, 0.8);
         }
-
+        
         .click-icon {
             width: 120px;
             height: 120px;
@@ -48,7 +48,7 @@
             box-shadow: var(--shadow-glow);
             position: relative;
         }
-
+        
         .click-icon::before {
             content: '';
             position: absolute;
@@ -61,14 +61,14 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
         }
-
+        
         .click-icon span {
             position: relative;
             z-index: 1;
             color: white;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
-
+        
         .click-title {
             font-size: 32px;
             font-weight: bold;
@@ -76,24 +76,24 @@
             margin-bottom: 15px;
             text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
         }
-
+        
         .click-subtitle {
             font-size: 18px;
             color: var(--text-secondary);
             margin-bottom: 20px;
         }
-
+        
         .click-hint {
             font-size: 14px;
             color: var(--primary-pink);
             animation: pulse 2s ease-in-out infinite;
         }
-
+        
         @keyframes pulse {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
         }
-
+        
         .system-info {
             position: absolute;
             bottom: 30px;
@@ -105,46 +105,46 @@
     </style>
 </head>
 <body onclick="enterDesktop()">
-<!-- 紫色动态线条 -->
-<div class="purple-line"></div>
-<div class="purple-line"></div>
-<div class="purple-line"></div>
-
-<div class="click-container">
-    <div class="click-content">
-        <div class="click-title">Circle OS</div>
-        <div class="click-subtitle">点击进入桌面</div>
+    <!-- 紫色动态线条 -->
+    <div class="purple-line"></div>
+    <div class="purple-line"></div>
+    <div class="purple-line"></div>
+    
+    <div class="click-container">
+        <div class="click-content">
+            <div class="click-title">Circle OS</div>
+            <div class="click-subtitle">点击进入桌面</div>
+        </div>
+        
+        <div class="system-info">
+            CircleOS v1.0 | 模块化操作系统
+        </div>
     </div>
 
-    <div class="system-info">
-        CircleOS v1.0 | 模块化操作系统
-    </div>
-</div>
-
-<script src="assets/scripts/utils.js"></script>
-<script>
-    function enterDesktop() {
-        showNotification('正在进入桌面...', 'success');
-
-        setTimeout(() => {
-            window.location.href = 'desktop.html';
-        }, 800);
-    }
-
-    // 系统初始化
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeSystem();
-        globalState.isLoggedIn = true;
-        globalState.currentUser = 'CircleOS User';
-    });
-
-    // 键盘支持
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            enterDesktop();
+    <script src="assets/scripts/utils.js"></script>
+    <script>
+        function enterDesktop() {
+            showNotification('正在进入桌面...', 'success');
+            
+            setTimeout(() => {
+                window.location.href = 'desktop.html';
+            }, 800);
         }
-    });
-</script>
+        
+        // 系统初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSystem();
+            globalState.isLoggedIn = true;
+            globalState.currentUser = 'CircleOS User';
+        });
+        
+        // 键盘支持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                enterDesktop();
+            }
+        });
+    </script>
 </body>
 </html>

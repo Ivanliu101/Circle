@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Circle OS - Beta 47 Verification</title>
-
+    
     <style>
         /* CSS Styles Start */
-
+        
         /* ----------------------- 
            1. Minimalist Theme Background 
            ----------------------- */
@@ -109,7 +109,7 @@
         .launch-time {
             font-size: 2em;
             font-weight: bold;
-            color: #FFFFFF;
+            color: #FFFFFF; 
             letter-spacing: 2px;
             padding: 5px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.5);
@@ -122,7 +122,7 @@
             font-size: 0.9em;
             color: rgba(255, 255, 255, 0.7);
         }
-
+        
         /* Beta badge */
         .beta-badge {
             position: absolute;
@@ -137,7 +137,7 @@
             letter-spacing: 1px;
             z-index: 2;
         }
-
+        
         /* Password modal */
         .password-modal {
             display: none;
@@ -151,7 +151,7 @@
             justify-content: center;
             align-items: center;
         }
-
+        
         .modal-content {
             background-color: #FFDDEE;
             padding: 40px;
@@ -160,13 +160,13 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             min-width: 300px;
         }
-
+        
         .modal-title {
             font-size: 2em;
             margin-bottom: 20px;
             color: #FFFFFF;
         }
-
+        
         .password-input {
             width: 100%;
             padding: 15px;
@@ -179,18 +179,18 @@
             margin-bottom: 20px;
             outline: none;
         }
-
+        
         .password-input:focus {
             border-color: rgba(167, 73, 199, 1);
             box-shadow: 0 0 15px rgba(167, 73, 199, 0.4);
         }
-
+        
         .modal-buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
         }
-
+        
         .modal-btn {
             padding: 12px 24px;
             border: none;
@@ -200,34 +200,34 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+        
         .btn-confirm {
             background-color: rgba(167, 73, 199, 0.8);
             color: white;
         }
-
+        
         .btn-confirm:hover {
             background-color: rgba(167, 73, 199, 1);
             transform: translateY(-2px);
         }
-
+        
         .btn-cancel {
             background-color: rgba(255, 255, 255, 0.3);
             color: white;
         }
-
+        
         .btn-cancel:hover {
             background-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-2px);
         }
-
+        
         .error-message {
             color: #ff4444;
             margin-top: 15px;
             font-size: 0.9em;
             display: none;
         }
-
+        
         /* Click hint */
         .click-hint {
             position: absolute;
@@ -238,7 +238,7 @@
             font-size: 0.8em;
             animation: pulse 2s infinite;
         }
-
+        
         @keyframes pulse {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
@@ -247,86 +247,86 @@
     </style>
 </head>
 <body onclick="showPasswordModal()">
-
-<div class="line-container">
-    <div class="moving-line" style="--rotation: 5deg;"></div>
-    <div class="moving-line" style="--rotation: -10deg;"></div>
-    <div class="moving-line" style="--rotation: 15deg;"></div>
-</div>
-
-<div class="message-box">
-
-    <div class="message-title">
-        CIRCLE OS
+    
+    <div class="line-container">
+        <div class="moving-line" style="--rotation: 5deg;"></div>
+        <div class="moving-line" style="--rotation: -10deg;"></div>
+        <div class="moving-line" style="--rotation: 15deg;"></div>
     </div>
 
-    <div class="message-status">
-        System final verification in progress.
-    </div>
+    <div class="message-box">
+        
+        <div class="message-title">
+            CIRCLE OS
+        </div>
+        
+        <div class="message-status">
+            System final verification in progress.
+        </div>
 
-    <p style="font-size: 1.1em;">
-        Estimated Launch Time:
-    </p>
-
-    <div class="launch-time">
-        2025.12.15 21:00 CST
-    </div>
-
-    <div class="note">
-        Welcome back. The new experience will be live at the scheduled time.
-    </div>
-
-</div>
-
-<div class="beta-badge">
-    BETA 47
-</div>
-
-<div class="click-hint">
-    Click anywhere to access Beta
-</div>
-
-<!-- Password Modal -->
-<div class="password-modal" id="passwordModal">
-    <div class="modal-content">
-        <div class="modal-title">Beta Access</div>
-        <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 20px;">
-            Enter access code to continue
+        <p style="font-size: 1.1em;">
+            Estimated Launch Time:
         </p>
-        <input type="password" class="password-input" id="passwordField" placeholder="Enter code..." maxlength="4">
-        <div class="error-message" id="errorMessage">
-            Invalid access code
+
+        <div class="launch-time">
+            2025.12.15 21:00 CST
         </div>
-        <div class="modal-buttons">
-            <button class="modal-btn btn-confirm" onclick="verifyPassword()">Confirm</button>
-            <button class="modal-btn btn-cancel" onclick="hidePasswordModal()">Cancel</button>
+        
+        <div class="note">
+            Welcome back. The new experience will be live at the scheduled time.
+        </div>
+
+    </div>
+    
+    <div class="beta-badge">
+        BETA 47
+    </div>
+    
+    <div class="click-hint">
+        Click anywhere to access Beta
+    </div>
+
+    <!-- Password Modal -->
+    <div class="password-modal" id="passwordModal">
+        <div class="modal-content">
+            <div class="modal-title">Beta Access</div>
+            <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 20px;">
+                Enter access code to continue
+            </p>
+            <input type="password" class="password-input" id="passwordField" placeholder="Enter code..." maxlength="4">
+            <div class="error-message" id="errorMessage">
+                Invalid access code
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-confirm" onclick="verifyPassword()">Confirm</button>
+                <button class="modal-btn btn-cancel" onclick="hidePasswordModal()">Cancel</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    function showPasswordModal() {
-        document.getElementById('passwordModal').style.display = 'flex';
-        document.getElementById('passwordField').focus();
-    }
-
-    function hidePasswordModal() {
-        document.getElementById('passwordModal').style.display = 'none';
-        document.getElementById('passwordField').value = '';
-        document.getElementById('errorMessage').style.display = 'none';
-    }
-
-    function verifyPassword() {
-        const password = document.getElementById('passwordField').value;
-        const errorMessage = document.getElementById('errorMessage');
-
-        if (password === '2030') {
-            // Correct password
-            errorMessage.style.display = 'none';
-
-            // Show success feedback
-            const modalContent = document.querySelector('.modal-content');
-            modalContent.innerHTML = `
+    <script>
+        function showPasswordModal() {
+            document.getElementById('passwordModal').style.display = 'flex';
+            document.getElementById('passwordField').focus();
+        }
+        
+        function hidePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordField').value = '';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+        
+        function verifyPassword() {
+            const password = document.getElementById('passwordField').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (password === '2030') {
+                // Correct password
+                errorMessage.style.display = 'none';
+                
+                // Show success feedback
+                const modalContent = document.querySelector('.modal-content');
+                modalContent.innerHTML = `
                     <div class="modal-title" style="color: #4CAF50;">Access Granted</div>
                     <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 20px;">
                         Welcome to CircleOS Beta
@@ -335,48 +335,48 @@
                         <button class="modal-btn btn-confirm" onclick="enterSystem()">Enter System</button>
                     </div>
                 `;
-
-            setTimeout(() => {
-                enterSystem();
-            }, 1500);
-        } else {
-            // Incorrect password
-            errorMessage.style.display = 'block';
-            document.getElementById('passwordField').value = '';
-
-            // Shake effect
-            const passwordField = document.getElementById('passwordField');
-            passwordField.style.animation = 'shake 0.5s ease-in-out';
-            setTimeout(() => {
-                passwordField.style.animation = '';
-            }, 500);
+                
+                setTimeout(() => {
+                    enterSystem();
+                }, 1500);
+            } else {
+                // Incorrect password
+                errorMessage.style.display = 'block';
+                document.getElementById('passwordField').value = '';
+                
+                // Shake effect
+                const passwordField = document.getElementById('passwordField');
+                passwordField.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    passwordField.style.animation = '';
+                }, 500);
+            }
         }
-    }
-
-    function enterSystem() {
-        // Navigate to boot screen
-        window.location.href = 'boot.html';
-    }
-
-    // Add shake animation
-    const style = document.createElement('style');
-    style.textContent = `
+        
+        function enterSystem() {
+            // Navigate to boot screen
+            window.location.href = 'boot.html';
+        }
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
             @keyframes shake {
                 0%, 100% { transform: translateX(0); }
                 25% { transform: translateX(-5px); }
                 75% { transform: translateX(5px); }
             }
         `;
-    document.head.appendChild(style);
-
-    // Keyboard support
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && document.getElementById('passwordModal').style.display === 'flex') {
-            verifyPassword();
-        } else if (e.key === 'Escape') {
-            hidePasswordModal();
-        }
-    });
-</script>
+        document.head.appendChild(style);
+        
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('passwordModal').style.display === 'flex') {
+                verifyPassword();
+            } else if (e.key === 'Escape') {
+                hidePasswordModal();
+            }
+        });
+    </script>
 </body>
 </html>

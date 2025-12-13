@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle OS - Beta 53</title>
+    
+    <style>
+        /* CSS Styles Start */
+        
+        /* ----------------------- 
+           1. Minimalist Theme Background 
+           ----------------------- */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #FFDDEE; /* Soft light pink background */
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            color: #FFFFFF; /* White text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* ----------------------- 
+           2. Dynamic Purple Line Effect 
+           ----------------------- */
+        .line-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* General style for a single line */
+        .moving-line {
+            position: absolute;
+            width: 100vw;
+            height: 2px; /* Thin line */
+            background-color: rgba(167, 73, 199, 0.6); /* Semi-transparent purple */
+            opacity: 0.8;
+            animation: lineMove 20s infinite linear alternate;
+        }
+
+        /* Different speeds and rotations for variety */
+        .moving-line:nth-child(1) {
+            top: 10%;
+            transform: rotate(5deg);
+            animation-duration: 25s;
+        }
+
+        .moving-line:nth-child(2) {
+            top: 50%;
+            transform: rotate(-10deg);
+            animation-duration: 18s;
+            animation-delay: -5s;
+        }
+
+        .moving-line:nth-child(3) {
+            top: 80%;
+            transform: rotate(15deg);
+            animation-duration: 30s;
+            animation-delay: -10s;
+        }
+
+        /* Line movement animation */
+        @keyframes lineMove {
+            0% { transform: translateX(-100vw) rotate(var(--rotation, 0deg)); }
+            100% { transform: translateX(100vw) rotate(var(--rotation, 0deg)); }
+        }
+
+
+        /* ----------------------- 
+           3. Central Content 
+           ----------------------- */
+        .content-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1; /* Ensure content is above lines */
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.1); /* Very slight background to help text stand out */
+            padding: 40px;
+            border-radius: 20px;
+            min-width: 400px;
+        }
+
+        .system-title {
+            font-size: 3em;
+            font-weight: 300; /* Light font weight for minimalist style */
+            margin-bottom: 10px;
+            color: #FFFFFF;
+        }
+
+        .system-subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .launch-time {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFFFFF; 
+            letter-spacing: 2px;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            margin: 20px 0;
+        }
+        
+        /* Beta badge */
+        .beta-badge {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background-color: rgba(167, 73, 199, 0.8);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .beta-badge:hover {
+            background-color: rgba(167, 73, 199, 1);
+            transform: scale(1.05);
+        }
+        
+        .note {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Beta notice modal */
+        .beta-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(45, 0, 89, 0.95);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            max-width: 400px;
+            border: 2px solid #FF69B4;
+            backdrop-filter: blur(10px);
+        }
+        
+        .beta-notice h3 {
+            margin-top: 0;
+            color: #FF69B4;
+            font-size: 24px;
+        }
+        
+        .beta-notice p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .beta-notice button {
+            background: linear-gradient(45deg, #FF69B4, #A749C7);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .beta-notice button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        
+        /* CSS Styles End */
+    </style>
+</head>
+<body>
+    
+    <div class="line-container">
+        <div class="moving-line" style="--rotation: 5deg;"></div>
+        <div class="moving-line" style="--rotation: -10deg;"></div>
+        <div class="moving-line" style="--rotation: 15deg;"></div>
+    </div>
+
+    <div class="content-container">
+        <div class="system-title">
+            CIRCLE OS
+        </div>
+        
+        <div class="system-subtitle">
+            System verification
+        </div>
+
+        <div class="launch-time">
+            2025.12.15 21:00 CST
+        </div>
+        
+        <div class="note">
+            Welcome back. The new experience will be live at the scheduled time.
+        </div>
+    </div>
+    
+    <div class="beta-badge" id="betaBadge">
+        BETA 55
+    </div>
+
+    <script>
+        // Show beta notice
+        function showBetaNotice() {
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            
+            const notice = document.createElement('div');
+            notice.className = 'beta-notice';
+            notice.innerHTML = `
+                <h3>Beta 版本提示</h3>
+                <p>您正在使用 CircleOS Beta 55 版本</p>
+                <p>如果您在使用过程中遇到任何问题，请联系 Ivan 进行反馈。</p>
+                <button onclick="enterSystem()">进入系统</button>
+            `;
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(notice);
+        }
+        
+        function enterSystem() {
+            // Remove beta notice
+            const overlay = document.querySelector('.overlay');
+            const notice = document.querySelector('.beta-notice');
+            if (overlay) overlay.remove();
+            if (notice) notice.remove();
+            
+            // Navigate to boot screen
+            window.location.href = 'boot.html';
+        }
+        
+        // Keyboard shortcut to enter system directly
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'd') {
+                enterSystem();
+            }
+        });
+    </script>
+</body>
+</html>
