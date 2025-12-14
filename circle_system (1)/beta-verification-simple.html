@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circle OS - Beta 53</title>
-    
+
     <style>
         /* CSS Styles Start */
-        
+
         /* ----------------------- 
            1. Minimalist Theme Background 
            ----------------------- */
@@ -108,14 +108,14 @@
         .launch-time {
             font-size: 1.5em;
             font-weight: bold;
-            color: #FFFFFF; 
+            color: #FFFFFF;
             letter-spacing: 2px;
             padding: 10px 0;
             border-top: 1px solid rgba(255, 255, 255, 0.5);
             border-bottom: 1px solid rgba(255, 255, 255, 0.5);
             margin: 20px 0;
         }
-        
+
         /* Beta badge */
         .beta-badge {
             position: absolute;
@@ -132,18 +132,18 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .beta-badge:hover {
             background-color: rgba(167, 73, 199, 1);
             transform: scale(1.05);
         }
-        
+
         .note {
             margin-top: 20px;
             font-size: 0.9em;
             color: rgba(255, 255, 255, 0.7);
         }
-        
+
         /* Beta notice modal */
         .beta-notice {
             position: fixed;
@@ -160,18 +160,18 @@
             border: 2px solid #FF69B4;
             backdrop-filter: blur(10px);
         }
-        
+
         .beta-notice h3 {
             margin-top: 0;
             color: #FF69B4;
             font-size: 24px;
         }
-        
+
         .beta-notice p {
             margin-bottom: 20px;
             line-height: 1.6;
         }
-        
+
         .beta-notice button {
             background: linear-gradient(45deg, #FF69B4, #A749C7);
             border: none;
@@ -182,12 +182,12 @@
             font-weight: bold;
             transition: all 0.3s ease;
         }
-        
+
         .beta-notice button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
         }
-        
+
         .overlay {
             position: fixed;
             top: 0;
@@ -197,76 +197,76 @@
             background: rgba(0, 0, 0, 0.7);
             z-index: 999;
         }
-        
+
         /* CSS Styles End */
     </style>
 </head>
 <body>
-    
-    <div class="line-container">
-        <div class="moving-line" style="--rotation: 5deg;"></div>
-        <div class="moving-line" style="--rotation: -10deg;"></div>
-        <div class="moving-line" style="--rotation: 15deg;"></div>
+
+<div class="line-container">
+    <div class="moving-line" style="--rotation: 5deg;"></div>
+    <div class="moving-line" style="--rotation: -10deg;"></div>
+    <div class="moving-line" style="--rotation: 15deg;"></div>
+</div>
+
+<div class="content-container">
+    <div class="system-title">
+        CIRCLE OS
     </div>
 
-    <div class="content-container">
-        <div class="system-title">
-            CIRCLE OS
-        </div>
-        
-        <div class="system-subtitle">
-            System verification
-        </div>
-
-        <div class="launch-time">
-            2025.12.15 21:00 CST
-        </div>
-        
-        <div class="note">
-            Welcome back. The new experience will be live at the scheduled time.
-        </div>
-    </div>
-    
-    <div class="beta-badge" id="betaBadge">
-        BETA 55
+    <div class="system-subtitle">
+        System verification
     </div>
 
-    <script>
-        // Show beta notice
-        function showBetaNotice() {
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            
-            const notice = document.createElement('div');
-            notice.className = 'beta-notice';
-            notice.innerHTML = `
+    <div class="launch-time">
+        2025.12.15 21:00 CST
+    </div>
+
+    <div class="note">
+        Welcome back. The new experience will be live at the scheduled time.
+    </div>
+</div>
+
+<div class="beta-badge" id="betaBadge">
+    BETA 57
+</div>
+
+<script>
+    // Show beta notice
+    function showBetaNotice() {
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+
+        const notice = document.createElement('div');
+        notice.className = 'beta-notice';
+        notice.innerHTML = `
                 <h3>Beta 版本提示</h3>
                 <p>您正在使用 CircleOS Beta 55 版本</p>
                 <p>如果您在使用过程中遇到任何问题，请联系 Ivan 进行反馈。</p>
                 <button onclick="enterSystem()">进入系统</button>
             `;
-            
-            document.body.appendChild(overlay);
-            document.body.appendChild(notice);
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(notice);
+    }
+
+    function enterSystem() {
+        // Remove beta notice
+        const overlay = document.querySelector('.overlay');
+        const notice = document.querySelector('.beta-notice');
+        if (overlay) overlay.remove();
+        if (notice) notice.remove();
+
+        // Navigate to boot screen
+        window.location.href = 'boot.html';
+    }
+
+    // Keyboard shortcut to enter system directly
+    document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'd') {
+            enterSystem();
         }
-        
-        function enterSystem() {
-            // Remove beta notice
-            const overlay = document.querySelector('.overlay');
-            const notice = document.querySelector('.beta-notice');
-            if (overlay) overlay.remove();
-            if (notice) notice.remove();
-            
-            // Navigate to boot screen
-            window.location.href = 'boot.html';
-        }
-        
-        // Keyboard shortcut to enter system directly
-        document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 'd') {
-                enterSystem();
-            }
-        });
-    </script>
+    });
+</script>
 </body>
 </html>

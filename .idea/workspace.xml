@@ -4,24 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37ff70d3-b094-4c9b-9e7a-cfcdec2410d9" name="Changes" comment="v2 Beta-53.1&#10;We redo it&#10;but stall have a lot of error">
-      <change beforePath="$PROJECT_DIR$/.idea/Circle.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/animations.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beta-verification-simple.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/beta-verification.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/boot.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/click-to-enter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/css.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/desktop.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lock-screen.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/safe-mode.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/safe_mode.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/update.html" beforeDir="false" />
+    <list default="true" id="37ff70d3-b094-4c9b-9e7a-cfcdec2410d9" name="Changes" comment="v2 Beta-56.5&#10;We redo it&#10;but stall have a lot of error">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/circle_system (1)/apps/app-update-checker.html" beforeDir="false" afterPath="$PROJECT_DIR$/circle_system (1)/apps/app-update-checker.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/circle_system (1)/beta-verification-simple.html" beforeDir="false" afterPath="$PROJECT_DIR$/circle_system (1)/beta-verification-simple.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/circle_system (1)/boot.html" beforeDir="false" afterPath="$PROJECT_DIR$/circle_system (1)/boot.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/circle_system (1)/lock-screen.html" beforeDir="false" afterPath="$PROJECT_DIR$/circle_system (1)/lock-screen.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/circle_system (1)/update.html" beforeDir="false" afterPath="$PROJECT_DIR$/circle_system (1)/update.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,24 +47,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "JavaScript Debug.beta-verification-simple.html.executor": "Run",
-    "JavaScript Debug.beta-verification.html.executor": "Debug",
-    "JavaScript Debug.index.html.executor": "Debug",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JavaScript Debug.beta-verification-simple.html.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.beta-verification.html.executor&quot;: &quot;Debug&quot;,
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Debug&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -93,7 +82,7 @@
       <workItem from="1765446699198" duration="17721000" />
       <workItem from="1765499520280" duration="800000" />
       <workItem from="1765554532798" duration="597000" />
-      <workItem from="1765594463359" duration="2800000" />
+      <workItem from="1765594463359" duration="6344000" />
     </task>
     <task id="LOCAL-00001" summary="First setup">
       <option name="closed" value="true" />
@@ -215,7 +204,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765598200455</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="v2 Beta-56&#10;We redo it&#10;but stall have a lot of error">
+      <option name="closed" value="true" />
+      <created>1765599854565</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1765599854565</updated>
+    </task>
+    <task id="LOCAL-00017" summary="v2 Beta-56.5&#10;We redo it&#10;but stall have a lot of error">
+      <option name="closed" value="true" />
+      <created>1765599867076</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1765599867076</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -237,6 +242,8 @@
     <MESSAGE value="v2 Beta-53&#10;We redo it" />
     <MESSAGE value="v2 Beta-53&#10;We redo it&#10;but stall have a lot of error" />
     <MESSAGE value="v2 Beta-53.1&#10;We redo it&#10;but stall have a lot of error" />
-    <option name="LAST_COMMIT_MESSAGE" value="v2 Beta-53.1&#10;We redo it&#10;but stall have a lot of error" />
+    <MESSAGE value="v2 Beta-56&#10;We redo it&#10;but stall have a lot of error" />
+    <MESSAGE value="v2 Beta-56.5&#10;We redo it&#10;but stall have a lot of error" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2 Beta-56.5&#10;We redo it&#10;but stall have a lot of error" />
   </component>
 </project>

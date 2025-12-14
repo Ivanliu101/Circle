@@ -160,111 +160,111 @@
     </style>
 </head>
 <body>
-    
-    <div class="line-container">
-        <div class="moving-line" style="--rotation: 5deg;"></div>
-        <div class="moving-line" style="--rotation: -10deg;"></div>
-        <div class="moving-line" style="--rotation: 15deg;"></div>
-    </div>
 
-    <div class="lock-screen-container">
-        <div class="lock-icon">🔒</div>
-        
-        <div class="lock-title">系统已锁定</div>
-        <div class="lock-subtitle">请输入密码解锁系统</div>
+<div class="line-container">
+    <div class="moving-line" style="--rotation: 5deg;"></div>
+    <div class="moving-line" style="--rotation: -10deg;"></div>
+    <div class="moving-line" style="--rotation: 15deg;"></div>
+</div>
 
-        <div class="lock-time" id="lockTime">00:00</div>
-        <div class="lock-date" id="lockDate">2025年12月13日</div>
+<div class="lock-screen-container">
+    <div class="lock-icon">🔒</div>
 
-        <div class="unlock-section">
-            <label class="password-label" for="unlockPassword">输入密码</label>
-            <input type="password" class="password-input" id="unlockPassword" placeholder="输入密码..." maxlength="4" autofocus>
-            <div class="error-message" id="unlockError">
-                密码错误
-            </div>
+    <div class="lock-title">系统已锁定</div>
+    <div class="lock-subtitle">请输入密码解锁系统</div>
+
+    <div class="lock-time" id="lockTime">00:00</div>
+    <div class="lock-date" id="lockDate">2025年12月13日</div>
+
+    <div class="unlock-section">
+        <label class="password-label" for="unlockPassword">输入密码</label>
+        <input type="password" class="password-input" id="unlockPassword" placeholder="输入密码..." maxlength="4" autofocus>
+        <div class="error-message" id="unlockError">
+            密码错误
         </div>
     </div>
-    
-    <div class="beta-badge">
-        BETA 55
-    </div>
+</div>
 
-    <script>
-        function updateDateTime() {
-            const now = new Date();
-            
-            // 更新时间
-            const timeString = now.toLocaleTimeString('zh-CN', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            document.getElementById('lockTime').textContent = timeString;
-            
-            // 更新日期
-            const dateString = now.toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('lockDate').textContent = dateString;
+<div class="beta-badge">
+    BETA 57
+</div>
+
+<script>
+    function updateDateTime() {
+        const now = new Date();
+
+        // 更新时间
+        const timeString = now.toLocaleTimeString('zh-CN', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('lockTime').textContent = timeString;
+
+        // 更新日期
+        const dateString = now.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        document.getElementById('lockDate').textContent = dateString;
+    }
+
+    function unlockSystem() {
+        const password = document.getElementById('unlockPassword').value;
+        const errorMessage = document.getElementById('unlockError');
+
+        if (password === '2030') {
+            // 正确密码
+            errorMessage.style.display = 'none';
+
+            // 返回桌面
+            window.location.href = 'desktop.html';
+        } else if (password.length === 4) {
+            // 错误密码
+            errorMessage.style.display = 'block';
+            document.getElementById('unlockPassword').value = '';
+
+            // 震动效果
+            const passwordField = document.getElementById('unlockPassword');
+            passwordField.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                passwordField.style.animation = '';
+            }, 500);
         }
-        
-        function unlockSystem() {
-            const password = document.getElementById('unlockPassword').value;
-            const errorMessage = document.getElementById('unlockError');
-            
-            if (password === '2030') {
-                // 正确密码
-                errorMessage.style.display = 'none';
-                
-                // 返回桌面
-                window.location.href = 'desktop.html';
-            } else if (password.length === 4) {
-                // 错误密码
-                errorMessage.style.display = 'block';
-                document.getElementById('unlockPassword').value = '';
-                
-                // 震动效果
-                const passwordField = document.getElementById('unlockPassword');
-                passwordField.style.animation = 'shake 0.5s ease-in-out';
-                setTimeout(() => {
-                    passwordField.style.animation = '';
-                }, 500);
-            }
-        }
-        
-        // 添加震动动画
-        const style = document.createElement('style');
-        style.textContent = `
+    }
+
+    // 添加震动动画
+    const style = document.createElement('style');
+    style.textContent = `
             @keyframes shake {
                 0%, 100% { transform: translateX(0); }
                 25% { transform: translateX(-5px); }
                 75% { transform: translateX(5px); }
             }
         `;
-        document.head.appendChild(style);
-        
-        // 自动验证当输入4位数字时
-        document.getElementById('unlockPassword').addEventListener('input', function(e) {
-            if (e.target.value.length === 4) {
-                unlockSystem();
-            } else {
-                document.getElementById('unlockError').style.display = 'none';
-            }
-        });
-        
-        // 键盘支持
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                unlockSystem();
-            }
-        });
-        
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-        });
-    </script>
+    document.head.appendChild(style);
+
+    // 自动验证当输入4位数字时
+    document.getElementById('unlockPassword').addEventListener('input', function(e) {
+        if (e.target.value.length === 4) {
+            unlockSystem();
+        } else {
+            document.getElementById('unlockError').style.display = 'none';
+        }
+    });
+
+    // 键盘支持
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            unlockSystem();
+        }
+    });
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    });
+</script>
 </body>
 </html>

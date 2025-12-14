@@ -9,69 +9,69 @@
             padding: 20px;
             text-align: center;
         }
-        
+
         .update-header {
             margin-bottom: 30px;
         }
-        
+
         .update-title {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
             color: var(--text-primary);
         }
-        
+
         .update-subtitle {
             font-size: 16px;
             color: var(--text-secondary);
         }
-        
+
         .version-info {
             background: rgba(255, 255, 255, 0.1);
             padding: 30px;
             border-radius: 15px;
             margin-bottom: 30px;
         }
-        
+
         .current-version {
             font-size: 18px;
             margin-bottom: 10px;
             color: var(--text-primary);
         }
-        
+
         .version-number {
             font-size: 36px;
             font-weight: bold;
             color: var(--primary-pink);
             margin-bottom: 20px;
         }
-        
+
         .update-status {
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
             font-size: 16px;
         }
-        
+
         .status-up-to-date {
             background: rgba(76, 175, 80, 0.2);
             color: #4CAF50;
             border: 2px solid #4CAF50;
         }
-        
+
         .status-available {
             background: rgba(255, 152, 0, 0.2);
             color: #FF9800;
             border: 2px solid #FF9800;
         }
-        
+
         .update-actions {
             display: flex;
             gap: 15px;
             justify-content: center;
             margin-bottom: 30px;
         }
-        
+
         .update-btn {
             padding: 12px 24px;
             border: none;
@@ -81,45 +81,45 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .btn-check {
             background: linear-gradient(45deg, var(--primary-pink), var(--primary-purple));
             color: white;
         }
-        
+
         .btn-check:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
         }
-        
+
         .btn-update {
             background: #4CAF50;
             color: white;
         }
-        
+
         .btn-update:hover {
             background: #45a049;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
         }
-        
+
         .btn-cancel {
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
             border: 2px solid var(--text-primary);
         }
-        
+
         .btn-cancel:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
         }
-        
+
         .update-info {
             font-size: 14px;
             color: var(--text-secondary);
             line-height: 1.6;
         }
-        
+
         .loading-spinner {
             display: none;
             margin: 20px auto;
@@ -130,7 +130,7 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -138,89 +138,89 @@
     </style>
 </head>
 <body>
-    <div class="update-checker">
-        <div class="update-header">
-            <div class="update-title">系统更新</div>
-            <div class="update-subtitle">检查并安装最新的系统更新</div>
-        </div>
-        
-        <div class="version-info">
-            <div class="current-version">当前系统版本</div>
-            <div class="version-number">Beta 55</div>
-        </div>
-        
-        <div class="update-status status-up-to-date" id="updateStatus">
-            <i class="fa fa-check-circle" style="margin-right: 10px;"></i>
-            <span>您的系统已是最新版本</span>
-        </div>
-        
-        <div class="update-actions">
-            <button class="update-btn btn-check" onclick="checkForUpdates()">
-                <i class="fa fa-refresh" style="margin-right: 8px;"></i>
-                检查更新
-            </button>
-            <button class="update-btn btn-update" id="updateButton" onclick="startUpdate()" style="display: none;">
-                <i class="fa fa-download" style="margin-right: 8px;"></i>
-                立即更新
-            </button>
-        </div>
-        
-        <div class="loading-spinner" id="loadingSpinner"></div>
-        
-        <div class="update-info">
-            <p>定期检查更新可以确保您的系统获得最新的功能和安全修复。</p>
-            <p>当前版本：Beta 49 | 发布日期：2025.12.13</p>
-        </div>
+<div class="update-checker">
+    <div class="update-header">
+        <div class="update-title">系统更新</div>
+        <div class="update-subtitle">检查并安装最新的系统更新</div>
     </div>
 
-    <script>
-        let updateAvailable = false;
-        
-        function checkForUpdates() {
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const updateStatus = document.getElementById('updateStatus');
-            const updateButton = document.getElementById('updateButton');
-            
-            // 显示加载动画
-            loadingSpinner.style.display = 'block';
-            
-            // 模拟检查更新过程
-            setTimeout(() => {
-                loadingSpinner.style.display = 'none';
-                
-                // 在Beta版本中，我们总是显示已是最新版本
-                updateAvailable = false;
-                
-                if (updateAvailable) {
-                    updateStatus.className = 'update-status status-available';
-                    updateStatus.innerHTML = `
+    <div class="version-info">
+        <div class="current-version">当前系统版本</div>
+        <div class="version-number">Beta 57</div>
+    </div>
+
+    <div class="update-status status-up-to-date" id="updateStatus">
+        <i class="fa fa-check-circle" style="margin-right: 10px;"></i>
+        <span>您的系统已是最新版本</span>
+    </div>
+
+    <div class="update-actions">
+        <button class="update-btn btn-check" onclick="checkForUpdates()">
+            <i class="fa fa-refresh" style="margin-right: 8px;"></i>
+            检查更新
+        </button>
+        <button class="update-btn btn-update" id="updateButton" onclick="startUpdate()" style="display: none;">
+            <i class="fa fa-download" style="margin-right: 8px;"></i>
+            立即更新
+        </button>
+    </div>
+
+    <div class="loading-spinner" id="loadingSpinner"></div>
+
+    <div class="update-info">
+        <p>定期检查更新可以确保您的系统获得最新的功能和安全修复。</p>
+        <p>当前版本：Beta 49 | 发布日期：2025.12.13</p>
+    </div>
+</div>
+
+<script>
+    let updateAvailable = false;
+
+    function checkForUpdates() {
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const updateStatus = document.getElementById('updateStatus');
+        const updateButton = document.getElementById('updateButton');
+
+        // 显示加载动画
+        loadingSpinner.style.display = 'block';
+
+        // 模拟检查更新过程
+        setTimeout(() => {
+            loadingSpinner.style.display = 'none';
+
+            // 在Beta版本中，我们总是显示已是最新版本
+            updateAvailable = false;
+
+            if (updateAvailable) {
+                updateStatus.className = 'update-status status-available';
+                updateStatus.innerHTML = `
                         <i class="fa fa-exclamation-circle" style="margin-right: 10px;"></i>
                         <span>发现新版本 Beta 50</span>
                     `;
-                    updateButton.style.display = 'inline-block';
-                } else {
-                    updateStatus.className = 'update-status status-up-to-date';
-                    updateStatus.innerHTML = `
+                updateButton.style.display = 'inline-block';
+            } else {
+                updateStatus.className = 'update-status status-up-to-date';
+                updateStatus.innerHTML = `
                         <i class="fa fa-check-circle" style="margin-right: 10px;"></i>
                         <span>您的系统已是最新版本</span>
                     `;
-                    updateButton.style.display = 'none';
-                }
-                
-                showNotification(updateAvailable ? '发现新版本！' : '未发现更新', updateAvailable ? 'info' : 'success');
-            }, 2000);
-        }
-        
-        function startUpdate() {
-            if (updateAvailable) {
-                window.location.href = '../update.html';
+                updateButton.style.display = 'none';
             }
+
+            showNotification(updateAvailable ? '发现新版本！' : '未发现更新', updateAvailable ? 'info' : 'success');
+        }, 2000);
+    }
+
+    function startUpdate() {
+        if (updateAvailable) {
+            window.location.href = '../update.html';
         }
-        
-        // 页面加载时自动检查一次更新
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(checkForUpdates, 1000);
-        });
-    </script>
+    }
+
+    // 页面加载时自动检查一次更新
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(checkForUpdates, 1000);
+    });
+</script>
 </body>
 </html>
